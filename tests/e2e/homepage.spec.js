@@ -7,7 +7,14 @@
 * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
 */
 import { test, expect } from './fixtures.js';
-import { configureBrowser, HOME_PATH, mockStacResource, recordRequestHeaders } from './helpers.js';
+import {
+  configureBrowser,
+  hasQuery,
+  HOME_PATH,
+  mockStacResource,
+  recordRequestHeaders,
+  requireAuth,
+} from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 import fs from 'fs';
@@ -102,6 +109,20 @@ test.describe('STAC Browser Data Source Selection', () => {
   });
 
   test('a stored RTL locale sets direction before the application mounts', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__directionAtMount = null;
+      const observer = new MutationObserver(() => {
+        if (document.querySelector('[data-v-app]')) {
+          window.__directionAtMount = document.documentElement.dir;
+          observer.disconnect();
+        }
+      });
+      observer.observe(document, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      });
+    });
     await configureBrowser(page, {
       detectLocaleFromBrowser: false,
       storeLocale: true,
@@ -111,26 +132,9 @@ test.describe('STAC Browser Data Source Selection', () => {
     });
     await page.addInitScript(() => window.localStorage.setItem('locale', 'ar'));
 
-    let releaseMessages;
-    const messagesReleased = new Promise(resolve => {
-      releaseMessages = resolve;
-    });
-    let messagesBlocked;
-    const blockedMessages = new Promise(resolve => {
-      messagesBlocked = resolve;
-    });
-    await page.route('**/src/locales/en/default.js*', async route => {
-      messagesBlocked();
-      await messagesReleased;
-      await route.continue();
-    });
-
-    await page.goto(HOME_PATH, { waitUntil: 'commit' });
-    await blockedMessages;
+    await page.goto(HOME_PATH);
+    await expect.poll(() => page.evaluate(() => window.__directionAtMount)).toBe('rtl');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-    await expect(page.locator('#stac-browser')).toHaveCount(0);
-
-    releaseMessages();
     await expect(page.locator('#stac-browser')).toBeVisible();
   });
 
@@ -281,7 +285,10 @@ test.describe('STAC Browser Data Source Selection', () => {
     await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
     await expect(page).toHaveURL(/\/ar\/localized\/arabic-child\.json\?\.language=ar$/);
 
-    await page.reload();
+    // A direct reload must establish localized-root trust before decoding the
+    // route again, otherwise local request query parameters are dropped.
+    await requireAuth(worker, arabicChildUrl, hasQuery('token', 'localized-route-token'));
+    await page.goto(`${arabicChild.getBrowserPath()}?token=localized-route-token&.language=ar`);
     await expect(page.getByRole('heading', { name: 'عنصر عربي مضبوط' })).toBeVisible();
     await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
 
@@ -290,24 +297,79 @@ test.describe('STAC Browser Data Source Selection', () => {
     await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
 
     // A user switch must wait for an alternate root already being prefetched.
-    const rootAfterConcurrentSwitch = await page.evaluate(async ({ englishUrl, arabicUrl }) => {
+    const rootAfterConcurrentSwitch = await page.evaluate(async ({ englishRootUrl, arabicRootUrl }) => {
       const store = document.querySelector('[data-v-app]')
         ?.__vue_app__?.config?.globalProperties?.$store;
-      store.commit('catalogRootUrl', englishUrl);
-      store.commit('clear', arabicUrl);
+      store.commit('catalogRootUrl', englishRootUrl);
+      store.commit('clear', arabicRootUrl);
       const backgroundLoad = store.dispatch('load', {
-        url: arabicUrl,
+        url: arabicRootUrl,
         isRoot: true,
         omitApi: true
       });
-      while (store.state.database[arabicUrl]?.constructor?.name !== 'Loading') {
-        await new Promise(resolve => setTimeout(resolve, 0));
-      }
+      await new Promise(resolve => {
+        const waitForLoading = () => {
+          if (store.state.database[arabicRootUrl]?.promise) {
+            resolve();
+          }
+          else {
+            setTimeout(waitForLoading, 0);
+          }
+        };
+        waitForLoading();
+      });
       await store.dispatch('switchCatalogRootLocale', { locale: 'ar' });
       await backgroundLoad;
       return store.state.catalogRootUrl;
-    }, { englishUrl, arabicUrl });
+    }, { englishRootUrl: englishUrl, arabicRootUrl: arabicUrl });
     expect(rootAfterConcurrentSwitch).toBe(arabicUrl);
+
+    // A newer no-link locale request must release the navigation flag owned
+    // by a stale alternate-root load so later state can still reach the URL.
+    await mockStacResource(worker, englishUrl, englishCatalog.root.build(), { delay: 500 });
+    const navigationState = await page.evaluate(async ({ englishRootUrl }) => {
+      const app = document.querySelector('[data-v-app]')?.__vue_app__;
+      const browser = app?._instance?.proxy;
+      const store = app?.config?.globalProperties?.$store;
+      store.commit('clear', englishRootUrl);
+      store.commit('languages', { dataLanguage: 'en', navigateData: true });
+
+      await new Promise(resolve => {
+        const waitForNavigation = () => {
+          if (browser.isNavigatingLocale && store.state.database[englishRootUrl]?.promise) {
+            resolve();
+          }
+          else {
+            setTimeout(waitForNavigation, 0);
+          }
+        };
+        waitForNavigation();
+      });
+
+      const localizedRootLoad = store.state.database[englishRootUrl].promise;
+      store.commit('languages', { dataLanguage: 'ar', navigateData: true });
+      await new Promise(resolve => {
+        setTimeout(resolve, 0);
+      });
+      const clearedByLatestNavigation = !browser.isNavigatingLocale;
+
+      await localizedRootLoad;
+      await new Promise(resolve => {
+        setTimeout(resolve, 0);
+      });
+      const remainsClearedAfterStaleLoad = !browser.isNavigatingLocale;
+
+      store.commit('updateState', { type: 'searchtype', value: 'navigation-resumed' });
+      return { clearedByLatestNavigation, remainsClearedAfterStaleLoad };
+    }, { englishRootUrl: englishUrl });
+    expect(navigationState).toEqual({
+      clearedByLatestNavigation: true,
+      remainsClearedAfterStaleLoad: true,
+    });
+    await expect(page).toHaveURL(/\.searchtype=navigation-resumed/);
+
+    await page.goto('/external/untrusted.example/catalog.json?.language=ar');
+    await expect(page.getByRole('alert')).toContainText('الوصول إلى الكتالوجات الخارجية غير مسموح');
   });
 
   test('a language-conformant API does not reload after synchronizing its data language', async ({ page, worker }) => {

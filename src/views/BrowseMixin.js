@@ -1,10 +1,7 @@
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
 import { getErrorCode, getErrorMessage } from '../store/utils';
-import { URI } from 'stac-js/src/utils.js';
 import { mapState, mapGetters } from 'vuex';
-
-const isExternalPath = path => URI(path || '/').is("absolute");
 
 export default {
   components: {
@@ -19,7 +16,7 @@ export default {
   },
   computed: {
     ...mapState(["allowExternalAccess", "catalogUrl", "loading", "locale", "url"]),
-    ...mapGetters(["fromBrowserPath", "error", "isLocalizedCatalogUrl"]),
+    ...mapGetters(["fromBrowserPath", "error", "isExternalUrl", "isLocalizedCatalogUrl"]),
     errorId() {
       return getErrorCode(this.error);
     },
@@ -27,7 +24,8 @@ export default {
       return getErrorMessage(this.error);
     },
     isExternal() {
-      return isExternalPath(this.path);
+      const url = this.fromBrowserPath(this.path || '/');
+      return this.isExternalUrl(url, false);
     }
   },
   watch: {
@@ -49,16 +47,20 @@ export default {
       // and the query parameters for the request are set in the store.
       // https://github.com/radiantearth/stac-browser/issues/822#issuecomment-4068820575
       await this.$router.isReady();
-      const url = this.fromBrowserPath(path || '/');
+      let url = this.fromBrowserPath(path || '/');
 
-      // Locale alternates advertised by the configured catalog remain trusted
-      // even when arbitrary external access is disabled. Establish that root
-      // context before deciding whether an encoded external path is allowed.
-      if (!this.allowExternalAccess && isExternalPath(path)) {
+      // Establish localized-root trust before loading an encoded external path.
+      // Arbitrary external URLs remain blocked when external access is disabled.
+      if (this.isExternalUrl(url, false)) {
         if (!this.isLocalizedCatalogUrl(url)) {
           await this.$store.dispatch('switchCatalogRootLocale', { locale: this.locale });
         }
-        if (!this.isLocalizedCatalogUrl(url)) {
+        if (this.isLocalizedCatalogUrl(url)) {
+          // The first decode happened before the localized root was trusted,
+          // so decode again to attach route-local request parameters.
+          url = this.fromBrowserPath(path || '/');
+        }
+        else if (!this.allowExternalAccess) {
           return;
         }
       }
