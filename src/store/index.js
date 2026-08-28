@@ -495,6 +495,9 @@ function getStore(config, router) {
         if (!(absoluteUrl instanceof urijs)) {
           absoluteUrl = URI(absoluteUrl);
         }
+        if (absoluteUrl.is("relative")) {
+          return false;
+        }
         const relative = absoluteUrl.relativeTo(state.catalogRootUrl);
         if (relative.equals(absoluteUrl)) {
           return false;
@@ -1109,7 +1112,8 @@ function getStore(config, router) {
           // Keep catalogUrl stable as the browser-path base. The localized root
           // is loaded separately for the header, breadcrumbs, and root metadata.
           const localeLink = stac.getLocaleLink(dataLanguage);
-          if (localeLink) {
+          const localeUrl = localeLink?.getAbsoluteUrl();
+          if (localeUrl && !Utils.equalUrl(localeUrl, url)) {
             await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
             const browserPath = cx.getters.toBrowserPath(localeLink);
             if (browserPath.startsWith('/')) {
@@ -1182,11 +1186,10 @@ function getStore(config, router) {
             }
           }
           if (catalogUrl && !Utils.equalUrl(url, catalogUrl)) {
-            await cx.dispatch('load', {
-              url: catalogUrl,
-              isRoot: true,
-              omitApi: Boolean(entityMatchesRequestedLanguage)
-            });
+            // todo: In principle we could set omitApi: true in many cases here,
+            // but until we can reliably load the API data on demand, we fully load it.
+            // https://github.com/radiantearth/stac-browser/issues/796
+            await cx.dispatch('load', { url: catalogUrl, isRoot: true });
           }
         }
 
