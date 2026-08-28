@@ -17,7 +17,7 @@
 */
 import { test, expect } from './fixtures.js';
 import StaticCatalog from '../fixtures/instances/static.js';
-import { waitForBrowserReady, openSourcePanel } from './helpers.js';
+import { configureBrowser, waitForBrowserReady, openSourcePanel } from './helpers.js';
 
 // ---------------------------------------------------------------------------
 // Validate button presence
@@ -92,5 +92,35 @@ test.describe('Validation - catalog', () => {
     const cards = page.locator('.results .card');
     const cardCount = await cards.count();
     expect(cardCount).toBeGreaterThan(0);
+  });
+
+  test('keeps the store locale separate from the validation localizer', async ({ page, worker }) => {
+    await catalog.createServer(worker);
+    await configureBrowser(page, {
+      detectLocaleFromBrowser: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+    const warnings = [];
+    page.on('console', message => {
+      if (message.type() === 'warning') {
+        warnings.push(message.text());
+      }
+    });
+
+    await page.goto(`/validation${catalog.root.getBrowserPath()}?.language=ar`);
+    const validation = page.locator('main.validation');
+    await expect(validation).toBeVisible();
+    await expect.poll(() => validation.evaluate(element => {
+      const component = element.__vueParentComponent?.proxy;
+      return {
+        locale: component?.locale,
+        validationLocaleType: typeof component?.validationLocale,
+      };
+    })).toEqual({ locale: 'ar', validationLocaleType: 'function' });
+    expect(warnings.some(warning =>
+      warning.includes('Computed property "locale" is already defined in Data')
+    )).toBe(false);
   });
 });

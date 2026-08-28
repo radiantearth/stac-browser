@@ -261,6 +261,7 @@ test.describe('STAC Browser Data Source Selection', () => {
       language: { code: 'ar', name: 'العربية', dir: 'rtl' },
       languages: [{ code: 'en', name: 'English' }],
     });
+    arabicCatalog.root.updateLink('child', { href: './localized/arabic-child.json' });
     englishChild
       .addExtensions([languageExtension])
       .addLink({ rel: 'alternate', href: arabicChildUrl, type: 'application/json', hreflang: 'ar' });
@@ -275,6 +276,7 @@ test.describe('STAC Browser Data Source Selection', () => {
     await page.goto(`${HOME_PATH}?.language=ar`);
     await expect(page.getByRole('heading', { name: 'كتالوج عربي مضبوط' })).toBeVisible();
     await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+    await expect(page.getByRole('link', { name: 'عنصر عربي مضبوط' })).toBeVisible();
     await expect(page).toHaveURL(/\/ar\/catalog\.json\?\.language=ar$/);
 
     await page.goto('/children/child.json?.language=en');
@@ -401,6 +403,67 @@ test.describe('STAC Browser Data Source Selection', () => {
     await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
     await expect.poll(() => requests.length).toBe(2);
+  });
+
+  test('a self-referential locale alternate does not block rendering', async ({ page, worker }) => {
+    const rootUrl = 'https://stac.example/self/catalog.json';
+    const catalog = new StaticCatalog({ url: rootUrl }).setMetadata({
+      title: 'Self-referential Catalog',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    catalog.root.addLink({
+      rel: 'alternate',
+      href: rootUrl,
+      type: 'application/json',
+      hreflang: 'en',
+    });
+    await catalog.createServer(worker);
+    await configureBrowser(page, {
+      catalogUrl: rootUrl,
+      detectLocaleFromBrowser: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto('/?.language=en');
+    await expect(page.getByRole('heading', { name: 'Self-referential Catalog' })).toBeVisible();
+    const state = await page.evaluate(() => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return {
+        loading: store.state.loading,
+        title: store.state.data?.title,
+      };
+    });
+    expect(state).toEqual({ loading: false, title: 'Self-referential Catalog' });
+  });
+
+  test('a localized direct API item entry still loads root collections', async ({ page, worker }) => {
+    const apiUrl = 'https://stac.example/localized-api/';
+    const api = API.defaultApi({ url: apiUrl });
+    const collection = api.addCollection('localized').setMetadata({ title: 'Localized Collection' });
+    const item = api.addItem(collection, 'arabic-item').setMetadata({
+      title: 'Arabic Item',
+      language: { code: 'ar', name: 'Arabic', dir: 'rtl' },
+    });
+    await api.createServer(worker);
+    await configureBrowser(page, {
+      catalogUrl: apiUrl,
+      detectLocaleFromBrowser: false,
+      locale: 'ar',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto(`${item.getBrowserPath()}?.language=ar`);
+    await expect(page.getByRole('heading', { name: 'Arabic Item' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return store.getters.getApiChildren(store.getters.root).list.length;
+    })).toBe(1);
   });
 
   test('should render catalog URL input with proper elements', async ({ page }) => {
