@@ -277,63 +277,66 @@ export default defineComponent({
     ...Watchers,
     dataLanguageNavigation: {
       async handler(request) {
+        const navigationId = ++this.localeNavigationId;
+        this.isNavigatingLocale = false;
         const locale = request?.locale;
         if (!locale) {
           return;
         }
-        const navigationId = ++this.localeNavigationId;
-        if (this.data instanceof STAC) {
-          const link = this.data.getLocaleLink(locale);
-          if (link) {
-            const state = Object.assign({}, this.stateQueryParameters);
-            const previousCatalogRootUrl = this.catalogRootUrl;
-            this.isNavigatingLocale = true;
-            try {
-              const catalogRootUrl = await this.$store.dispatch('switchCatalogRootLocale', {
-                locale,
-                commit: false
-              });
-              if (navigationId !== this.localeNavigationId) {
-                return;
+        try {
+          if (this.data instanceof STAC) {
+            const link = this.data.getLocaleLink(locale);
+            if (link) {
+              this.isNavigatingLocale = true;
+              const state = Object.assign({}, this.stateQueryParameters);
+              const previousCatalogRootUrl = this.catalogRootUrl;
+              try {
+                const catalogRootUrl = await this.$store.dispatch('switchCatalogRootLocale', {
+                  locale,
+                  commit: false
+                });
+                if (navigationId !== this.localeNavigationId) {
+                  return;
+                }
+                if (catalogRootUrl) {
+                  this.$store.commit('catalogRootUrl', catalogRootUrl);
+                }
+                const failure = await this.$router.push(this.toBrowserPath(link));
+                if (navigationId !== this.localeNavigationId) {
+                  return;
+                }
+                if (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated)) {
+                  if (this.catalogRootUrl !== previousCatalogRootUrl) {
+                    this.$store.commit('catalogRootUrl', previousCatalogRootUrl);
+                  }
+                  return;
+                }
+                this.$store.commit('state', state);
               }
-              if (catalogRootUrl) {
-                this.$store.commit('catalogRootUrl', catalogRootUrl);
-              }
-              const failure = await this.$router.push(this.toBrowserPath(link));
-              if (navigationId !== this.localeNavigationId) {
-                return;
-              }
-              if (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated)) {
-                if (this.catalogRootUrl !== previousCatalogRootUrl) {
+              catch (error) {
+                if (
+                  navigationId === this.localeNavigationId &&
+                  this.catalogRootUrl !== previousCatalogRootUrl
+                ) {
                   this.$store.commit('catalogRootUrl', previousCatalogRootUrl);
                 }
-                return;
+                console.error(error);
               }
-              this.$store.commit('state', state);
             }
-            catch (error) {
-              if (
-                navigationId === this.localeNavigationId &&
-                this.catalogRootUrl !== previousCatalogRootUrl
-              ) {
-                this.$store.commit('catalogRootUrl', previousCatalogRootUrl);
-              }
-              console.error(error);
-            }
-            finally {
-              if (navigationId === this.localeNavigationId) {
-                this.isNavigatingLocale = false;
-              }
+            else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
+              // this.url gets reset with resetCatalog so store the url for use in load
+              const url = this.url;
+              // Todo: Resetting the catalogs is not ideal.
+              // A better way would be to combine the language code and URL as the index in the browser database
+              // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
+              this.$store.commit('resetCatalog', true);
+              await this.$store.dispatch('load', { url, show: true });
             }
           }
-          else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
-            // this.url gets reset with resetCatalog so store the url for use in load
-            const url = this.url;
-            // Todo: Resetting the catalogs is not ideal. 
-            // A better way would be to combine the language code and URL as the index in the browser database
-            // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
-            this.$store.commit('resetCatalog', true);
-            await this.$store.dispatch('load', { url, show: true });
+        }
+        finally {
+          if (navigationId === this.localeNavigationId) {
+            this.isNavigatingLocale = false;
           }
         }
       }

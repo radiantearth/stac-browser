@@ -123,7 +123,6 @@
     "storeAs": "حفظ الشفرة باسم:",
     "installDependencies": "تثبيت التبعيات:"
   },
-  "externalInfo": "يُوفّر مصدر بيانات خارجي هذا {type}.",
   "favorites": {
     "add": "إضافة إلى المفضلة",
     "empty": "لم تُضف أي عناصر إلى المفضلة بعد. استخدم زر «المفضلة» في صفحة الكتالوج أو المجموعة أو العنصر لإضافته.",
@@ -158,8 +157,7 @@
   },
   "goBack": {
     "description": "العودة إلى {type}",
-    "label": "رجوع",
-    "refererDescription": "العودة إلى آخر صفحة تمت زيارتها في الكتالوج"
+    "label": "رجوع"
   },
   "goToCollection": {
     "description": "الانتقال إلى المجموعة المرتبطة",
@@ -407,7 +405,6 @@
     "conformanceClasses": "فئات المطابقة",
     "detailsAboutSource": "تفاصيل حول مصدر STAC",
     "extension": "امتداد",
-    "externalData": "مصدر بيانات خارجي",
     "fileFormat": "تنسيق الملف",
     "id": "المعرّف",
     "invalid": "غير صالح",
@@ -469,7 +466,6 @@
   "stacAssets": "أصل بيانات | أصول البيانات",
   "stacCatalog": "كتالوج | كتالوجات",
   "stacCollection": "مجموعة | مجموعات",
-  "stacEntity": "مورد | موارد",
   "stacItem": "عنصر | عناصر",
   "submit": "إرسال",
   "switchToDarkMode": "التبديل إلى الوضع الداكن",
