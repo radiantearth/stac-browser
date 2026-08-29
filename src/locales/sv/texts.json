@@ -380,6 +380,7 @@
     "validating": "Validerar...",
     "validationNA": "inte tillgänglig",
     "validationParams": {
+      "additionalProperty": "ytterligare egenskap",
       "allowedValue": "tillåtet värde",
       "allowedValues": "tillåtna värden",
       "comparison": "jämförelse",
