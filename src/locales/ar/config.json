@@ -1,5 +1,6 @@
 {
   "native": "العربية",
   "global": "Arabic",
-  "transliteration": "al-arabiyya"
+  "transliteration": "al-arabiyya",
+  "direction": "rtl"
 }

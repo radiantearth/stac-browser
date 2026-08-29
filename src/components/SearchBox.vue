@@ -50,7 +50,7 @@ export default {
   input {
     min-height: $input-height;
     padding: $input-padding-y $input-padding-x;
-    padding-left: calc($input-padding-x * 2 + $font-size-base);
+    padding-inline-start: calc($input-padding-x * 2 + $font-size-base);
     z-index: 1;
     display: inline-block;
     border: $input-border-width $border-style $input-border-color;
@@ -63,12 +63,12 @@ export default {
   .icon {
     height: $font-size-base;
     user-select: none;
-    margin-left: $input-padding-x;
+    margin-inline-start: $input-padding-x;
     width: $font-size-base;
     z-index: 2;
     position: absolute;
     top: 50%;
-    left: 0;
+    inset-inline-start: 0;
     transform: translateY(-50%);
     display: flex;
     align-items: center;

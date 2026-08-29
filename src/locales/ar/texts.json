@@ -1,38 +1,38 @@
 {
   "actions": {
-    "openIn": "افتح في {service}"
+    "openIn": "فتح باستخدام {service}"
   },
-  "additionalActions": " افعال إضافية",
-  "additionalResources": "مصادر إضافية ",
+  "additionalActions": "إجراءات إضافية",
+  "additionalResources": "موارد إضافية",
   "anonymized": {
-    "title": "مجهول"
+    "title": "مجهول الهوية"
   },
   "assets": {
     "alternate": {
       "main": "المفضل"
     },
     "copyUrl": {
-      "generic": "إنسخ الرابط ",
-      "withSource": "إنسخ الرابط ل {source}"
+      "generic": "نسخ عنوان URL",
+      "withSource": "نسخ عنوان URL من {source}"
     },
-    "currentlyShown": "هذا هو الأصل الذي يظهر حاليًا.",
+    "currentlyShown": "هذا هو أصل البيانات المعروض حاليًا.",
     "download": {
-      "generic": "تحميل",
-      "withSource": " تحميل من {source}"
+      "generic": "تنزيل",
+      "withSource": "تنزيل من {source}"
     },
-    "inItems": "الأصول في العناصر | الأصول في العناصر",
+    "inItems": "أصل بيانات ضمن العناصر | أصول بيانات ضمن العناصر",
     "role": {
       "data": "البيانات",
       "metadata": "البيانات الوصفية"
     },
     "showOnMap": "عرض على الخريطة",
     "showThumbnail": "إظهار الصورة المصغرة",
-    "shown": "عرض"
+    "shown": "معروض"
   },
   "authentication": {
     "button": {
-      "login": "تسجيل الدخول ",
-      "logout": "تسجيل الخروج ",
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج",
       "title": "تقديم أو تحديث بيانات الاعتماد الخاصة بك"
     },
     "chooseMethod": "اختر طريقة المصادقة",
@@ -70,8 +70,12 @@
     "false": "لا",
     "true": "نعم"
   },
+  "close": "إغلاق",
   "copy": "نسخ",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "تعذّر النسخ. يُرجى التحقق من أذونات المتصفح.",
+    "unsupported": "الحافظة غير متاحة في هذا المتصفح."
+  },
   "default": "افتراضي",
   "defaultWithValue": "افتراضي ({value})",
   "deprecated": "مهمل",
@@ -87,6 +91,7 @@
   },
   "description": "الوصف",
   "errors": {
+    "apiListRequested": "الطلب غير صالح. لا تُدعم حاليًا الطلبات المباشرة إلى نقطتي النهاية ‎/collections و‎.../items.",
     "authFailed": "حدث خطأ في الطلب، قد تكون بيانات المصادقة المقدمة غير صحيحة.",
     "badRequest": "الطلب غير صالح. قد يكون ذلك بسبب معلمات غير صحيحة، مثل طلب بحث غير صحيح، أو قد يكون خطأ في STAC Browser.",
     "contactProvider": "يرجى التواصل مع مشغل الخدمة لحل هذه المشكلة.",
@@ -105,21 +110,50 @@
     "loadApiItemsFailed": "تعذر تحميل عناصر API.",
     "loadFilteredItems": "عذرًا، فشل تحميل قائمة العناصر المصفاة.",
     "loadItems": "عذرًا، فشل تحميل قائمة عناصر STAC.",
+    "missingPermissions": "بيانات الاعتماد المحددة لهذا الطلب لا تملك الأذونات المطلوبة.",
     "networkError": "قد تحدث هذه المشكلة عندما لا تسمح الخوادم بالوصول الخارجي عبر متصفحات الويب (مثل عدم وجود رؤوس CORS). @:errors.contactProvider",
     "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
     "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
+    "title": "خطأ",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
-  "exampleCode": {},
+  "exampleCode": {
+    "title": "مثال برمجي",
+    "storeAs": "حفظ الشفرة باسم:",
+    "installDependencies": "تثبيت التبعيات:"
+  },
   "favorites": {
-    "exportFormats": {}
+    "add": "إضافة إلى المفضلة",
+    "empty": "لم تُضف أي عناصر إلى المفضلة بعد. استخدم زر «المفضلة» في صفحة الكتالوج أو المجموعة أو العنصر لإضافته.",
+    "export": "تصدير",
+    "exportDescription": "تصدير المفضلة إلى ملف، مثلًا لاستيرادها في متصفح آخر.",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "كتالوج STAC"
+    },
+    "import": "استيراد",
+    "importDescription": "استيراد المفضلة من ملف صُدّر سابقًا.",
+    "importInvalid": "الملف المحدد لا يحتوي على عناصر مفضلة.",
+    "imported": "تم استيراد {count} من العناصر المفضلة الجديدة.",
+    "label": "مفضلة",
+    "localOnly": "تُحفظ المفضلة محليًا في متصفح الويب هذا فقط، ولا تتم مزامنتها بين الأجهزة أو المتصفحات.",
+    "remove": "إزالة من المفضلة",
+    "title": "المفضلة"
   },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
-  "features": {},
+  "features": {
+    "empty": "لا توجد معالم متاحة.",
+    "noProperties": "لم تُقدّم أي خصائص.",
+    "title": "معلم | معالم"
+  },
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "show": "عرض بملء الشاشة"
+    "exitLabel": "✕",
+    "show": "العرض في وضع ملء الشاشة",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -131,14 +165,14 @@
     "label": "مجموعة"
   },
   "goToParent": {
-    "description": "الانتقال إلى الأصل",
+    "description": "الانتقال إلى المستوى الأعلى",
     "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "أعلى"
   },
   "in": "في {catalog}",
   "index": {
     "api": "واجهة برمجة التطبيقات",
-    "catalog": "الكتالوج",
+    "catalog": "كتالوج ثابت",
     "load": "تحميل",
     "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
     "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
@@ -148,28 +182,82 @@
   },
   "items": {
     "filter": "عوامل التصفية",
+    "filterChangesNotApplied": "تغيّرت عوامل التصفية، لكن التغييرات لم تُطبّق بعد.",
     "hideFilter": "إخفاء عوامل التصفية",
     "noTime": "لم يتم تحديد وقت",
     "noneAvailableForCollection": "لا توجد عناصر متاحة لهذه المجموعة.",
     "showFilter": "إظهار عوامل التصفية"
   },
   "loading": "جارٍ التحميل...",
-  "manage": {},
+  "manage": {
+    "addCollection": "إضافة مجموعة",
+    "addItem": "إضافة عنصر",
+    "confirmDeleteTitle": "تأكيد الحذف",
+    "confirmDeleteMessage": "هل أنت متأكد من رغبتك في حذف مورد STAC هذا؟",
+    "create": "إنشاء",
+    "delete": "حذف",
+    "discardDraft": "تجاهل التغييرات المستعادة",
+    "draftRestored": "تمت استعادة تغييرات غير محفوظة من جلسة سابقة.",
+    "edit": "تحرير",
+    "leavePage": "مغادرة الصفحة",
+    "save": "حفظ",
+    "noUndo": "لا يمكن التراجع عن هذا الإجراء.",
+    "unsavedChangesLeave": "لديك تغييرات غير محفوظة. هل تريد حقًا مغادرة هذه الصفحة؟",
+    "unsavedChangesTitle": "تغييرات غير محفوظة",
+    "validate": "تحقق"
+  },
   "map": "الخريطة",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {
-      "error": {}
+    "attribution": {
+      "collapseLabel": "✕",
+      "description": "بيانات الإسناد",
+      "label": "i"
     },
-    "displayLimit": {},
-    "layers": {},
-    "location": {},
+    "bboxSelect": {
+      "add": "انقر على الخريطة لإضافة مربع إحاطة.",
+      "eastLon": "خط الطول الشرقي",
+      "error": {
+        "incomplete": "الإحداثي مفقود",
+        "invalidLat": "يجب أن تكون القيمة بين ‎-90 و90",
+        "invalidLon": "يجب أن تكون القيمة بين ‎-180 و180",
+        "latOrder": "يجب أن يكون خط العرض الجنوبي أقل من خط العرض الشمالي",
+        "lonOrder": "يجب أن يكون خط الطول الغربي أقل من خط الطول الشرقي"
+      },
+      "northLat": "خط العرض الشمالي",
+      "remove": "انقر داخل مربع الإحاطة لإزالته.",
+      "southLat": "خط العرض الجنوبي",
+      "westLon": "خط الطول الغربي"
+    },
+    "close": "إغلاق",
+    "displayLimit": {
+      "message": "مجموعة البيانات هذه كبيرة جدًا، وقد يؤدي عرضها إلى إبطاء المتصفح أو توقفه.",
+      "showAnyway": "العرض على أي حال",
+      "title": "مجموعة بيانات كبيرة"
+    },
+    "fit": "ملاءمة العرض للنطاق",
+    "layers": {
+      "base": "الطبقات الأساسية",
+      "footprint": "نطاق التغطية",
+      "title": "الطبقات",
+      "unnamed": "بلا اسم رقم {id}"
+    },
+    "location": {
+      "description": "الانتقال إلى موقعك"
+    },
+    "nobasemap": "لا تتوفر خرائط أساسية.",
+    "nodata": "لا تتوفر معلومات مكانية في البيانات الوصفية.",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "تكبير",
+        "label": "+"
+      },
+      "out": {
+        "description": "تصغير",
+        "label": "–"
+      }
     }
   },
-  "messageForSchemaError": "{message}، للمخطط {schemaPath}",
+  "messageForSchemaError": "خطأ في المخطط {schemaPath}: {message}",
   "metadata": {
     "general": "عام",
     "title": "البيانات الوصفية"
@@ -184,13 +272,22 @@
   },
   "open": "فتح",
   "pagination": {
-    "first": "« الأول",
-    "last": "الأخير »",
-    "next": "التالي ›",
-    "previous": "‹ السابق"
+    "first": "الأولى »",
+    "last": "« الأخيرة",
+    "next": "التالي ‹",
+    "previous": "› السابق"
   },
-  "poweredBy": "مشغل بواسطة {link}",
-  "programming": {},
+  "poweredBy": "مدعوم من {link}",
+  "programming": {
+    "csharp": "C#",
+    "curl": "cURL",
+    "go": "Go",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "مايكروسوفت أزور",
     "file": "نظام الملفات (محلي)",
@@ -220,12 +317,28 @@
   "reset": "إعادة تعيين",
   "search": {
     "addCollections": "اضغط على Enter لإضافة مجموعة",
-    "addFilter": "إضافة فلتر",
-    "additionalFilters": "فلاتر إضافية",
+    "addDate": "إضافة تاريخ",
+    "addFilter": "إضافة عامل تصفية",
+    "additionalFilters": "عوامل تصفية إضافية",
     "addItemIds": "اضغط على Enter لإضافة معرّف عنصر",
     "addSearchTerm": "اضغط على Enter لإضافة مصطلح بحث",
-    "arrayInput": {},
+    "arrayInput": {
+      "addValue": "اضغط على Enter لإضافة قيمة",
+      "helpText": "أدخل قيمة أو أكثر"
+    },
+    "arrayContains": "يحتوي على الكل",
+    "arrayContainsDescription": "تحتوي المصفوفة على جميع القيم المحددة",
+    "arrayContainedBy": "مجموعة فرعية من",
+    "arrayContainedByDescription": "المصفوفة مجموعة فرعية من القيم المحددة",
+    "arrayEquals": "مطابقة تامة",
+    "arrayEqualsDescription": "تطابق المصفوفة القيم المحددة تمامًا (العناصر نفسها بأي ترتيب)",
+    "arrayOverlaps": "يحتوي على أي منها",
+    "arrayOverlapsDescription": "تحتوي المصفوفة على قيمة واحدة على الأقل من القيم المحددة",
+    "between": "بين",
+    "betweenOperatorDescription": "يتحقق مما إذا كانت قيمة الحقل الرقمية تقع ضمن النطاق المحدد، شاملًا الحدّين.",
     "dateDescription": "جميع الأوقات بتوقيت UTC (التوقيت العالمي المنسق).",
+    "disabledDueToSingleDate": "عامل التصفية هذا معطل لأن النطاق الزمني للمجموعة يتكون من تاريخ ووقت واحد.",
+    "droppedFilters": "عوامل التصفية التالية غير مدعومة هنا ولذلك أُزيلت: {filters}.",
     "enterCollections": "أدخل معرّف مجموعة واحد أو أكثر...",
     "enterItemIds": "أدخل معرّف عنصر واحد أو أكثر...",
     "enterSearchTerms": "أدخل مصطلح بحث واحد أو أكثر...",
@@ -236,6 +349,8 @@
     "freeTextDescription": "ابحث عن واحد على الأقل من المصطلحات المحددة في الحقول مثل العنوان والوصف.",
     "greaterThan": "أكبر من",
     "greaterThanEqual": "أكبر من أو يساوي",
+    "in": "ينتمي إلى",
+    "inOperatorDescription": "يتحقق مما إذا كانت قيمة الحقل إحدى القيم المحددة.",
     "itemIds": "معرّفات العناصر",
     "itemsPerPage": "عناصر لكل صفحة",
     "itemsPerPageDescription": "عدد العناصر المطلوبة لكل صفحة، الحد الأقصى {maxItems} عنصر.",
@@ -243,21 +358,25 @@
     "lessThanEqual": "أقل من أو يساوي",
     "likeOperatorDescription": "يمكنك استخدام أحرف البدل. `_` يطابق حرفًا واحدًا، `%` يطابق أي عدد من الأحرف. للبحث عن حرف بدل محدد، تحتاج إلى إضافة `\\` قبله.",
     "logical": {
-      "and": "مطابقة جميع الفلاتر (و)",
-      "or": "مطابقة أي فلتر (أو)"
+      "and": "مطابقة جميع عوامل التصفية (و)",
+      "or": "مطابقة أي عامل تصفية (أو)",
+      "not": "نفي عامل التصفية"
     },
     "matches": "يطابق",
     "metaDescription": "البحث في البيانات المتاحة في {title}.",
     "modifyCriteria": "يرجى تعديل معايير البحث.",
     "noFurtherItemsFound": "لا توجد عناصر إضافية متاحة.",
     "noItemsFound": "لم يتم العثور على عناصر للفلاتر المحددة.",
+    "noOperatorsError": "لا يدعم STAC Browser أي عوامل تشغيل لعامل التصفية {queryable}.",
     "noOptions": "لم يتم إدخال أي شيء بعد",
     "notEqualTo": "لا يساوي",
     "notFullySupported": "قد لا تكون جميع الخيارات مدعومة.",
     "notSupported": "بحث العناصر غير مدعوم من قبل API.",
     "placeholder": "بحث...",
+    "removeDate": "إزالة التاريخ",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
-    "selectForItemSearch": "حدد للبحث عن عنصر",
+    "selectDateRange": "حدد نطاقًا زمنيًا",
+    "selectForItemSearch": "تحديد لبحث العناصر",
     "spatialExtent": "النطاق المكاني",
     "tabs": {
       "collections": "البحث عن المجموعات",
@@ -283,7 +402,7 @@
     "title": "فرز"
   },
   "source": {
-    "conformanceClasses": "فئات الامتثال",
+    "conformanceClasses": "فئات المطابقة",
     "detailsAboutSource": "تفاصيل حول مصدر STAC",
     "extension": "امتداد",
     "fileFormat": "تنسيق الملف",
@@ -292,18 +411,19 @@
     "label": "المصدر",
     "language": {
       "label": "اللغة: {currentLanguage}",
-      "onlyData": "البيانات فقط متاحة بهذه اللغة!",
-      "onlyUI": "واجهة المستخدم فقط متاحة بهذه اللغة!",
+      "onlyData": "لا تتوفر بهذه اللغة إلا البيانات!",
+      "onlyUI": "لا تتوفر بهذه اللغة إلا واجهة المستخدم!",
       "switch": "تغيير اللغة"
     },
-    "locatedAt": "تم العثور على ملف بيانات STAC في:",
+    "locatedAt": "يوجد ملف بيانات STAC الوصفية في:",
+    "manage": "إدارة",
     "share": {
       "bsky": "Bluesky",
       "email": "البريد الإلكتروني",
       "label": "مشاركة",
       "mastodon": "Mastodon.social",
       "message": "{title} متاح على {url}",
-      "sharePageWithOthers": "مشاركة رابط هذه الصفحة في أي مكان تريده:",
+      "sharePageWithOthers": "شارك عنوان URL لهذه الصفحة أينما تريد:",
       "title": "مشاركة",
       "withOthers": "مشاركة هذه الصفحة مع الآخرين",
       "x": "إكس (تويتر)"
@@ -331,7 +451,7 @@
       "minContains": "يحتوي على الأقل",
       "missingProperty": "خاصية مفقودة",
       "multipleOf": "مضاعف لـ",
-      "passingSchemas": "المخططات الناجحة",
+      "passingSchemas": "المخططات المطابقة",
       "pattern": "النمط",
       "property": "الخاصية",
       "propertyName": "اسم الخاصية",
@@ -343,11 +463,13 @@
       "title": "تقرير التحقق"
     }
   },
-  "stacAssets": "أصل | الأصول",
+  "stacAssets": "أصل بيانات | أصول البيانات",
   "stacCatalog": "كتالوج | كتالوجات",
   "stacCollection": "مجموعة | مجموعات",
   "stacItem": "عنصر | عناصر",
   "submit": "إرسال",
+  "switchToDarkMode": "التبديل إلى الوضع الداكن",
+  "switchToLightMode": "التبديل إلى الوضع الفاتح",
   "table": {
     "emptyFilteredText": "لا توجد سجلات تطابق طلبك",
     "emptyText": "لا توجد سجلات لعرضها",
@@ -368,10 +490,12 @@
       "title": "عرض كقائمة"
     },
     "tiles": {
-      "label": "مربعات",
-      "title": "عرض كمربعات"
+      "label": "تجانبات",
+      "title": "عرض كتجانبات"
     },
     "title": "خيارات العرض"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": "مميّز"
+  }
 }

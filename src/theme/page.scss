@@ -105,7 +105,7 @@ svg {
       }
 
       .user {
-        text-align: right;
+        text-align: end;
       }
 
       // On small screens the buttons and the title don't fit on one line,
@@ -312,7 +312,7 @@ svg {
 
         .nav-pills {
           margin: 0;
-          margin-right: 0 !important;
+          margin-inline-end: 0 !important;
           padding: 0;
 
           > li {
@@ -329,7 +329,7 @@ svg {
 
             > button {
               width: 100%;
-              text-align: left;
+              text-align: start;
             }
           }
         }
@@ -361,7 +361,7 @@ svg {
   .global-error {
     position: fixed;
     bottom: 0;
-    right: 0;
+    inset-inline-end: 0;
     z-index: $zindex-toast;
     opacity: 0.9;
     max-width: 50vh;
@@ -407,7 +407,7 @@ svg {
   }
   .btn-group-vertical.actions {
     .btn {
-      text-align: left;
+      text-align: start;
     }
   }
 
@@ -425,8 +425,8 @@ svg {
   @include media-breakpoint-up(lg) {
     .button-label {
       display: inline-block;
-      margin-left: 0.33rem;
-      margin-right: 0.1rem;
+      margin-inline-start: 0.33rem;
+      margin-inline-end: 0.1rem;
       white-space: nowrap;
     }
   }
@@ -458,7 +458,7 @@ svg {
       min-width: 50%;
 
       > .title {
-        text-align: left;
+        text-align: start;
         min-width: 0;
         overflow: hidden;
         white-space: nowrap;
@@ -636,7 +636,7 @@ svg {
       -webkit-box-orient: vertical;
       overflow: hidden;
       overflow-wrap: anywhere;
-      text-align: left;
+      text-align: start;
       line-height: 1.5em;
       max-height: 4.5em; /* 3 lines at 1.5em line-height */
     }
@@ -724,7 +724,7 @@ svg {
   .multiselect__tags,
   .multiselect__single {
     border-color: var(--bs-border-color);
-    padding-left: $input-padding-x;
+    padding-inline-start: $input-padding-x;
     font-size: $font-size-base;
   }
 
@@ -783,6 +783,16 @@ svg {
   .multiselect__input::placeholder {
     color: var(--bs-secondary-color);
     opacity: 1;
+  }
+}
+
+[dir=rtl] {
+  #stac-browser {
+    // Navigation chevrons convey inline direction rather than a fixed physical
+    // direction, so mirror them when the document direction changes.
+    .directional-icon {
+      transform: scaleX(-1);
+    }
   }
 }
 

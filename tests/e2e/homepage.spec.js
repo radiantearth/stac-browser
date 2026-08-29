@@ -7,8 +7,16 @@
 * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
 */
 import { test, expect } from './fixtures.js';
-import { HOME_PATH, mockStacResource } from './helpers.js';
+import {
+  configureBrowser,
+  hasQuery,
+  HOME_PATH,
+  mockStacResource,
+  recordRequestHeaders,
+  requireAuth,
+} from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
+import API from '../fixtures/instances/api.js';
 import fs from 'fs';
 const catalogs = JSON.parse(fs.readFileSync(
   new URL('../fixtures/templates/catalogs.json', import.meta.url), 'utf-8'
@@ -74,7 +82,459 @@ test.describe('STAC Browser Data Source Selection', () => {
     const englishOption = dropdownMenu.getByText(/english/i);
     await expect(englishOption).toBeVisible();
   });
-  
+
+  test('Arabic switches the complete interface to RTL and keeps technical input LTR', async ({ page }) => {
+    await page.goto(`${HOME_PATH}?.language=ar`);
+
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('#stac-browser')).toHaveCSS('direction', 'rtl');
+    await expect(page.getByRole('button', { name: 'تحميل', exact: true })).toBeVisible();
+
+    // URLs remain unambiguous even while the surrounding form follows Arabic direction.
+    const urlInput = page.getByRole('textbox', { name: /كتالوج STAC أو API/i });
+    await expect(urlInput).toHaveAttribute('dir', 'ltr');
+    await expect(urlInput).toHaveCSS('direction', 'ltr');
+
+    // The leading navigation group moves to the right and the user controls to the left.
+    const navigation = await page.locator('header .site .navigation').boundingBox();
+    const userControls = await page.locator('header .site .user').boundingBox();
+    expect(navigation.x).toBeGreaterThan(userControls.x);
+
+    // Direction must be reversible when users switch back to an LTR language.
+    await page.getByRole('button', { name: /اللغة: العربية/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^English$/).click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  });
+
+  test('a stored RTL locale sets direction before the application mounts', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__directionAtMount = null;
+      const observer = new MutationObserver(() => {
+        if (document.querySelector('[data-v-app]')) {
+          window.__directionAtMount = document.documentElement.dir;
+          observer.disconnect();
+        }
+      });
+      observer.observe(document, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    await configureBrowser(page, {
+      detectLocaleFromBrowser: false,
+      storeLocale: true,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+    await page.addInitScript(() => window.localStorage.setItem('locale', 'ar'));
+
+    await page.goto(HOME_PATH);
+    await expect.poll(() => page.evaluate(() => window.__directionAtMount)).toBe('rtl');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('#stac-browser')).toBeVisible();
+  });
+
+  test('a preselected UI language follows the matching catalog alternate', async ({ page, worker }) => {
+    const englishUrl = 'https://stac.example/language/catalog.json';
+    const arabicUrl = 'https://stac.example/language/ar/catalog.json';
+    const languageExtension = 'https://stac-extensions.github.io/language/v1.0.0/schema.json';
+
+    const englishCatalog = new StaticCatalog({ url: englishUrl }).setMetadata({
+      title: 'English Catalog',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+    englishCatalog.root
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicUrl, type: 'application/json', hreflang: 'ar' });
+    const englishChild = englishCatalog.addCatalog({
+      url: 'https://stac.example/language/child.json',
+    }).setMetadata({
+      title: 'English Child',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+
+    const arabicCatalog = new StaticCatalog({ url: arabicUrl }).setMetadata({
+      title: 'كتالوج عربي',
+      description: 'كتالوج تجريبي باللغة العربية.',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    arabicCatalog.root
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishUrl, type: 'application/json', hreflang: 'en' });
+    const arabicChild = arabicCatalog.addCatalog({
+      url: 'https://stac.example/language/ar/child.json',
+    }).setMetadata({
+      title: 'عنصر عربي',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    englishChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicChild.getAbsoluteUrl(), type: 'application/json', hreflang: 'ar' });
+    arabicChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishChild.getAbsoluteUrl(), type: 'application/json', hreflang: 'en' });
+
+    await englishCatalog.createServer(worker, { reset: false });
+    await arabicCatalog.createServer(worker, { reset: false });
+
+    await page.goto(`${HOME_PATH}?.language=ar`);
+    await page.getByRole('textbox', { name: /كتالوج STAC أو API/i }).fill(englishUrl);
+    await page.getByRole('button', { name: 'تحميل', exact: true }).click();
+
+    await expect(page.getByRole('heading', { name: 'كتالوج عربي' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+
+    await page.getByRole('button', { name: /اللغة: العربية/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^English$/).click();
+    await expect(page.getByRole('heading', { name: 'English Catalog' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('English Catalog');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+    await expect(page.getByRole('heading', { name: 'كتالوج عربي' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+
+    // The localized root context must also follow switches made on child pages.
+    await page.goto(`${arabicChild.getBrowserPath()}?.language=ar`);
+    await expect(page.getByRole('heading', { name: 'عنصر عربي' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي');
+
+    await page.getByRole('button', { name: /اللغة: العربية/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^English$/).click();
+    await expect(page.getByRole('heading', { name: 'English Child' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('English Catalog');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  });
+
+  test('a configured catalog keeps stable paths while switching localized roots', async ({ page, worker }) => {
+    const englishUrl = 'https://stac.example/configured/en/catalog.json';
+    const arabicUrl = 'https://stac.example/configured/ar/catalog.json';
+    const englishChildUrl = 'https://stac.example/configured/en/children/child.json';
+    const arabicChildUrl = 'https://stac.example/configured/ar/localized/arabic-child.json';
+    const languageExtension = 'https://stac-extensions.github.io/language/v1.0.0/schema.json';
+
+    await configureBrowser(page, {
+      catalogUrl: englishUrl,
+      allowExternalAccess: false,
+      detectLocaleFromBrowser: false,
+      storeLocale: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    const englishCatalog = new StaticCatalog({ url: englishUrl }).setMetadata({
+      title: 'Configured English Catalog',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+    englishCatalog.root
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicUrl, type: 'application/json', hreflang: 'ar' });
+    const englishChild = englishCatalog.addCatalog({ url: englishChildUrl }).setMetadata({
+      title: 'Configured English Child',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+
+    const arabicCatalog = new StaticCatalog({ url: arabicUrl }).setMetadata({
+      title: 'كتالوج عربي مضبوط',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    arabicCatalog.root
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishUrl, type: 'application/json', hreflang: 'en' });
+    const arabicChild = arabicCatalog.addCatalog({ url: arabicChildUrl }).setMetadata({
+      title: 'عنصر عربي مضبوط',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    arabicCatalog.root.updateLink('child', { href: './localized/arabic-child.json' });
+    englishChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicChildUrl, type: 'application/json', hreflang: 'ar' });
+    arabicChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishChildUrl, type: 'application/json', hreflang: 'en' });
+
+    await englishCatalog.createServer(worker, { reset: false });
+    await arabicCatalog.createServer(worker, { reset: false });
+    await mockStacResource(worker, arabicUrl, arabicCatalog.root.build(), { delay: 100 });
+
+    await page.goto(`${HOME_PATH}?.language=ar`);
+    await expect(page.getByRole('heading', { name: 'كتالوج عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+    await expect(page.getByRole('link', { name: 'عنصر عربي مضبوط' })).toBeVisible();
+    await expect(page).toHaveURL(/\/ar\/catalog\.json\?\.language=ar$/);
+
+    await page.goto('/children/child.json?.language=en');
+    await expect(page.getByRole('heading', { name: 'Configured English Child' })).toBeVisible();
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+    await expect(page.getByRole('heading', { name: 'عنصر عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+    await expect(page).toHaveURL(/\/ar\/localized\/arabic-child\.json\?\.language=ar$/);
+
+    // A direct reload must establish localized-root trust before decoding the
+    // route again, otherwise local request query parameters are dropped.
+    await requireAuth(worker, arabicChildUrl, hasQuery('token', 'localized-route-token'));
+    await page.goto(`${arabicChild.getBrowserPath()}?token=localized-route-token&.language=ar`);
+    await expect(page.getByRole('heading', { name: 'عنصر عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+
+    await page.locator('header .title .stac-link').click();
+    await expect(page.getByRole('heading', { name: 'كتالوج عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+
+    // A user switch must wait for an alternate root already being prefetched.
+    const rootAfterConcurrentSwitch = await page.evaluate(async ({ englishRootUrl, arabicRootUrl }) => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      store.commit('catalogRootUrl', englishRootUrl);
+      store.commit('clear', arabicRootUrl);
+      const backgroundLoad = store.dispatch('load', {
+        url: arabicRootUrl,
+        isRoot: true,
+        omitApi: true
+      });
+      await new Promise(resolve => {
+        const waitForLoading = () => {
+          if (store.state.database[arabicRootUrl]?.promise) {
+            resolve();
+          }
+          else {
+            setTimeout(waitForLoading, 0);
+          }
+        };
+        waitForLoading();
+      });
+      await store.dispatch('switchCatalogRootLocale', { locale: 'ar' });
+      await backgroundLoad;
+      return store.state.catalogRootUrl;
+    }, { englishRootUrl: englishUrl, arabicRootUrl: arabicUrl });
+    expect(rootAfterConcurrentSwitch).toBe(arabicUrl);
+
+    // A newer no-link locale request must release the navigation flag owned
+    // by a stale alternate-root load so later state can still reach the URL.
+    await mockStacResource(worker, englishUrl, englishCatalog.root.build(), { delay: 500 });
+    const navigationState = await page.evaluate(async ({ englishRootUrl }) => {
+      const app = document.querySelector('[data-v-app]')?.__vue_app__;
+      const browser = app?._instance?.proxy;
+      const store = app?.config?.globalProperties?.$store;
+      store.commit('clear', englishRootUrl);
+      store.commit('languages', { dataLanguage: 'en', navigateData: true });
+
+      await new Promise(resolve => {
+        const waitForNavigation = () => {
+          if (browser.isNavigatingLocale && store.state.database[englishRootUrl]?.promise) {
+            resolve();
+          }
+          else {
+            setTimeout(waitForNavigation, 0);
+          }
+        };
+        waitForNavigation();
+      });
+
+      const localizedRootLoad = store.state.database[englishRootUrl].promise;
+      store.commit('languages', { dataLanguage: 'ar', navigateData: true });
+      await new Promise(resolve => {
+        setTimeout(resolve, 0);
+      });
+      const clearedByLatestNavigation = !browser.isNavigatingLocale;
+
+      await localizedRootLoad;
+      await new Promise(resolve => {
+        setTimeout(resolve, 0);
+      });
+      const remainsClearedAfterStaleLoad = !browser.isNavigatingLocale;
+
+      store.commit('updateState', { type: 'searchtype', value: 'navigation-resumed' });
+      return { clearedByLatestNavigation, remainsClearedAfterStaleLoad };
+    }, { englishRootUrl: englishUrl });
+    expect(navigationState).toEqual({
+      clearedByLatestNavigation: true,
+      remainsClearedAfterStaleLoad: true,
+    });
+    await expect(page).toHaveURL(/\.searchtype=navigation-resumed/);
+
+    await page.goto('/external/untrusted.example/catalog.json?.language=ar');
+    await expect(page.getByRole('alert')).toContainText('الوصول إلى الكتالوجات الخارجية غير مسموح');
+  });
+
+  test('a language-conformant API does not reload after synchronizing its data language', async ({ page, worker }) => {
+    const apiUrl = 'https://stac.example/language-api/';
+    const api = API.minimalApi({ url: apiUrl });
+    api.root
+      .addConformsTo('https://api.stacspec.org/v1.0.0/language')
+      .setMetadata({
+        language: { code: 'en', name: 'English' },
+        languages: [{ code: 'ar', name: 'العربية', dir: 'rtl' }],
+      });
+    await api.createServer(worker);
+    const requests = await recordRequestHeaders(worker, apiUrl);
+
+    await configureBrowser(page, {
+      catalogUrl: apiUrl,
+      detectLocaleFromBrowser: false,
+      storeLocale: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: api.root.data.title })).toBeVisible();
+    await expect.poll(() => requests.length).toBe(1);
+
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect.poll(() => requests.length).toBe(2);
+  });
+
+  test('a self-referential locale alternate does not block rendering', async ({ page, worker }) => {
+    const rootUrl = 'https://stac.example/self/catalog.json';
+    const catalog = new StaticCatalog({ url: rootUrl }).setMetadata({
+      title: 'Self-referential Catalog',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    catalog.root.addLink({
+      rel: 'alternate',
+      href: rootUrl,
+      type: 'application/json',
+      hreflang: 'en',
+    });
+    await catalog.createServer(worker);
+    await configureBrowser(page, {
+      catalogUrl: rootUrl,
+      detectLocaleFromBrowser: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto('/?.language=en');
+    await expect(page.getByRole('heading', { name: 'Self-referential Catalog' })).toBeVisible();
+    const state = await page.evaluate(() => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return {
+        loading: store.state.loading,
+        title: store.state.data?.title,
+      };
+    });
+    expect(state).toEqual({ loading: false, title: 'Self-referential Catalog' });
+  });
+
+  test('a localized direct API item entry still loads root collections', async ({ page, worker }) => {
+    const apiUrl = 'https://stac.example/localized-api/';
+    const api = API.defaultApi({ url: apiUrl });
+    const collection = api.addCollection('localized').setMetadata({ title: 'Localized Collection' });
+    const item = api.addItem(collection, 'arabic-item').setMetadata({
+      title: 'Arabic Item',
+      language: { code: 'ar', name: 'Arabic', dir: 'rtl' },
+    });
+    await api.createServer(worker);
+    await configureBrowser(page, {
+      catalogUrl: apiUrl,
+      detectLocaleFromBrowser: false,
+      locale: 'ar',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto(`${item.getBrowserPath()}?.language=ar`);
+    await expect(page.getByRole('heading', { name: 'Arabic Item' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return store.getters.getApiChildren(store.getters.root).list.length;
+    })).toBe(1);
+  });
+
+  test('switching locale from a child loads alternate root API collections', async ({ page, worker }) => {
+    const englishUrl = 'https://stac.example/localized-root-api/en/';
+    const arabicUrl = 'https://stac.example/localized-root-api/ar/';
+    const languageExtension = 'https://stac-extensions.github.io/language/v1.0.0/schema.json';
+
+    const englishApi = API.minimalApi({ url: englishUrl });
+    englishApi.root
+      .setMetadata({
+        title: 'English API Root',
+        language: { code: 'en', name: 'English' },
+        languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+      })
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicUrl, type: 'application/json', hreflang: 'ar' });
+    englishApi.addCollection('english').setMetadata({ title: 'English API Collection' });
+    const englishChild = englishApi.addStaticCatalog({ url: `${englishUrl}child.json` }).setMetadata({
+      title: 'English API Child',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+
+    const arabicApi = API.minimalApi({ url: arabicUrl });
+    arabicApi.root
+      .setMetadata({
+        title: 'جذر API العربي',
+        language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+        languages: [{ code: 'en', name: 'English' }],
+      })
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishUrl, type: 'application/json', hreflang: 'en' });
+    arabicApi.addCollection('arabic').setMetadata({ title: 'Arabic API Collection' });
+    const arabicChild = arabicApi.addStaticCatalog({ url: `${arabicUrl}child.json` }).setMetadata({
+      title: 'طفل API العربي',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    englishChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicChild.getAbsoluteUrl(), type: 'application/json', hreflang: 'ar' });
+    arabicChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishChild.getAbsoluteUrl(), type: 'application/json', hreflang: 'en' });
+
+    await englishApi.createServer(worker, { reset: false });
+    await arabicApi.createServer(worker, { reset: false });
+    await configureBrowser(page, {
+      catalogUrl: englishUrl,
+      allowExternalAccess: false,
+      detectLocaleFromBrowser: false,
+      storeLocale: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto('/child.json?.language=en');
+    await expect(page.getByRole('heading', { name: 'English API Child' })).toBeVisible();
+
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+
+    await expect(page.getByRole('heading', { name: 'طفل API العربي' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return store.getters.getApiChildren(store.getters.root).list.map(child => child.title);
+    })).toEqual(['Arabic API Collection']);
+  });
+
   test('should render catalog URL input with proper elements', async ({ page }) => {
     await page.goto(HOME_PATH);
     

@@ -114,7 +114,7 @@ export default {
 <style lang="scss" scoped>
 .ol-layercontrol {
   z-index: 1;
-  left: 0.5em;
+  inset-inline-start: 0.5em;
   bottom: 0.5em;
 }
 .layercontrol {
@@ -145,7 +145,7 @@ export default {
     }
 
     li li {
-      padding-left: 0.75rem;
+      padding-inline-start: 0.75rem;
     }
   }
 }
