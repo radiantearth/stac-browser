@@ -183,7 +183,7 @@ export default {
       this.displayLimitError = null;
       this.ignoreDisplayLimit = false;
 
-      await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
+      await this.createMap(this.$refs.map, this.onfocusOnly);
 
       if (this.stac) {
         this.addStacLayer();

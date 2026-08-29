@@ -160,7 +160,7 @@ export default {
     async initMap() {
       this.map = null;
 
-      await this.createMap(this.$refs.map, this.stac, true);
+      await this.createMap(this.$refs.map, true);
 
       // Add extent interaction for bbox selection
       const condition = (event) => {
