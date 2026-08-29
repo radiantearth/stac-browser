@@ -961,7 +961,7 @@ function getStore(config, router) {
           return null;
         }
         const url = link.getAbsoluteUrl();
-        await cx.dispatch('load', { url, isRoot: true, omitApi: true });
+        await cx.dispatch('load', { url, isRoot: true });
         if (!cx.getters.getStac(url)) {
           return null;
         }

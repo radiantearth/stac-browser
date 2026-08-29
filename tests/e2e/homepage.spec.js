@@ -466,6 +466,75 @@ test.describe('STAC Browser Data Source Selection', () => {
     })).toBe(1);
   });
 
+  test('switching locale from a child loads alternate root API collections', async ({ page, worker }) => {
+    const englishUrl = 'https://stac.example/localized-root-api/en/';
+    const arabicUrl = 'https://stac.example/localized-root-api/ar/';
+    const languageExtension = 'https://stac-extensions.github.io/language/v1.0.0/schema.json';
+
+    const englishApi = API.minimalApi({ url: englishUrl });
+    englishApi.root
+      .setMetadata({
+        title: 'English API Root',
+        language: { code: 'en', name: 'English' },
+        languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+      })
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicUrl, type: 'application/json', hreflang: 'ar' });
+    englishApi.addCollection('english').setMetadata({ title: 'English API Collection' });
+    const englishChild = englishApi.addStaticCatalog({ url: `${englishUrl}child.json` }).setMetadata({
+      title: 'English API Child',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+
+    const arabicApi = API.minimalApi({ url: arabicUrl });
+    arabicApi.root
+      .setMetadata({
+        title: 'جذر API العربي',
+        language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+        languages: [{ code: 'en', name: 'English' }],
+      })
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishUrl, type: 'application/json', hreflang: 'en' });
+    arabicApi.addCollection('arabic').setMetadata({ title: 'Arabic API Collection' });
+    const arabicChild = arabicApi.addStaticCatalog({ url: `${arabicUrl}child.json` }).setMetadata({
+      title: 'طفل API العربي',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    englishChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicChild.getAbsoluteUrl(), type: 'application/json', hreflang: 'ar' });
+    arabicChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishChild.getAbsoluteUrl(), type: 'application/json', hreflang: 'en' });
+
+    await englishApi.createServer(worker, { reset: false });
+    await arabicApi.createServer(worker, { reset: false });
+    await configureBrowser(page, {
+      catalogUrl: englishUrl,
+      allowExternalAccess: false,
+      detectLocaleFromBrowser: false,
+      storeLocale: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto('/child.json?.language=en');
+    await expect(page.getByRole('heading', { name: 'English API Child' })).toBeVisible();
+
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+
+    await expect(page.getByRole('heading', { name: 'طفل API العربي' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return store.getters.getApiChildren(store.getters.root).list.map(child => child.title);
+    })).toEqual(['Arabic API Collection']);
+  });
+
   test('should render catalog URL input with proper elements', async ({ page }) => {
     await page.goto(HOME_PATH);
     
