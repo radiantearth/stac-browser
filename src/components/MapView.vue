@@ -106,8 +106,8 @@ export default {
     childrenOptions() {
       const showItems = this.children && this.children.isItemCollection;
       return {
-        displayPreview: showItems,
-        displayOverview: showItems && this.displayOverviewsForChildren
+        displayPreview: showItems && this.displayPreview,
+        displayOverview: showItems && this.displayOverview && this.displayOverviewsForChildren
       };
     },
     showDisplayLimitModal: {
