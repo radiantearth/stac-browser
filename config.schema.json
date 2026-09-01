@@ -63,6 +63,9 @@
     "displayOverview": {
       "type": "boolean"
     },
+    "displayPreviewsForChildren": {
+      "type": "boolean"
+    },
     "displayOverviewsForChildren": {
       "type": "boolean"
     },
