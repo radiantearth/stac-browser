@@ -199,8 +199,9 @@
         "required": ["label", "url"]
       }
     },
-    "faviconHref": {
-      "type": ["string", "null"]
+    "faviconImage": {
+      "type": ["string", "null"],
+      "format": "uri"
     }
   }
 }

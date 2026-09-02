@@ -68,5 +68,5 @@ export default {
   transactionsRequirePreflight: true,
   crs: {},
   footerLinks: null,
-  faviconHref: null
+  faviconImage: null
 };
