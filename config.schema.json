@@ -198,6 +198,9 @@
         },
         "required": ["label", "url"]
       }
+    },
+    "faviconHref": {
+      "type": ["string", "null"]
     }
   }
 }
