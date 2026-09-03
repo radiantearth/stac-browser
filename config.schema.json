@@ -201,7 +201,7 @@
     },
     "faviconImage": {
       "type": ["string", "null"],
-      "format": "uri"
+      "format": "uri-reference"
     }
   }
 }

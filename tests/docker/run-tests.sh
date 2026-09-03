@@ -28,14 +28,12 @@ allowed_domains="example.com,quote's.test,back\\slash.test"
 catalog_title=$'Earth\'s \\ catalog\nSecond line'
 path_prefix="/browser/"
 footer_links='[{"label":"Docs","url":"https://example.com/docs"}]'
-favicon="icon.svg"
 container_id="$(
   docker run --detach --rm \
     --env "SB_allowedDomains=$allowed_domains" \
     --env "SB_catalogTitle=$catalog_title" \
     --env "SB_pathPrefix=$path_prefix" \
     --env "SB_footerLinks=$footer_links" \
-    --env "SB_faviconImage=$favicon" \
     "$DOCKER_IMAGE"
 )"
 
@@ -73,10 +71,6 @@ assert.equal(window.STAC_BROWSER_CONFIG.pathPrefix, process.env.PATH_PREFIX);
 assert.deepEqual(window.STAC_BROWSER_CONFIG.footerLinks, [
   { label: "Docs", url: "https://example.com/docs" },
 ]);
-assert.equal(
-  window.STAC_BROWSER_CONFIG.faviconImage,
-  "icon.svg",
-);
 NODE
 
 nginx_conf="$(docker exec "$container_id" cat /etc/nginx/conf.d/default.conf)"

@@ -53,7 +53,7 @@ The override order for the configuration is:
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
-  - [faviconImage](#faviconImage)
+  - [faviconImage](#faviconimage)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
     - [`history`](#history)
