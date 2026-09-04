@@ -325,7 +325,7 @@
     "addItemIds": "Naciśnij Enter, aby dodać ID elementu",
     "addSearchTerm": "Naciśnij Enter, aby dodać frazę wyszukiwania",
     "arrayInput": {
-      "addValue": "Naciśnij enter, aby dodać wartość",
+      "addValue": "Naciśnij Enter, aby dodać wartość",
       "helpText": "Podaj wartość lub wartości"
     },
     "arrayContains": "Zawiera wszystkie",
@@ -340,7 +340,7 @@
     "betweenOperatorDescription": "Sprawdza, czy wartość liczbowa pola mieści się w podanym zakresie. Zakres jest obustronnie domknięty.",
     "dateDescription": "Wszystkie czasy w Uniwersalnym Czasie Koordynowanym (UTC).",
     "disabledDueToSingleDate": "Ten filtr jest wyłączony, ponieważ zakres czasowy kolekcji to pojedyncza data i godzina.",
-    "droppedFilters": "Poniższe filtry nie są obsługiwane i zostały usunięte: {filters}.",
+    "droppedFilters": "Poniższe filtry nie są tutaj obsługiwane i zostały usunięte: {filters}.",
     "enterCollections": "Wprowadź jedno lub więcej ID kolekcji...",
     "enterItemIds": "Podaj jedno lub więcej ID elementu...",
     "enterSearchTerms": "Podaj jedną lub więcej fraz wyszukiwania...",
