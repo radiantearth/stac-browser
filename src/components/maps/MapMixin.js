@@ -1,5 +1,6 @@
 import { isObject } from 'stac-js/src/utils.js';
 import i18n from '../../i18n';
+import Utils from '../../utils';
 import { mapGetters, mapState } from 'vuex';
 import { needsAuthenticatedFetch } from '../../models/authMedia';
 import OlMap from 'ol/Map.js';
@@ -39,7 +40,7 @@ export default {
         getRequestHeaders: this.getRequestHeadersForStacLayer,
         // Adds the configured query parameters (incl. query-parameter
         // credentials) to the URLs requested by ol-stac
-        getRequestUrl: (ref, url) => this.getRequestUrl(url),
+        getRequestUrl: (ref, url, isTemplate) => isTemplate ? this.getRequestUrlTemplate(url) : this.getRequestUrl(url),
         httpRequestFn: async (url, responseType) => {
           const response = await this.$store.dispatch('request', { link: url, axiosOptions: { responseType } });
           return response.data;
@@ -75,6 +76,9 @@ export default {
     }
   },
   methods: {
+    getRequestUrlTemplate(template) {
+      return Utils.restoreUrlTemplateParams(this.getRequestUrl(template), template);
+    },
     // Returns the HTTP headers (e.g. for authentication) that ol-stac attaches
     // to the requests for the given URL. External URLs get no credentials.
     getRequestHeadersForStacLayer(ref, url) {
@@ -209,8 +213,8 @@ export default {
               // ol-mapbox-style (style, sources, sprites, glyphs, tiles).
               // A transformRequest defined in the basemap config takes over
               // instead and must handle credentials itself.
-              options.transformRequest = (url) => {
-                const requestUrl = this.getRequestUrl(url);
+              options.transformRequest = (url, type) => {
+                const requestUrl = type === 'Tiles' ? this.getRequestUrlTemplate(url) : this.getRequestUrl(url);
                 if (needsAuthenticatedFetch(this.$store, url)) {
                   return new Request(requestUrl, { headers: this.$store.state.requestHeaders });
                 }

@@ -532,7 +532,6 @@ function getStore(config, router) {
           return url;
         }
       },
-
       acceptedLanguages: state => {
         const languages = {};
         // Implement in ascending order so that the higher priority entries override previous ones

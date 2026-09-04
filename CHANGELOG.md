@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The Docker entrypoint and Vite config now support both forms of the JSON Schema `type` keyword (a string or an array of strings), fixing a `jq` error when setting `SB_footerLinks` via environment variables
+- Tile URL templates keep their variables intact instead of percent-encoding them
 - `apiCatalogPriority: "childs"` doesn't hide collection items in the sidebar anymore
 - The conformance classes of the configured catalog are no longer applied to external content,
   e.g. sorting and filtering are no longer offered for (and sent to) external APIs that may not support them
