@@ -351,8 +351,8 @@
     "freeTextDescription": "Wyszukaj co najmniej jedną z podanych fraz w polach takich, jak nazwa i opis.",
     "greaterThan": "większy niż",
     "greaterThanEqual": "większy niż lub równy",
-    "in": "",
-    "inOperatorDescription": "",
+    "in": "zawiera się w",
+    "inOperatorDescription": "Sprawdza, czy wartość pola jest jedną z podanych wartości.",
     "itemIds": "ID elementów",
     "itemsPerPage": "Elementów na stronę",
     "itemsPerPageDescription": "Liczba elementów żądanych na stronę, maks. {maxItems} elementów.",
@@ -362,22 +362,22 @@
     "logical": {
       "and": "Dopasuj wszystkie wiltry (i)",
       "or": "Dopasuj dowolny filtr (lub)",
-      "not": ""
+      "not": "Anuluj filtr"
     },
     "matches": "dopasowania",
     "metaDescription": "Przeszukaj ofertę danych {title}.",
     "modifyCriteria": "Dostosuj kryteria wyszukiwania.",
     "noFurtherItemsFound": "Brak dostępnych dalszych elementów.",
     "noItemsFound": "Brak elementów spełniających podane kryteria.",
-    "noOperatorsError": "",
+    "noOperatorsError": "STAC Browser nie obsługuje żadnych operatorów dla filtru {queryable}.",
     "noOptions": "Nic nie wpisano",
     "notEqualTo": "nierówny",
     "notFullySupported": "Nie wszystkie opcje mogą być obsługiwane.",
     "notSupported": "Wyszukiwanie elementów nie jest obsługiwane przez API.",
     "placeholder": "Wyszukaj...",
-    "removeDate": "",
+    "removeDate": "Usuń datę",
     "selectCollections": "Wybierz jedną lub więcej kolekcji...",
-    "selectDateRange": "",
+    "selectDateRange": "Wybierz zakres dat",
     "selectForItemSearch": "Wybierz do wyszukiwania elementu",
     "spatialExtent": "Zasięg przestrzenny",
     "tabs": {
@@ -407,7 +407,7 @@
     "conformanceClasses": "Klasy zgodności",
     "detailsAboutSource": "Szczegóły źródła STAC",
     "extension": "Rozszerzenie",
-    "externalData": "",
+    "externalData": "Zewnętrzne źródło danych",
     "fileFormat": "Format pliku",
     "id": "ID",
     "invalid": "Nieprawidłowy",
@@ -419,7 +419,7 @@
       "switch": "Zmień język"
     },
     "locatedAt": "Metadane STAC znajdują się pod adresem:",
-    "manage": "",
+    "manage": "Zarządzaj",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
@@ -469,11 +469,11 @@
   "stacAssets": "Zasób | Zasoby",
   "stacCatalog": "Katalog | Katalogi",
   "stacCollection": "Kolekcja | Kolekcje",
-  "stacEntity": "",
+  "stacEntity": "obiekt | obiekty",
   "stacItem": "Element | Elementy",
   "submit": "Zatwierdź",
-  "switchToDarkMode": "",
-  "switchToLightMode": "",
+  "switchToDarkMode": "Przełącz na tryb ciemny",
+  "switchToLightMode": "Przełącz na tryb jasny",
   "table": {
     "emptyFilteredText": "Brak rekordów spełniających żądanie",
     "emptyText": "Brak rekordów do wyświetlenia",
@@ -500,6 +500,6 @@
     "title": "Opcje wyświetlania"
   },
   "widgets": {
-    "featured": ""
+    "featured": "Wyróżnione"
   }
 }
