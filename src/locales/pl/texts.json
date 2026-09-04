@@ -126,7 +126,7 @@
   "externalInfo": "{type} pochodzi z zewnętrznego źródła danych.",
   "favorites": {
     "add": "Dodaj do ulubionych",
-    "empty": "Nie dodano jeszcze żadnych pozycji do ulubionych. Aby dodać, użyj przycisku „Ulubione\" na stronie katalogu, kolekcji lub elementu.",
+    "empty": "Nie dodano jeszcze żadnych pozycji do ulubionych. Aby dodać, użyj przycisku \"Ulubione\" na stronie katalogu, kolekcji lub produktu.",
     "export": "Eksportuj",
     "exportDescription": "Wyeksportuj ulubione do pliku, np. aby zaimportować je w innej przeglądarce.",
     "exportFormats": {
@@ -193,7 +193,7 @@
   "loading": "Ładowanie...",
   "manage": {
     "addCollection": "Dodaj kolekcję",
-    "addItem": "Dodaj element",
+    "addItem": "Dodaj produkt",
     "confirmDeleteTitle": "Potwierdź usunięcie",
     "confirmDeleteMessage": "Czy na pewno chcesz usunąć ten obiekt STAC?",
     "create": "Utwórz",
@@ -333,7 +333,7 @@
     "arrayContainedBy": "Jest podzbiorem",
     "arrayContainedByDescription": "Tablica jest podzbiorem podanych wartości",
     "arrayEquals": "Dokładnie odpowiada",
-    "arrayEqualsDescription": "Tablica dokładnie odpowiada podanym wartościom (te same elementy, dowolna kolejność)",
+    "arrayEqualsDescription": "Tablica dokładnie odpowiada podanym wartościom (te same produkty, dowolna kolejność)",
     "arrayOverlaps": "Zawiera dowolne",
     "arrayOverlapsDescription": "Tablica zawiera co najmniej jedną z podanych wartości",
     "between": "pomiędzy",
@@ -362,7 +362,7 @@
     "logical": {
       "and": "Dopasuj wszystkie wiltry (i)",
       "or": "Dopasuj dowolny filtr (lub)",
-      "not": "Anuluj filtr"
+      "not": "Zaneguj filtr"
     },
     "matches": "dopasowania",
     "metaDescription": "Przeszukaj ofertę danych {title}.",
