@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - A "Back" button on pages with external content returns to the page in the catalog from which the external content was reached
+- Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
 - The source popover indicates when the shown data is not part of the configured catalog
 - Widget `ExternalWarning`: Shows an information on the page of a catalog, collection or item that is not part of the configured catalog
 
