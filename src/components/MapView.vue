@@ -1,6 +1,6 @@
 <template>
   <div class="map-container">
-    <div ref="map" class="map" :id="mapId" tabindex="0">
+    <div ref="map" class="map" :id="mapId" tabindex="0" role="region" :aria-label="$t('map')">
       <!-- this will be filled by OpenLayers -->
       <LayerControl :map="map" :maxZoom="maxZoom" />
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />

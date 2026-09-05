@@ -1,6 +1,6 @@
 <template>
   <div class="map-container">
-    <div ref="map" class="map" tabindex="0">
+    <div ref="map" class="map" tabindex="0" role="region" :aria-label="$t('map')">
       <!-- this will be filled by OpenLayers -->
       <TextControl :text="help" :map="map" />
       <UserLocationControl :map="map" :maxZoom="maxZoom" />
