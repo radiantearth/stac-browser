@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The conformance classes of the configured catalog are no longer applied to external content,
   e.g. sorting and filtering are no longer offered for (and sent to) external APIs that may not support them
 - The map renders very small footprints instead of staying empty
-- Maps on item pages react to mouse and keyboard interactions again without requiring to focus the map first
+- Maps on item pages react to drag and mouse-wheel interactions again without requiring the map to be focused first
 
 ## [5.1.0-rc.1] - 2026-08-15
 
