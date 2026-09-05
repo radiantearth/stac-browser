@@ -1,6 +1,6 @@
 <template>
   <div class="map-container">
-    <div ref="map" class="map">
+    <div ref="map" class="map" tabindex="0" role="region" :aria-label="$t('map')">
       <!-- this will be filled by OpenLayers -->
       <TextControl :text="help" :map="map" />
       <UserLocationControl :map="map" :maxZoom="maxZoom" />
@@ -160,7 +160,9 @@ export default {
     async initMap() {
       this.map = null;
 
-      await this.createMap(this.$refs.map, this.stac, true);
+      // The map is only shown after opting in via a checkbox,
+      // so interactions are enabled without requiring focus
+      await this.createMap(this.$refs.map);
 
       // Add extent interaction for bbox selection
       const condition = (event) => {

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Show favorite button in the search cards by default
+- Maps don't trap page scrolling: scroll-wheel zoom and one-finger panning require a click/tap on the map first, indicated by a hint and a highlight
 
 ### Fixed
 
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The conformance classes of the configured catalog are no longer applied to external content,
   e.g. sorting and filtering are no longer offered for (and sent to) external APIs that may not support them
 - The map renders very small footprints instead of staying empty
+- Maps can be panned and zoomed with the keyboard after focusing them
 
 ## [5.1.0-rc.1] - 2026-08-15
 

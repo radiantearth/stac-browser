@@ -237,6 +237,7 @@
       "title": "Large dataset"
     },
     "fit": "Fit to extent",
+    "focusHint": "Click or tap the map to zoom and pan",
     "layers": {
       "base": "Base Layers",
       "footprint": "Footprint",
