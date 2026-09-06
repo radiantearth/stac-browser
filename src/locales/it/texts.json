@@ -237,6 +237,7 @@
       "title": "Set di dati di grandi dimensioni"
     },
     "fit": "Adatta alla estensione",
+    "focusHint": "",
     "layers": {
       "base": "Livelli di base",
       "footprint": "Impronta a terra",
