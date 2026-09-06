@@ -5,7 +5,10 @@ import { mapGetters, mapState } from 'vuex';
 import { needsAuthenticatedFetch } from '../../models/authMedia';
 import OlMap from 'ol/Map.js';
 import View from 'ol/View.js';
+import Kinetic from 'ol/Kinetic.js';
 import { defaults } from 'ol/interaction/defaults';
+import DragPan from 'ol/interaction/DragPan.js';
+import { all, focus, noModifierKeys, primaryAction } from 'ol/events/condition.js';
 import ZoomControl from 'ol/control/Zoom.js';
 import AttributionControl from 'ol/control/Attribution.js';
 import FullScreenControl from 'ol/control/FullScreen.js';
@@ -87,7 +90,7 @@ export default {
       }
       return null;
     },
-    async createMap(element, onfocusOnly = false) {
+    async createMap(element, onFocusOnly = false) {
       let projection = 'EPSG:3857';
       let visibleLayer = 0;
 
@@ -104,15 +107,28 @@ export default {
         }
       }
 
+      const interactions = defaults({
+        altShiftDragRotate: false,
+        pinchRotate: false,
+        dragPan: !onFocusOnly,
+        onFocusOnly
+      });
+      if (onFocusOnly) {
+        // Starting a mouse drag on the map is already a clear intent to pan,
+        // but a one-finger touch drag is how the page is scrolled,
+        // so only the latter requires the map to be focused first
+        interactions.push(new DragPan({
+          condition: (event) => all(noModifierKeys, primaryAction)(event)
+            && (event.originalEvent.pointerType !== 'touch' || focus(event)),
+          kinetic: new Kinetic(-0.005, 0.05, 100)
+        }));
+      }
+
       // Create map instance
       this.map = markRaw(new OlMap({
         target: element,
         controls: [],
-        interactions: defaults({
-          altShiftDragRotate: false,
-          pinchRotate: false,
-          onfocusOnly
-        }),
+        interactions,
         view: new View({
           center: [0, 0],
           zoom: 0,

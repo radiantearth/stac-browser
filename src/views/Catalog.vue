@@ -28,7 +28,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" pills card vertical end>
               <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
-                <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
+                <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />

@@ -282,6 +282,25 @@ svg {
     overflow: hidden;
     position: relative;
     z-index: 0;
+
+    // Indicate that the map reacts to scroll and drag interactions,
+    // matching the focus style of form inputs.
+    &:focus-within {
+      border-radius: var(--bs-border-radius);
+      box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+
+      // The border is drawn via ::after as it would otherwise
+      // be hidden behind the map canvas
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        border: var(--bs-border-width) var(--bs-border-style) #{$input-focus-border-color};
+        border-radius: var(--bs-border-radius);
+      }
+    }
   }
 
   h2 {

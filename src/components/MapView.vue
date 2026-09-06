@@ -1,10 +1,11 @@
 <template>
   <div class="map-container">
-    <div ref="map" class="map" :id="mapId">
+    <div ref="map" class="map" :id="mapId" tabindex="0" role="region" :aria-label="$t('map')">
       <!-- this will be filled by OpenLayers -->
       <LayerControl :map="map" :maxZoom="maxZoom" />
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
+      <div class="focus-hint" :class="{visible: focusHint}">{{ $t('mapping.focusHint') }}</div>
     </div>
     <ConfirmModal
       v-model="showDisplayLimitModal" :title="$t('mapping.displayLimit.title')"
@@ -73,10 +74,6 @@ export default {
       type: Object,
       default: null
     },
-    onfocusOnly: {
-      type: Boolean,
-      default: false
-    },
     popover: {
       type: Boolean,
       default: false
@@ -91,6 +88,7 @@ export default {
       selector: null,
       mapId: `map-${++mapId}`,
       displayLimitError: null,
+      focusHint: false,
     };
   },
   computed: {
@@ -172,9 +170,17 @@ export default {
     // These are created here and not in data() to avoid them being reactive
     this.stacLayer = null;
     this.ignoreDisplayLimit = false;
+    this.focusHintTimer = null;
   },
   async mounted() {
+    // Explain that the map must be focused before it reacts to scroll zoom and touch panning
+    this.$refs.map.addEventListener('wheel', this.onGatedInteraction, { passive: true });
+    this.$refs.map.addEventListener('touchmove', this.onGatedInteraction, { passive: true });
+    this.$refs.map.addEventListener('focusin', this.hideFocusHint);
     await this.showStacLayer();
+  },
+  beforeUnmount() {
+    clearTimeout(this.focusHintTimer);
   },
   methods: {
     async showStacLayer() {
@@ -183,7 +189,8 @@ export default {
       this.displayLimitError = null;
       this.ignoreDisplayLimit = false;
 
-      await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
+      // Only interact with a focused map to avoid trapping page scrolling
+      await this.createMap(this.$refs.map, true);
 
       if (this.stac) {
         this.addStacLayer();
@@ -293,6 +300,18 @@ export default {
     resetSelection() {
       this.selection = null;
     },
+    onGatedInteraction() {
+      if (this.$refs.map.contains(document.activeElement)) {
+        return;
+      }
+      this.focusHint = true;
+      clearTimeout(this.focusHintTimer);
+      this.focusHintTimer = setTimeout(() => this.focusHint = false, 2000);
+    },
+    hideFocusHint() {
+      clearTimeout(this.focusHintTimer);
+      this.focusHint = false;
+    },
     showAnyway() {
       this.displayLimitError = null;
       this.ignoreDisplayLimit = true;
@@ -318,6 +337,26 @@ export default {
 #stac-browser {
   .map-popover {
     max-width: 400px;
+  }
+
+  .map > .focus-hint {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+
+    &.visible {
+      opacity: 1;
+    }
   }
 
   .popover-target {
