@@ -98,6 +98,24 @@ test.describe('Children endpoint on the landing page', () => {
     await expect(page).toHaveURL(new RegExp(child.getBrowserPath()));
   });
 
+  test('a child is reloaded from its self link when opened', async ({ page, worker }) => {
+    const api = API.minimalApi();
+    api.addChild('child-catalog').setMetadata({ title: 'Child Catalog' });
+    await api.createServer(worker);
+
+    // Entries in the children endpoint may be reduced, so opening a child must
+    // fetch the full entity instead of reusing the (possibly partial) listing.
+    const requests = trackRequests(page, /\/api\/catalogs\/child-catalog(\?|$)/);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await page.getByRole('link', { name: /Child Catalog/ }).click();
+    await waitForBrowserReady(page);
+
+    expect(requests.length).toBeGreaterThanOrEqual(1);
+  });
+
   test('children without self links are skipped gracefully', async ({ page, worker }) => {
     const api = API.minimalApi();
     api.addChild('child-catalog').setMetadata({ title: 'Child Catalog' });
