@@ -83,14 +83,14 @@ export function createSTAC(data, url = null, store = null, incomplete = false) {
   return obj;
 }
 
-// Returns the child links of the entity that are not already contained in the
-// given list of catalogs/collections (compared by absolute URL).
+// Returns the links with the given relation type of the entity that are not
+// already contained in the given list of entities (compared by absolute URL).
 // See also https://github.com/radiantearth/stac-browser/issues/103
-export function getMissingChildren(catalogs, stac) {
-  const catalogUrls = new Set(catalogs.map(collection => collection.getAbsoluteUrl()));
-  return stac.getStacLinksWithRel('child').filter(link => {
+export function getMissingChildren(entities, stac, rel = 'child') {
+  const urls = new Set(entities.map(entity => entity.getAbsoluteUrl()));
+  return stac.getStacLinksWithRel(rel).filter(link => {
     const absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
-    return !catalogUrls.has(absoluteUrl);
+    return !urls.has(absoluteUrl);
   });
 }
 
