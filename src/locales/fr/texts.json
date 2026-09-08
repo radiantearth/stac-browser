@@ -237,6 +237,7 @@
       "title": "Jeu de données volumineux"
     },
     "fit": "Adapter à l'étendue",
+    "focusHint": "Cliquez sur la carte pour zoomer et déplacer",
     "layers": {
       "base": "Couches de base",
       "footprint": "Empreinte",
