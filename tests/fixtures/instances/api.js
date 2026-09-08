@@ -167,7 +167,7 @@ export default class API extends Instance {
 
     // GET /
     this.addConformanceEndpoint();
-    this.root.addConformsTo('https://api.stacspec.org/v1.0.0-rc.2/children');
+    this.root.addConformsTo('https://api.stacspec.org/v1.0.0/children');
     target.addLink({ href: children.getAbsoluteUrl(), rel: 'children', type: 'application/json' });
 
     return this;

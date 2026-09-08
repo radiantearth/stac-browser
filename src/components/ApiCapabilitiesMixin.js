@@ -12,8 +12,6 @@ export const CQL_JSON = [
 const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
 const CQL_ARRAY_OPERATORS = ['http://www.opengis.net/spec/cql2/1.*/conf/array-functions'];
 
-export const CHILDREN = ['https://api.stacspec.org/v1.*/children'];
-
 export const TYPES = {
   // OGC / STAC API - Features
   Items: {

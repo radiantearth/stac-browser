@@ -96,10 +96,10 @@ function guessParentUrlFromApiPath(url, levels) {
 
 // Returns the STAC object for the given URL from the cache,
 // otherwise creates it from the given data and adds it to the cache.
-function getOrCreateStac(cx, data, url) {
+function getOrCreateStac(cx, data, url, incomplete = false) {
   let stac = cx.getters.getStac(url);
   if (!stac) {
-    stac = createSTAC(data, url, cx);
+    stac = createSTAC(data, url, cx, incomplete);
     cx.commit('loaded', { url, data: stac });
   }
   return stac;
@@ -109,7 +109,8 @@ function getOrCreateStac(cx, data, url) {
 // to cached STAC objects, using the entry's self link. If a guessSegment is
 // given, `{guessSegment}/{id}` relative to the catalog is used as a fallback
 // (https://github.com/radiantearth/stac-browser/issues/486). Entries without a
-// detectable URL are skipped.
+// detectable URL are skipped. The entries may be reduced, so they are flagged
+// as incomplete and reloaded in full when opened.
 // todo: Convert data to stac-js
 function resolveApiList(cx, list, stac, guessSegment = null) {
   return list.map(entry => {
@@ -131,7 +132,7 @@ function resolveApiList(cx, list, stac, guessSegment = null) {
     if (!url) {
       return null;
     }
-    return getOrCreateStac(cx, entry, url.toString());
+    return getOrCreateStac(cx, entry, url.toString(), true);
   }).filter(Boolean);
 }
 
@@ -467,14 +468,18 @@ function getStore(config, router) {
         const showChilds = !priority || priority === 'childs';
         const collections = getApiChildrenSource(state, stac, 'collections');
         const items = getApiChildrenSource(state, stac, 'items');
+
+        // apiCatalogPriority only affects catalogs and collections, never items (#990).
+        const apiItems = getApiChildrenList(items);
+        groups.items = apiItems.length > 0 ? apiItems : stac.getLinksWithRels(['item']);
+
         if (showCollections) {
           groups.collections.list = getApiChildrenList(collections);
-          groups.items = getApiChildrenList(items);
-          const paginated = isObject(collections) && !(collections instanceof Loading) ? collections : items;
-          if (isObject(paginated) && !(paginated instanceof Loading)) {
-            groups.collections.prev = paginationLink(paginated.prev, 'collections');
-            groups.collections.next = paginationLink(paginated.next, 'collections');
-          }
+        }
+        const paginated = showCollections && isObject(collections) && !(collections instanceof Loading) ? collections : items;
+        if (isObject(paginated) && !(paginated instanceof Loading)) {
+          groups.collections.prev = paginationLink(paginated.prev, 'collections');
+          groups.collections.next = paginationLink(paginated.next, 'collections');
         }
         if (showChilds) {
           if (stac.getApiChildrenLink()) {
@@ -490,7 +495,6 @@ function getStore(config, router) {
           else {
             groups.children.list = getMissingChildren(groups.collections.list, stac);
           }
-          groups.items = groups.items.concat(stac.getLinksWithRels(['item']));
         }
         return groups;
       },
@@ -1273,7 +1277,7 @@ function getStore(config, router) {
                 else {
                   return null;
                 }
-                return getOrCreateStac(cx, item, url.toString());
+                return getOrCreateStac(cx, item, url.toString(), true);
               } catch (error) {
                 console.error(error);
                 return null;
