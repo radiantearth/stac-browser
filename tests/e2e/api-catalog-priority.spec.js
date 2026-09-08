@@ -1,8 +1,10 @@
 /**
- * Regression tests for the `apiCatalogPriority` config option, which chooses
- * between the two sources of catalogs and collections — static `rel="child"`
- * links and the `/collections` endpoint (rel="data") — on the main pages and
- * in the browse tree. Items are never affected by the option (#990).
+ * Regression tests for the `apiCatalogPriority` and `apiItemPriority` config
+ * options, which choose between the two sources of catalogs and collections —
+ * static `rel="child"` links and the `/collections` endpoint (rel="data") —
+ * and the two sources of items — static `rel="item"` links and the items
+ * endpoint (rel="items") — on the main pages and in the browse tree.
+ * Items are never affected by `apiCatalogPriority` (#990).
  */
 import { test, expect } from './fixtures.js';
 import { configureBrowser, waitForBrowserReady } from './helpers.js';
@@ -174,5 +176,67 @@ test.describe('apiCatalogPriority', () => {
     // Clicking the active node toggles it open
     await sidebar.getByRole('button', { name: 'Dedup Collection' }).click();
     await expect(sidebar.getByText('item-1')).toHaveCount(1);
+  });
+});
+
+test.describe('apiItemPriority', () => {
+  // A collection with one item only in the items endpoint
+  // and one item only linked through a static item link
+  function createApi() {
+    const api = API.defaultApi();
+    const collection = api.addCollection('mixed-items').setMetadata({ title: 'Mixed Items' });
+    api.addItem(collection, 'api-item');
+    const linked = collection.addItem({ url: 'collections/mixed-items/items/linked-item' });
+    linked.setMetadata({ id: 'linked-item' });
+    return { api, collection };
+  }
+
+  test('null shows the items from both sources', async ({ page, worker }) => {
+    const { api, collection } = createApi();
+    await api.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: /api-item/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /linked-item/ })).toBeVisible();
+  });
+
+  test('api shows only the items from the items endpoint', async ({ page, worker }) => {
+    const { api, collection } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { apiItemPriority: 'api' });
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: /api-item/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /linked-item/ })).not.toBeVisible();
+  });
+
+  test('links shows only the items from the item links', async ({ page, worker }) => {
+    const { api, collection } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { apiItemPriority: 'links' });
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: /linked-item/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /api-item/ })).not.toBeVisible();
+  });
+
+  test('items linked and loaded from the API are shown once on the collection page', async ({ page, worker }) => {
+    const api = API.defaultApi();
+    const collection = api.addCollection('dedup-collection').setMetadata({ title: 'Dedup Collection' });
+    const item = api.addItem(collection, 'item-1');
+    // The same item is also linked statically
+    collection.addItemLink(item);
+    await api.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: /item-1/ })).toHaveCount(1);
   });
 });

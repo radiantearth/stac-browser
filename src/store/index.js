@@ -413,13 +413,11 @@ function getStore(config, router) {
       },
 
       items: state => {
-        if (state.apiItems.length > 0) {
-          return state.apiItems;
+        const apiItems = state.apiItemPriority === 'links' ? [] : state.apiItems;
+        if (state.apiItemPriority === 'api' || !state.data) {
+          return apiItems;
         }
-        else if (state.data) {
-          return state.data.getStacLinksWithRel('item');
-        }
-        return [];
+        return getMissingChildren(apiItems, state.data, 'item').concat(apiItems);
       },
       collections: state => {
         if (!state.data?.isCatalogLike || state.apiCatalogPriority === 'childs') {
@@ -467,11 +465,11 @@ function getStore(config, router) {
         const showCollections = !priority || priority === 'collections';
         const showChilds = !priority || priority === 'childs';
         const collections = getApiChildrenSource(state, stac, 'collections');
-        const items = getApiChildrenSource(state, stac, 'items');
+        const items = state.apiItemPriority === 'links' ? null : getApiChildrenSource(state, stac, 'items');
 
-        // apiCatalogPriority only affects catalogs and collections, never items (#990).
+        // apiCatalogPriority only affects catalogs and collections (#990), items are governed by apiItemPriority
         const apiItems = getApiChildrenList(items);
-        groups.items = apiItems.length > 0 ? apiItems : stac.getLinksWithRels(['item']);
+        groups.items = state.apiItemPriority === 'api' ? apiItems : getMissingChildren(apiItems, stac, 'item').concat(apiItems);
 
         if (showCollections) {
           groups.collections.list = getApiChildrenList(collections);

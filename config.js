@@ -33,6 +33,7 @@ export default {
     "sv"
   ],
   apiCatalogPriority: null,
+  apiItemPriority: null,
   mergeCatalogsAndCollections: false,
   useTileLayerAsFallback: false,
   displayGeoTiffByDefault: false,

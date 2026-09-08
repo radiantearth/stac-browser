@@ -74,6 +74,7 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
+  - [apiItemPriority](#apiitempriority)
   - [mergeCatalogsAndCollections](#mergecatalogsandcollections)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
@@ -204,9 +205,24 @@ The following options are available:
 - `childs`: Show only children
 - `null`: Default behavior
 
-This option only applies to catalogs and collections, it never hides items.
+This option only applies to catalogs and collections, items are governed by [apiItemPriority](#apiitempriority).
 
 See also [mergeCatalogsAndCollections](#mergecatalogsandcollections) for how the two sources are displayed.
+
+### apiItemPriority
+
+For STAC APIs there are two potential sources for items:
+
+1. Items loaded from an items endpoint, detected through the `items` link
+2. Items detected through the `item` links
+
+By default, STAC Browser loads and shows data from both sources, but tries to eliminate duplicates.
+If you only want to show the data from one of the sources, you can use this option.
+The following options are available:
+
+- `api`: Show only items from the items endpoint
+- `links`: Show only items from the item links
+- `null`: Default behavior
 
 ### mergeCatalogsAndCollections
 
