@@ -129,6 +129,22 @@ test.describe('Children endpoint on the landing page', () => {
     await expect(page.getByRole('link', { name: /Child Catalog/ })).toBeVisible();
     await expect(page.getByRole('link', { name: /Flawed Catalog/ })).not.toBeVisible();
   });
+
+  test('children with relative self links are skipped gracefully', async ({ page, worker }) => {
+    const api = API.minimalApi();
+    api.addChild('child-catalog').setMetadata({ title: 'Child Catalog' });
+    const flawed = api.addChild('relative-catalog').setMetadata({ title: 'Relative Catalog' });
+    flawed.removeSelfLink();
+    flawed.addLink({ rel: 'self', href: 'catalogs/relative-catalog', type: 'application/json' });
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator(CARD)).toHaveCount(1);
+    await expect(page.getByRole('link', { name: /Child Catalog/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Relative Catalog/ })).not.toBeVisible();
+  });
 });
 
 test.describe('Children pagination', () => {
@@ -191,7 +207,7 @@ test.describe('Children at any hierarchy level', () => {
   test('a nested catalog exposes its own children endpoint', async ({ page, worker }) => {
     const api = API.minimalApi();
     const nested = api.addChild('nested-catalog').setMetadata({ title: 'Nested Catalog' });
-    api.addChildrenExtension(nested, 'catalogs/nested-catalog/children');
+    api.addChildrenExtension(nested);
     api.addChild('deep-child', { parent: nested, url: 'catalogs/deep-child' }).setMetadata({ title: 'Deep Child' });
     await api.createServer(worker);
 
@@ -208,7 +224,7 @@ test.describe('Children at any hierarchy level', () => {
     const api = API.defaultApi();
     const collection = api.addCollection('my-collection').setMetadata({ title: 'Test Collection' });
     api.addItem(collection, 'item-1').setMetadata({ id: 'item-1' });
-    api.addChildrenExtension(collection, 'collections/my-collection/children');
+    api.addChildrenExtension(collection);
     api.addChild('sub-collection', {
       parent: collection,
       type: 'collection',
@@ -315,6 +331,36 @@ test.describe('Interplay with other API features', () => {
     // Remove the search term: the full list is restored from the cache
     await collectionsSection.locator('.catalog-filter .multiselect__tag-icon').click();
     await expect(page.locator(CARD)).toHaveCount(3);
+  });
+
+  test('the children list is not altered by a collection search', async ({ page, worker }) => {
+    const api = API.defaultApi({}, { freeTextSearchEnabled: true });
+    api.addCollection('alpha').setMetadata({ title: 'Alpha Collection' });
+    const shared = api.addCollection('shared-collection').setMetadata({ title: 'Shared Collection' });
+    api.addExistingChild(shared);
+    api.addChild('child-catalog').setMetadata({ title: 'Child Catalog' });
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search#free-text');
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    // The shared collection is deduplicated into the collections section
+    const childrenSection = page.locator(SECTION).first();
+    await expect(childrenSection.locator('.card-grid > *')).toHaveCount(1);
+
+    // Search for a collection that is neither shared nor a child
+    const collectionsSection = page.locator(SECTION).last();
+    const multiselect = collectionsSection.locator('.catalog-filter .multiselect');
+    await multiselect.click();
+    await multiselect.locator('input.multiselect__input').fill('Alpha');
+    await multiselect.locator('input.multiselect__input').press('Enter');
+    await expect(collectionsSection.locator('.card-grid > *')).toHaveCount(1);
+
+    // The non-matching shared collection must not reappear as a child
+    await expect(childrenSection.locator('.card-grid > *')).toHaveCount(1);
+    await expect(childrenSection.getByRole('link', { name: /Child Catalog/ })).toBeVisible();
   });
 
   test('no children request without the children extension', async ({ page, worker }) => {

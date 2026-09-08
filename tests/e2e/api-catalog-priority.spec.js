@@ -239,4 +239,29 @@ test.describe('apiItemPriority', () => {
 
     await expect(page.getByRole('link', { name: /item-1/ })).toHaveCount(1);
   });
+
+  test('the API item count is hidden when additional item links are shown', async ({ page, worker }) => {
+    const { api, collection } = createApi();
+    await api.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    // The API count (1) doesn't cover the statically linked item (2 shown)
+    await expect(page.getByRole('link', { name: /linked-item/ })).toBeVisible();
+    await expect(page.locator('.items-container header .badge')).not.toBeVisible();
+  });
+
+  test('the API item count is shown when all items come from the API', async ({ page, worker }) => {
+    const api = API.defaultApi();
+    const collection = api.addCollection('api-only').setMetadata({ title: 'API Only' });
+    api.addItem(collection, 'item-1');
+    await api.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: /item-1/ })).toBeVisible();
+    await expect(page.locator('.items-container header .badge')).toHaveText('1');
+  });
 });
