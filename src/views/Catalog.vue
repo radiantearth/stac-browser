@@ -75,7 +75,7 @@
           :stac="data" :items="items" :api="hasApiItems" allowFilter
           showControls :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
-          :count="apiItemsNumberMatched"
+          :count="itemsCount"
           @paginate="paginateItems" @filter-items="filterItems"
           @filters-shown="filtersShown"
         />
@@ -140,7 +140,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'mergeCatalogsAndCollections', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemPriority', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'mergeCatalogsAndCollections', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'childCatalogs', 'collections', 'collectionLink', 'getApiChildren', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
@@ -166,7 +166,7 @@ export default defineComponent({
       }
     },
     apiItemsLoading() {
-      return this.getApiItemsLoading(this.data);
+      return this.hasApiItems && this.getApiItemsLoading(this.data);
     },
     hasMore() {
       return this.apiCatalogPriority !== 'childs' && Boolean(this.nextCollectionsLink);
@@ -212,6 +212,9 @@ export default defineComponent({
       return Object.values(this.data.item_assets);
     },
     itemPages() {
+      if (!this.hasApiItems) {
+        return {};
+      }
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
@@ -220,7 +223,14 @@ export default defineComponent({
       return pages;
     },
     hasApiItems() {
-      return Boolean(this.apiItemsLink);
+      return Boolean(this.apiItemsLink) && this.apiItemPriority !== 'links';
+    },
+    itemsCount() {
+      // The API count can't account for additional statically linked items
+      if (!this.hasApiItems || this.items.length !== this.apiItems.length) {
+        return null;
+      }
+      return this.apiItemsNumberMatched;
     },
     hasApiCollections() {
       return Boolean(this.data.getApiCollectionsLink()) && this.apiCatalogPriority !== 'childs';

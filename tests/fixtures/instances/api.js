@@ -154,11 +154,14 @@ export default class API extends Instance {
   
   // Adds a children endpoint (STAC API - Children extension) to the given
   // entity, which can occur at any level of the hierarchy (defaults to the root).
-  addChildrenExtension(target = this.root, url = 'children') {
+  addChildrenExtension(target = this.root, url = null) {
     this.childrenCollections = this.childrenCollections || {}; // keys = target URLs, values = ChildrenCollection objects
     const key = target.getAbsoluteUrl();
     if (this.childrenCollections[key]) {
       return this;
+    }
+    if (!url) {
+      url = target === this.root ? 'children' : `${target.url.replace(/\/+$/, '')}/children`;
     }
 
     // GET .../children

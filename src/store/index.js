@@ -5,7 +5,7 @@ import urijs from 'urijs';
 
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError, externalBrowserPathRE } from '../utils';
-import { toAbsolute } from 'stac-js/src/http.js';
+import { normalizeUri, toAbsolute } from 'stac-js/src/http.js';
 import { getMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { ChildrenCollection, STAC } from 'stac-js';
 
@@ -116,8 +116,8 @@ function resolveApiList(cx, list, stac, guessSegment = null) {
   return list.map(entry => {
     let selfLink = Utils.getLinkWithRel(entry.links, 'self');
     let url;
-    if (selfLink?.href) {
-      url = toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
+    if (selfLink?.href && URI(selfLink.href).is('absolute')) {
+      url = normalizeUri(selfLink.href, null, false, false);
     }
     else if (guessSegment) {
       let baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
@@ -431,16 +431,21 @@ function getStore(config, router) {
       // Child links (or the children endpoint if supported) minus the entries
       // already in the collections list. With the Children extension the endpoint
       // is authoritative, so the static child links are not merged in.
-      childCatalogs: (state, getters) => {
+      childCatalogs: state => {
         if (!state.data?.isCatalogLike || state.apiCatalogPriority === 'collections') {
           return [];
         }
+        // Deduplicate against the unfiltered collections so that
+        // a collection search doesn't alter the children list
+        const collections = state.apiCatalogPriority === 'childs'
+          ? []
+          : getApiChildrenList(getApiChildrenSource(state, state.data, 'collections'));
         if (state.data.getApiChildrenLink()) {
           const children = getApiChildrenList(getApiChildrenSource(state, state.data, 'children'));
-          const collectionUrls = new Set(getters.collections.map(collection => collection.getAbsoluteUrl()));
+          const collectionUrls = new Set(collections.map(collection => collection.getAbsoluteUrl()));
           return children.filter(child => !collectionUrls.has(child.getAbsoluteUrl()));
         }
-        return getMissingChildren(getters.collections, state.data);
+        return getMissingChildren(collections, state.data);
       },
       catalogs: (state, getters) => {
         if (!state.data?.isCatalogLike) {

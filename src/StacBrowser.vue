@@ -362,6 +362,7 @@ export default defineComponent({
     root(root, oldRoot) {
       const canChange = [
         'apiCatalogPriority',
+        'apiItemPriority',
         'cardViewMode',
         'crossOriginMedia',
         'defaultCollectionSort',
