@@ -267,6 +267,14 @@ export default defineComponent({
     ...mapState('search', ['droppedFilters']), 
     ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
+    // The two search forms share one set of URL params; only the form matching
+    // the active searchtype reads or writes them. With no searchtype set (e.g. a
+    // single available search), this form is treated as active.
+    isActiveSearchType() {
+      const mySearchType = this.type === 'Collections' ? 'collections' : 'items';
+      const active = this.$store.state.stateQueryParameters.searchtype;
+      return !active || active === mySearchType;
+    },
     droppedFilterNames() {
       const labels = {
         freeText: () => this.$t('search.freeText'),
@@ -514,6 +522,23 @@ export default defineComponent({
     apiCollectionsPaginated() {
       this.updateApiCollections();
     },
+    '$route.query'(newQuery, oldQuery) {
+      // Only re-read when the filter params themselves change (e.g. back/forward).
+      // searchtype is deliberately excluded: a tab switch must not pull the
+      // previous search's still-present params into the newly-active form.
+      const searchKeys = FILTER_FIELDS.map(field => `.${field}`);
+      const pick = (q) => searchKeys
+        .filter(k => k in (q || {}))
+        .sort()
+        .reduce((obj, k) => {
+          obj[k] = q[k];
+          return obj;
+        }, {});
+
+      if (JSON.stringify(pick(newQuery)) !== JSON.stringify(pick(oldQuery))) {
+        this.rebuildFromUrl();
+      }
+    },
     'activeParams.collections': {
       immediate: true,
       deep: true,
@@ -604,6 +629,14 @@ export default defineComponent({
     formId++;
   },
   created() {
+    // Restore the executed search from the URL (only the active search does).
+    const hasUrlFilters = this.rebuildFromUrl();
+    if (hasUrlFilters) {
+      this.$nextTick(() => {
+        this.$emit('input', this.activeParams);
+      });
+    }
+
     let promises = [];
     if (this.stac && this.type !== 'Collections') {
       if (this.cql) {
@@ -649,6 +682,89 @@ export default defineComponent({
     });
   },
   methods: {
+    // Writes the executed search to the URL under spec-native names (q,
+    // datetime, ...). Only the active search writes, so the single set of
+    // params is never contended; searchtype records which search they belong to.
+    syncVuexToUrl() {
+      if (!this.isActiveSearchType) {
+        return;
+      }
+      const params = this.activeParams || {};
+      // TODO: also serialize the CQL filters (filters/rawFilters/filterLogic) so
+      // that shared URLs can reproduce advanced filter searches.
+      FILTER_FIELDS.forEach(field => {
+        const value = params[field];
+        let urlValue = value;
+
+        if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+          urlValue = undefined;
+        } else if (Array.isArray(value)) {
+          if (field === 'datetime') {
+            urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
+          } else if (['q', 'collections', 'ids'].includes(field)) {
+            // Stored as an array; serialized comma-separated (STAC GET form for
+            // free-text terms and collection/item id lists).
+            urlValue = value;
+          } else {
+            urlValue = value.join(',');
+          }
+        }
+
+        this.$store.commit('updateState', { type: field, value: urlValue });
+      });
+    },
+
+    rebuildFromUrl() {
+      if (!this.isActiveSearchType) {
+        return false;
+      }
+      const query = this.$route.query || {};
+      let foundFiltersInUrl = false;
+
+      FILTER_FIELDS.forEach(field => {
+        const value = query[`.${field}`];
+        if (value === null || value === undefined) {
+          return;
+        }
+        let parsedValue = value;
+
+        if (typeof value === 'string') {
+          if (['q', 'collections', 'ids'].includes(field)) {
+            // Comma-separated per the STAC GET conventions (Basic free-text
+            // terms; collection/item id lists).
+            parsedValue = value.split(',');
+          } else if (field === 'bbox') {
+            const coords = decodeURIComponent(value).split(',').map(Number);
+            if ((coords.length === 4 || coords.length === 6) && coords.every(n => !Number.isNaN(n))) {
+              parsedValue = coords;
+            } else {
+              return;
+            }
+          } else if (field === 'datetime') {
+            const decoded = decodeURIComponent(value);
+            const parts = decoded.includes('/') ? decoded.split('/') : decoded.split(',');
+            parsedValue = parts.map(d => {
+              if (!d || d === '..') {return d;}
+              const date = new Date(d);
+              return isNaN(date.getTime()) ? d : date;
+            });
+          } else if (field === 'limit') {
+            const limitInt = Number.parseInt(decodeURIComponent(value), 10);
+            if (!Number.isNaN(limitInt) && limitInt > 0) {
+              parsedValue = Math.min(limitInt, this.maxItems || 10000);
+            } else {
+              return;
+            }
+          }
+        }
+
+        const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
+        this.$store.commit(mutation, { [field]: parsedValue });
+        foundFiltersInUrl = true;
+      });
+
+      return foundFiltersInUrl;
+    },
     resetSearchCollection() {
       clearTimeout(this.collectionsLoadingTimer);
       this.collectionsLoadingTimer = null;
@@ -809,6 +925,9 @@ export default defineComponent({
       // Executing a search retires the notice about the previous carry-over
       this.$store.commit('search/clearDroppedFilters', this.type);
 
+      // The URL mirrors the executed search, so it's written on submit only.
+      this.syncVuexToUrl();
+
       this.$emit('input', this.activeParams);
     },
     onReset() {
@@ -821,6 +940,9 @@ export default defineComponent({
       }
       // The notice about the carry-over refers to a state that was just discarded
       this.$store.commit('search/clearDroppedFilters', this.type);
+
+      this.syncVuexToUrl();
+
       this.$emit('input', this.activeParams, true);
     },
     addSearchTerm(term) {

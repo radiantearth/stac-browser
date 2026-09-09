@@ -22,6 +22,7 @@ function createApi() {
   // Advertise free-text collection search so that the free-text field shows up
   api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
   api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search#free-text');
+  api.root.addConformsTo('https://api.stacspec.org/v1.0.0/item-search#free-text');
   return { api, collection };
 }
 
@@ -141,4 +142,93 @@ test('corrects a URL entered with a trailing slash if the server reports none', 
 
   await expect(page).toHaveURL(ENTERED_PATH);
   await expect(page.getByRole('heading', { name: /Example API/i })).toBeVisible();
+});
+
+test.describe('Search filter URL serialization', () => {
+
+  test.beforeEach(async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await mockStacResource(worker, CANONICAL, api.root.build());
+    
+    await page.goto(`/search${CANONICAL_PATH}`);
+    await waitForBrowserReady(page);
+  });
+
+  test('Filters serialize under spec-native names, scoped by searchtype', async ({ page }) => {
+    await page.getByRole('tab', { name: /Items/i }).click();
+
+    const itemSearchGroup = page.locator('.tab-pane.active .filter-freetext');
+    await expect(itemSearchGroup).toBeVisible();
+    const itemSearchMultiselect = itemSearchGroup.locator('.multiselect');
+    await itemSearchMultiselect.locator('.multiselect__tags').click();
+    const itemSearchInput = itemSearchGroup.locator('input.multiselect__input');
+    await expect(itemSearchInput).toBeVisible();
+    await itemSearchInput.fill('water');
+    await itemSearchInput.press('Enter');
+
+    // The URL reflects the executed search, so editing the form alone must not
+    // change it; it's only written on submit.
+    await expect(page).not.toHaveURL(/\.q=water/);
+    await page.locator('.tab-pane.active').getByRole('button', { name: /submit/i }).click();
+
+    // Spec-native name, no per-type prefix; searchtype records the active search.
+    await expect(page).toHaveURL(/\.q=water/);
+    await expect(page).toHaveURL(/\.searchtype=items/);
+
+    await page.getByRole('tab', { name: /Collections/i }).click();
+    const collectionSearchGroup = page.locator('.tab-pane.active .filter-freetext');
+    await expect(collectionSearchGroup).toBeVisible();
+    const collectionSearchMultiselect = collectionSearchGroup.locator('.multiselect');
+    await collectionSearchMultiselect.locator('.multiselect__tags').click();
+    const collectionSearchInput = collectionSearchGroup.locator('input.multiselect__input');
+    await expect(collectionSearchInput).toBeVisible();
+    await collectionSearchInput.fill('clouds');
+    await collectionSearchInput.press('Enter');
+
+    await page.locator('.tab-pane.active').getByRole('button', { name: /submit/i }).click();
+
+    // The active search owns the shared params; switching and submitting the
+    // collection search replaces the item search's q under the same key.
+    await expect(page).toHaveURL(/\.q=clouds/);
+    await expect(page).toHaveURL(/\.searchtype=collections/);
+    await expect(page).not.toHaveURL(/\.q=water/);
+  });
+
+  test('Reset button completely clears filters from the URL', async ({ page }) => {
+    await page.goto(`/search${CANONICAL_PATH}?.q=water&.limit=15&.searchtype=items`);
+    await waitForBrowserReady(page);
+
+    await page.getByRole('tab', { name: /Items/i }).click();
+    await page.locator('.tab-pane.active').getByRole('button', { name: /reset/i }).click();
+
+    await expect(page).not.toHaveURL(/\.q=water/);
+    await expect(page).not.toHaveURL(/\.limit=/);
+  });
+
+  test('Free-text q treats commas as term separators (Basic free-text)', async ({ page }) => {
+    // STAC Basic free-text GET: terms are comma-separated and a space is part of
+    // a term, so `EO,Earth Observation` is two terms, not one.
+    await page.goto(`/search${CANONICAL_PATH}?.q=EO%2CEarth%20Observation&.searchtype=items`);
+    await waitForBrowserReady(page);
+
+    await page.getByRole('tab', { name: /Items/i }).click();
+    const tags = page.locator('.tab-pane.active .filter-freetext .multiselect__tag');
+    await expect(tags).toHaveCount(2);
+    await expect(tags.nth(0)).toContainText('EO');
+    await expect(tags.nth(1)).toContainText('Earth Observation');
+  });
+
+  test('Invalid garbage data in the URL is safely ignored (Validation)', async ({ page }) => {
+    await page.goto(`/search${CANONICAL_PATH}?.bbox=foo,bar,baz,qux&.limit=-50&.searchtype=items`);
+    await waitForBrowserReady(page);
+
+    await page.getByRole('tab', { name: /Items/i }).click();
+    const limitInput = page.locator('.tab-pane.active .limit input');
+    await expect(limitInput).not.toHaveValue('-50');
+
+    // Verify bbox was ignored
+    const spatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
+    await expect(spatialCheckbox).not.toBeChecked();
+  });
 });
