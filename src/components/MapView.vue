@@ -304,7 +304,9 @@ export default {
       this.selection = null;
     },
     onGatedInteraction() {
-      if (this.$refs.map.contains(document.activeElement)) {
+      // getRootNode: in the web component, document.activeElement is only the
+      // shadow host; the shadow root knows the actually focused element.
+      if (this.$refs.map.contains(this.$refs.map.getRootNode().activeElement)) {
         return;
       }
       this.focusHint = true;
