@@ -4,7 +4,7 @@
       <b-tab
         v-for="generator in generatorInstances"
         :key="generator.language"
-        :title="generator.label"
+        :title="$t(generator.label)"
         :id="generator.language"
       >
         <CodeBox

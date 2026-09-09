@@ -1,10 +1,12 @@
 <template>
   <li class="link">
-    <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
     <b-popover
-      :target="popoverId" placement="auto" teleport-to="#stac-browser" class="link-more"
+      placement="auto" class="link-more"
       focus hover :boundary-padding="20"
     >
+      <template #target>
+        <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
+      </template>
       <Description v-if="link.description" :description="link.description" compact />
       <section class="link-actions">
         <h3 class="first">{{ $t('additionalActions') }}</h3>

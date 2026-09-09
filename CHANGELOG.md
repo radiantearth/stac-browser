@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- STAC Browser can be embedded into any web page, regardless of framework, as a `<stac-browser>` web component
+  (custom element) rendered into an isolated shadow root. See [docs/web-component.md](docs/web-component.md).
+  - Built with `npm run build:web-component` into `stac-browser.js`, `stac-browser.css` and additional code-split chunks in `dist/`; deploy the whole directory
+  - Configurable via attributes (`url`, `catalog-title`, `locale`, `history-mode`, `isolation`) and a `config` DOM property
+  - Emits `navigate`, `title`, `description`, `locale`, `structuredData` and `error` events so the host page can react
+    and manage its own document head
+  - Exposes `navigate(to)` and `navigateToStac(url)` methods for programmatic navigation by route or STAC URL
+  - Exposes the displayed resource through the `url` and `data` getters and a `data` event
+  - `setData(data, url)` renders custom STAC data without fetching it, e.g. for an editor live preview
+  - Themeable from the host by forwarding Bootstrap CSS custom properties (e.g. `--bs-primary`) into the shadow root;
+    the site header follows the primary color and can be styled independently via `--sb-header` and `--sb-header-color`
+  - `isolation` option: `inline` (default — grows with the host page, overlays span it, and it inherits the host's
+    background/text color/typography) or `isolated` (iframe-like — owns its scroll viewport, contains overlays within
+    its box, and styles itself; requires a fixed height)
+- New `memory` value for the `historyMode` option that keeps navigation entirely in memory without touching the
+  browser URL (the default in the web component; not recommended for standalone deployments)
 - New config option `basemaps` to customize the basemaps via JSON without code changes,
   e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
 - Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:

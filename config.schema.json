@@ -93,7 +93,7 @@
     },
     "historyMode": {
       "type": "string",
-      "enum": ["history", "hash"],
+      "enum": ["history", "hash", "memory"],
       "buildOnly": true
     },
     "RUNTIME": {

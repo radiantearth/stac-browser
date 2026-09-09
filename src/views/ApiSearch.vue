@@ -101,6 +101,9 @@ export default defineComponent({
     StacActions: defineAsyncComponent(() => import('../components/StacActions.vue')),
     StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
+  inject: {
+    embedded: { default: false }
+  },
   props: {
     loadParent: {
       type: String,
@@ -320,7 +323,7 @@ export default defineComponent({
         }
       } catch (error) {
         this.data = null;
-        this.error = getErrorMessage(error);
+        this.error = getErrorMessage(this.$i18n, error);
         this.errorId = getErrorCode(error);
       } finally {
         this.loading = false;
@@ -349,7 +352,11 @@ export default defineComponent({
         this.data = null;
       }
       else if (this.searchLink) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Embedded, never scroll the host window (see the router scrollBehavior).
+        const target = Utils.resolveScrollTarget(this.$el);
+        if (target !== window || !this.embedded) {
+          target.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         await this.loadResults(this.searchLink);
       }
     },
