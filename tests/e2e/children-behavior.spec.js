@@ -1,13 +1,12 @@
 /**
- * Regression tests for how collections are loaded from the `/collections`
- * endpoint (rel="data") and assembled into the children list of a
- * catalog-like entity: merging with static `rel="child"` links (#103),
- * pagination, URL guessing (#486), caching and list resets across
- * entities (#617), endpoint precedence in the load action, and collection
- * free-text search.
+ * Regression tests for how children of a catalog-like entity are loaded and
+ * displayed, covering the interplay of static `rel="child"` links and the
+ * `/collections` endpoint (rel="data") in many variants.
  *
- * These tests pin down the current behavior before the children/collections
- * handling is refactored for the STAC API - Children extension (#218).
+ * Covers merge and de-duplication semantics (#103), the separated vs. merged
+ * display (`mergeCatalogsAndCollections`), pagination, URL guessing (#486),
+ * list resets across entities (#617), endpoint precedence in the load action,
+ * and collection free-text search.
  * The `apiCatalogPriority` option is covered in api-catalog-priority.spec.js.
  */
 import { test, expect } from './fixtures.js';
@@ -70,6 +69,55 @@ test.describe('Merging static child links and API collections (#103)', () => {
     // infinite scrolling through the paginated collections (#103)
     await expect(page.locator(CARD)).toHaveCount(3);
     await expect(page.locator(CARD).first()).toContainText('Static Catalog');
+  });
+});
+
+test.describe('Separated children and collections display', () => {
+  function createApi() {
+    const api = API.defaultApi();
+    api.addCollection('api-collection').setMetadata({ title: 'API Collection' });
+    const shared = api.addCollection('shared-collection').setMetadata({ title: 'Shared Collection' });
+    api.root.addChildLink(shared);
+    api.addStaticCatalog({ url: 'static-catalog' }).setMetadata({ title: 'Static Catalog' });
+    return { api };
+  }
+
+  test('children and collections are shown as separate sections by default', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const sections = page.locator('.catalogs');
+    await expect(sections).toHaveCount(2);
+
+    // The children section lists the static child links,
+    // except for those that are also in the collections list
+    const childrenSection = sections.first();
+    await expect(childrenSection.locator('header .title')).toHaveText(/Catalog/);
+    await expect(childrenSection.locator('.card-grid > *')).toHaveCount(1);
+    await expect(childrenSection.getByRole('link', { name: /Static Catalog/ })).toBeVisible();
+
+    // The collections section lists the collections endpoint results
+    const collectionsSection = sections.last();
+    await expect(collectionsSection.locator('header .title')).toHaveText(/Collections/);
+    await expect(collectionsSection.locator('.card-grid > *')).toHaveCount(2);
+    await expect(collectionsSection.getByRole('link', { name: /API Collection/ })).toBeVisible();
+    await expect(collectionsSection.getByRole('link', { name: /Shared Collection/ })).toBeVisible();
+  });
+
+  test('mergeCatalogsAndCollections shows a single merged list', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { mergeCatalogsAndCollections: true });
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const sections = page.locator('.catalogs');
+    await expect(sections).toHaveCount(1);
+    await expect(page.locator(CARD)).toHaveCount(3);
   });
 });
 

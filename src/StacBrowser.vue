@@ -362,6 +362,7 @@ export default defineComponent({
     root(root, oldRoot) {
       const canChange = [
         'apiCatalogPriority',
+        'apiItemPriority',
         'cardViewMode',
         'crossOriginMedia',
         'defaultCollectionSort',
@@ -369,6 +370,7 @@ export default defineComponent({
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
         'maxDisplayPixels',
+        'mergeCatalogsAndCollections',
         'preferredAssets',
         'showThumbnailsAsAssets'
       ];

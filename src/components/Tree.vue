@@ -74,7 +74,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage']),
+    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'mergeCatalogsAndCollections', 'uiLanguage']),
     ...mapGetters(['getApiChildren', 'getChildren', 'getStac', 'isApiChildrenLoading', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
@@ -154,40 +154,34 @@ export default {
       return this.childs.length > this.shownChilds.length;
     },
     childs() {
-      if (this.stac?.isCatalogLike) {
-        const children = this.getChildren(this.stac, this.apiCatalogPriority);
-        if (children.length < 2) {
-          return children;
-        }
-
-        const collectionSort = Utils.parseApiSortParameter(this.defaultCollectionSort);
-        const itemSort = Utils.parseApiSortParameter(this.defaultItemSort);
-
-        const prev = [];
-        const next = [];
-        const items = [];
-        const catalogs = [];
-        for (const child of children) {
-          if (['prev', 'previous'].includes(child?.rel)) {
-            prev.push(child);
-          }
-          else if (child?.rel === 'next') {
-            next.push(child);
-          }
-          else if (child?.rel === 'item' || child?.isItem) {
-            items.push(child);
-          }
-          else {
-            catalogs.push(child);
-          }
-        }
-
-        const sortedCatalogs = collectionSort.direction === 0 ? catalogs : sortStac(catalogs, collectionSort, this.uiLanguage);
-        const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
-
-        return prev.concat(sortedCatalogs, sortedItems, next);
+      if (!this.stac?.isCatalogLike) {
+        return [];
       }
-      return [];
+      const { children, collections, items } = this.getChildren(this.stac, this.apiCatalogPriority);
+
+      const collectionSort = Utils.parseApiSortParameter(this.defaultCollectionSort);
+      const itemSort = Utils.parseApiSortParameter(this.defaultItemSort);
+      const sortCatalogs = list => collectionSort.direction === 0 ? list : sortStac(list, collectionSort, this.uiLanguage);
+      const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
+
+      const childs = [];
+      if (this.mergeCatalogsAndCollections) {
+        children.prev && childs.push(children.prev);
+        collections.prev && childs.push(collections.prev);
+        childs.push(...sortCatalogs(children.list.concat(collections.list)), ...sortedItems);
+        children.next && childs.push(children.next);
+        collections.next && childs.push(collections.next);
+      }
+      else {
+        // Children before collections, each list paginated on its own
+        children.prev && childs.push(children.prev);
+        childs.push(...sortCatalogs(children.list));
+        children.next && childs.push(children.next);
+        collections.prev && childs.push(collections.prev);
+        childs.push(...sortCatalogs(collections.list), ...sortedItems);
+        collections.next && childs.push(collections.next);
+      }
+      return childs;
     },
     shownChilds() {
       return this.childs.slice(0, this.chunk * 50);
@@ -204,11 +198,15 @@ export default {
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
     },
+    source() {
+      // The source that a pagination link belongs to, see the getChildren getter
+      return this.item.source || 'collections';
+    },
     canLoadMore() {
-      return this.item.rel === 'next' && this.getApiChildren(this.parent)?.type === 'collections';
+      return this.item.rel === 'next' && Boolean(this.getApiChildren(this.parent, this.source)?.next);
     },
     loadingMore() {
-      return this.isApiChildrenLoading(this.parent);
+      return this.isApiChildrenLoading(this.parent, this.source);
     }
   },
   watch: {
@@ -234,12 +232,18 @@ export default {
       if (!visible || this.loadingMore) {
         return;
       }
+      const children = this.source === 'children';
       try {
-        await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+        if (children) {
+          await this.$store.dispatch('loadApiChildren', { stac: this.parent, next: true });
+        }
+        else {
+          await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+        }
       } catch (error) {
         this.$store.commit('showGlobalError', {
           error,
-          message: this.$t('errors.loadApiCollectionsFailed')
+          message: this.$t(children ? 'errors.loadApiChildrenFailed' : 'errors.loadApiCollectionsFailed')
         });
       }
     },
