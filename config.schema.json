@@ -198,6 +198,10 @@
         },
         "required": ["label", "url"]
       }
+    },
+    "faviconImage": {
+      "type": ["string", "null"],
+      "format": "uri-reference"
     }
   }
 }

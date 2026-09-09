@@ -53,6 +53,7 @@ The override order for the configuration is:
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
+  - [faviconImage](#faviconimage)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
     - [`history`](#history)
@@ -180,6 +181,12 @@ The following options are available:
 - `null`: Default behavior
 
 This option only applies to catalogs and collections, it never hides items.
+
+### faviconImage
+
+URL to an icon image to use as a favicon in the broswer tab.
+Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
+
 
 ## Deployment
 
