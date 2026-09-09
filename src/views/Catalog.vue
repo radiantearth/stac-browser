@@ -80,7 +80,7 @@ import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import Utils from '../utils';
+import Utils, { getTemporalExtentFormatOptions } from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from 'stac-js';
@@ -124,7 +124,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'omitTimeForMidnight', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
@@ -182,7 +182,7 @@ export default defineComponent({
           // Remove union temporal extent in favor of more concrete extents
           extents = extents.slice(1);
         }
-        return this.formatTemporalExtents(extents);
+        return this.formatTemporalExtents(extents, null, getTemporalExtentFormatOptions(extents, this.omitTimeForMidnight));
       }
       return null;
     },
