@@ -1,16 +1,15 @@
 FROM node:lts-alpine AS build-step
-ARG DYNAMIC_CONFIG=true
 ARG historyMode="history"
 ARG SB_CONFIG=""
-ENV DYNAMIC_CONFIG="${DYNAMIC_CONFIG}"
+ARG SB_RUNTIME=true
 ENV SB_historyMode="${historyMode}"
 ENV SB_CONFIG="${SB_CONFIG}"
+ENV SB_RUNTIME="${SB_RUNTIME}"
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!--RC//;s/RC-->//' index.html
 RUN npm run build
 
 
