@@ -12,6 +12,50 @@
 import { test, expect } from './fixtures.js';
 import { waitForBrowserReady, waitForMapReady, getMapState } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
+import API from '../fixtures/instances/api.js';
+
+function getChildMapOptions(page) {
+  return page.evaluate(() => {
+    let el = document.querySelector('.map-container .map');
+    while (el) {
+      const inst = el.__vueParentComponent;
+      try {
+        const options = inst?.proxy?.childrenOptions ?? inst?.ctx?.childrenOptions;
+        if (options) {
+          return options;
+        }
+      } catch {
+        // Continue walking up the component tree.
+      }
+      el = el.parentElement;
+    }
+    return null;
+  });
+}
+
+test.describe('Child map display options', () => {
+  test('can configure previews and overviews independently', async ({ page, worker }) => {
+    const api = API.minimalApi();
+    const collection = api.addCollection('collection');
+    api.addManyItems(collection, 2);
+    await api.createServer(worker);
+
+    await page.addInitScript(() => {
+      window.STAC_BROWSER_CONFIG = {
+        displayPreviewsForChildren: false,
+        displayOverviewsForChildren: true,
+      };
+    });
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+
+    await expect.poll(() => getChildMapOptions(page)).toEqual({
+      displayPreview: false,
+      displayOverview: true,
+    });
+  });
+});
 
 /**
  * Build a static catalog containing a single Item near New Zealand whose
