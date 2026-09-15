@@ -3,7 +3,7 @@ export default {
     catalogTitle: "Open Science Catalogue",
     catalogTitleAfterImage: null,
     catalogImage: null,
-    apiUrl: "https://eoapi.workspace.earthcode-staging.earthcode.eox.at/stac",
+    apiUrl: "https://eoapi.workspace.earthcode.eox.at/stac",
     staticEndpoint: "https://esa-earthcode.github.io/open-science-catalog-metadata/",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
@@ -85,6 +85,25 @@ export default {
                     link.href.includes("/missions/")
                 )) {
                     link.rel = "osc:metadata";
+                }
+                // Suppress duplicate Access links from "Additional Resources" on product pages
+                const titleLower = (link.title || '').toLowerCase();
+                const isDocOrLicense = titleLower.includes('documentation') || titleLower.includes('license') || titleLower.includes('publication');
+                const isAccessLink = link.href && !isDocOrLicense && (
+                    link.rel === 'access' ||
+                    link.rel === 'osc:data-access' ||
+                    titleLower === 'access' ||
+                    titleLower.includes('data access') ||
+                    titleLower.includes('access data') ||
+                    (link.rel === 'via' && (titleLower === '' || titleLower === 'access'))
+                );
+                if (stac['osc:type'] === 'product' && isAccessLink) {
+                    link.rel = "osc:data-access";
+                }
+                // Suppress sub-catalog child links from STAC Browser's separate catalogs column on product pages,
+                // so that the OSC Data Access widget serves as the unified place to access the data without double display.
+                if (stac['osc:type'] === 'product' && link.rel === 'child') {
+                    link.rel = "osc:subcatalog";
                 }
                 return link;
             });

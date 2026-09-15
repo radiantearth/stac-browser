@@ -19,5 +19,18 @@
   "status": "Status:",
   "browse": "Overview",
   "topics": "Related EarthCODE Forum Topics",
-  "fairAssessment": "FAIR Assessment"
+  "fairAssessment": "FAIR Assessment",
+  "dataAccess": {
+    "title": "Data Access",
+    "accessTheData": "Access the Data",
+    "accessLink": "Access Data",
+    "accessNotebook": "Access Notebook",
+    "externalAccess": "External Access",
+    "subCatalogs": "Sub-Catalogs & Collections",
+    "itemsAvailable": "{count} Data Items / Granules available",
+    "noAccess": "No direct data access available for this product.",
+    "browseCatalog": "Browse Catalog",
+    "browseItems": "Browse Items",
+    "directDownload": "Direct Download"
+  }
 }

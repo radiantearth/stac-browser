@@ -11,7 +11,8 @@ export const stacBrowserNavigatesTo = [
   'predecessor-version',
   'successor-version',
   'source', // label extension,
-  'alternate' // language extension
+  'alternate', // language extension
+  'osc:subcatalog'
 ].concat(hierarchical).concat(pagination);
 
 // Rels that are handled in a special way and should not be shown in the link list
@@ -26,6 +27,8 @@ export const stacBrowserSpecialHandling = [
   'icon', // Other v
   'license',
   'osc:metadata',
+  'osc:data-access',
+  'osc:subcatalog'
 ].concat(hierarchical).concat(pagination).concat(queryables);
 
 // OGC APIs
