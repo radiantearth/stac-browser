@@ -51,21 +51,24 @@
         box-sizing: border-box;
       }
 
-      /* --- PAGE CONTAINER (MATCHES px-15 pt-8 FROM OLD METRICS.VUE) --- */
+      /* --- PAGE CONTAINER (MATCHES ESA-UI / EARTHCODE CONTAINER) --- */
       .app-container {
         display: flex;
         flex-direction: column;
         height: 100%;
         width: 100%;
-        padding: 32px 60px 24px 60px; /* Equivalent to px-15 pt-8 */
+        max-width: calc(1400px + 4rem);
+        margin: 0 auto;
+        padding: 32px 2rem 24px 2rem;
         box-sizing: border-box;
         overflow: hidden;
         gap: 16px;
       }
 
-      @media (max-width: 960px) {
+      @media (max-width: 45em) {
         .app-container {
-          padding: 16px;
+          max-width: calc(1400px + 3rem);
+          padding: 16px 1.5rem;
           overflow-y: auto;
           height: auto;
           gap: 12px;
@@ -1352,7 +1355,7 @@
 
       let apiUrlParam =
         urlParams.get("apiUrl") ||
-        "https://eoapi.workspace.earthcode-staging.earthcode.eox.at/stac/collections";
+        "https://eoapi.workspace.earthcode.eox.at/stac/collections";
       if (
         apiUrlParam &&
         !apiUrlParam.endsWith("/collections") &&

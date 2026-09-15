@@ -16,9 +16,24 @@
         margin: 0;
         background: #f0f2f5;
         height: 100dvh;
+        overflow: hidden;
+      }
+      .search-layout-container {
         display: flex;
         flex-direction: row;
+        width: 100%;
+        max-width: calc(1400px + 4rem);
+        margin: 0 auto;
+        padding: 0 2rem;
+        box-sizing: border-box;
+        height: 100dvh;
         overflow: hidden;
+      }
+      @media (max-width: 45em) {
+        .search-layout-container {
+          max-width: calc(1400px + 3rem);
+          padding: 0 1.5rem;
+        }
       }
       .sidebar {
         width: 350px;
@@ -53,9 +68,14 @@
       }
       @media (max-width: 768px) {
         body {
-          flex-direction: column;
           overflow: visible;
           height: auto;
+        }
+        .search-layout-container {
+          flex-direction: column;
+          height: auto;
+          overflow: visible;
+          padding: 0;
         }
         .sidebar {
           display: block;
@@ -251,21 +271,23 @@
       <div class="loading-spinner"></div>
     </div>
 
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h1>
-          Search <span class="mobile-only">Products & Workflows</span>
-        </h1>
-      </div>
-      <eox-itemfilter id="itemfilter">
-        <div slot="filterstitle">
-          <p><strong>Products & Workflows</strong></p>
+    <div class="search-layout-container">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h1>
+            Search <span class="mobile-only">Products & Workflows</span>
+          </h1>
         </div>
-      </eox-itemfilter>
-    </div>
-    <div class="main-content">
-      <div id="status"></div>
-      <div id="results"></div>
+        <eox-itemfilter id="itemfilter">
+          <div slot="filterstitle">
+            <p><strong>Products & Workflows</strong></p>
+          </div>
+        </eox-itemfilter>
+      </div>
+      <div class="main-content">
+        <div id="status"></div>
+        <div id="results"></div>
+      </div>
     </div>
 
     <script type="module">
@@ -296,7 +318,7 @@
         "https://esa-earthcode.github.io/open-science-catalog-metadata";
       const API_URL =
         urlParams.get("apiUrl") ||
-        "https://eoapi.workspace.earthcode-staging.earthcode.eox.at/stac";
+        "https://eoapi.workspace.earthcode.eox.at/stac";
       let productBaseUrl =
         urlParams.get("productBaseUrl") ||
         urlParams.get("siteUrl") ||

@@ -13,3 +13,19 @@
     display: none !important;
   }
 }
+
+#stac-browser {
+  width: 100% !important;
+  max-width: calc(1400px + 4rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  box-sizing: border-box !important;
+
+  @media (max-width: 45em) {
+    max-width: calc(1400px + 3rem) !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+}

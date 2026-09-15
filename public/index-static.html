@@ -8,193 +8,205 @@
     <link rel="stylesheet" href="css/materialdesignicons.min.css" />
     <!-- ESA Custom Fonts -->
     <link rel="stylesheet" href="css/notesesabold.css" />
+    <!-- ESA UI Package Styles & Custom Elements -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/css/main.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/components/card.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/components/gateway.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/components/footer.js"></script>
 
     <style>
       :root {
         --primary-color: #003247; /* ESA Deep Blue */
-        --secondary-color: #335e6f; /* ESA Grey-Blue */
-        --background-color: #ffffff;
-        --border-color: rgba(0, 0, 0, 0.12);
-        --border-radius: 4px;
+        --secondary-color: #335e6f; /* ESA Slate Blue */
+        --dark-bg: #0b1d26; /* EarthCODE Dark Blue */
+        --border-radius: 2px;
         --font-family: Arial, sans-serif;
         --header-font: "NotesESAbold", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         font-family: var(--font-family);
         margin: 0;
-        background: var(--background-color);
-        box-sizing: border-box;
+        padding: 0;
+        background: var(--dark-bg);
+        color: #ffffff;
         overflow-x: hidden;
       }
 
-      /* Container padding matches Vuetify px-15 pt-0 and pa-2 */
       .container {
-        max-width: 1200px;
+        max-width: calc(1400px + 4rem);
         margin: 0 auto;
-        padding: 0 60px;
-        box-sizing: border-box;
+        padding: 0 2rem;
       }
 
-      @media (max-width: 960px) {
+      @media (max-width: 45em) {
         .container {
-          padding: 0 16px;
+          max-width: calc(1400px + 3rem);
+          padding: 0 1.5rem;
         }
       }
 
-      .welcome-section {
-        padding-top: 20px;
-        padding-bottom: 20px;
+      /* Sections Spacing following EarthCODE guidelines */
+      section {
+        padding: 90px 0;
+      }
+
+      @media (min-width: 960px) {
+        section {
+          padding: 110px 0;
+        }
+      }
+
+      /* Hero Banner Section */
+      .hero-section {
+        background-color: var(--dark-bg);
+        background-image: linear-gradient(180deg, #00121a 0%, #0b1d26 100%);
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       }
 
       h1.welcome-title {
         font-family: var(--header-font);
-        color: var(--primary-color);
-        margin: 20px 0 15px 0;
-        font-size: 3rem;
+        color: #ffffff;
+        margin: 0 auto 20px auto;
+        font-size: 3.25rem;
         line-height: 1.15;
+        max-width: 950px;
       }
 
       @media (max-width: 960px) {
         h1.welcome-title {
-          font-size: 2rem;
+          font-size: 2.25rem;
         }
       }
 
-      p {
-        color: rgba(0, 0, 0, 0.87);
-        font-size: 1rem;
-        line-height: 1.5;
-        margin-bottom: 16px;
+      .hero-subtitle {
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 1.125rem;
+        line-height: 1.7;
+        max-width: 850px;
+        margin: 0 auto 40px auto;
       }
 
-      p strong {
-        color: rgba(0, 0, 0, 0.87);
+      /* EarthCODE Button Styles (.btn-cta) */
+      .hero-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
       }
 
-      a {
-        color: var(--secondary-color);
-        text-decoration: underline;
-        font-weight: 500;
-        transition: color 0.2s;
-      }
-
-      a:hover {
-        color: var(--primary-color);
-      }
-
-      .btn-primary {
-        background-color: var(--primary-color);
-        color: white !important;
-        text-decoration: none !important;
-        padding: 8px 16px;
-        border-radius: var(--border-radius);
-        font-size: 0.875rem;
-        font-weight: bold;
+      .btn-cta {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.2s, box-shadow 0.2s;
-        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-          0px 2px 2px 0px rgba(0, 0, 0, 0.14),
-          0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-        margin-top: 8px;
-        margin-bottom: 8px;
-      }
-
-      .btn-primary:hover {
-        background-color: var(--secondary-color);
-        color: white !important;
+        justify-content: center;
         text-decoration: none !important;
-        box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-          0px 4px 5px 0px rgba(0, 0, 0, 0.14),
-          0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-      }
-
-      .btn-primary i {
-        font-size: 1.125rem;
-      }
-
-      /* Grid Section */
-      .themes-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        padding-top: 10px;
-        padding-bottom: 40px;
-      }
-
-      @media (max-width: 960px) {
-        .themes-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .theme-card {
-        display: block;
-        text-decoration: none !important;
-        color: inherit;
-        outline: none;
-      }
-
-      .theme-card-content {
-        position: relative;
-        height: 300px;
-        overflow: hidden;
-        border-radius: var(--border-radius);
-        border-bottom: 0.25em solid var(--secondary-color);
-        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-          0px 2px 2px 0px rgba(0, 0, 0, 0.14),
-          0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-        transition: box-shadow 0.3s ease;
-      }
-
-      .theme-card:hover .theme-card-content {
-        box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-          0px 8px 10px 1px rgba(0, 0, 0, 0.14),
-          0px 3px 14px 2px rgba(0, 0, 0, 0.12);
-      }
-
-      .theme-image-wrapper {
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-
-      .theme-card:hover .theme-image-wrapper {
-        transform: scale(1.05);
-      }
-
-      .imageLabel {
-        background: #003247;
-        color: white;
-        position: absolute;
+        background-color: #ffffff;
+        color: #335e6f !important;
+        padding: 8px 30px !important;
+        border-radius: var(--border-radius) !important;
+        transition: all 0.25s ease;
+        font-weight: 500;
+        font-family: var(--font-family);
+        font-size: 0.75rem !important;
+        height: 48px;
         text-transform: uppercase;
-        padding: 1px 10px;
-        top: 37%;
-        left: 15%;
-        font-size: 21px;
-        font-weight: bold;
-        letter-spacing: 0.5px;
-        pointer-events: none; /* Let clicks pass through if any */
-        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-          0px 2px 2px 0px rgba(0, 0, 0, 0.14),
-          0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+        letter-spacing: 0.35rem;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+
+      .btn-cta:hover {
+        transform: translateY(-0.15rem);
+        color: #335e6f !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-cta.primary {
+        background-color: #335e6f;
+        color: #ffffff !important;
+      }
+
+      .btn-cta.primary:hover {
+        background-color: #274b59;
+        color: #ffffff !important;
+      }
+
+      .btn-cta.secondary {
+        background-color: transparent;
+        color: #ffffff !important;
+        border: 2px solid #ffffff;
+      }
+
+      .btn-cta.secondary:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #ffffff !important;
+      }
+
+      .btn-cta i {
+        font-size: 1rem;
+        margin-right: 6px;
+        letter-spacing: normal;
+      }
+
+      /* White Section - What products can I find here? */
+      .white-section {
+        background-color: #ffffff;
+        color: #003247;
+      }
+
+      .section-heading-light {
+        font-family: var(--header-font);
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin: 0 0 15px 0;
+      }
+
+      .section-lead-light {
+        color: #4a5568;
+        font-size: 1.1rem;
+        line-height: 1.65;
+        margin-bottom: 45px;
+        max-width: 980px;
+      }
+
+      /* Feature Band Section (Dark) */
+      .feature-section {
+        background-color: var(--dark-bg);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Explore By Theme Section */
+      .themes-section {
+        background-color: var(--dark-bg);
+      }
+
+      .section-heading-dark {
+        font-family: var(--header-font);
+        color: #ffffff;
+        font-size: 2.5rem;
+        margin: 0 0 10px 0;
+      }
+
+      .section-subtitle-dark {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 1.1rem;
+        margin: 0 0 40px 0;
       }
 
       /* Skeleton loader styles */
       .skeleton-card {
-        height: 300px;
-        background: #f0f0f0;
+        height: 320px;
+        background: #002838;
         border-radius: var(--border-radius);
         position: relative;
         overflow: hidden;
-        border-bottom: 0.25em solid #ccc;
       }
 
       .skeleton-card::after {
@@ -207,8 +219,8 @@
         background: linear-gradient(
           90deg,
           rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.2) 20%,
-          rgba(255, 255, 255, 0.5) 60%,
+          rgba(255, 255, 255, 0.05) 20%,
+          rgba(255, 255, 255, 0.1) 60%,
           rgba(255, 255, 255, 0) 100%
         );
         animation: shimmer 1.5s infinite;
@@ -223,6 +235,89 @@
         }
       }
 
+      /* Community Contributions Section (Light) */
+      .community-section {
+        background-color: #ffffff;
+        color: #003247;
+      }
+
+      .community-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+      }
+
+      @media (max-width: 768px) {
+        .community-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .community-col h3 {
+        font-family: var(--header-font);
+        color: var(--primary-color);
+        font-size: 1.65rem;
+        margin: 0 0 15px 0;
+      }
+
+      .community-col p {
+        color: #4a5568;
+        font-size: 1.05rem;
+        line-height: 1.65;
+        margin: 0 0 25px 0;
+      }
+
+      .community-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .link-email {
+        color: var(--secondary-color);
+        text-decoration: underline;
+        font-weight: bold;
+        font-size: 1.05rem;
+      }
+
+      .link-email:hover {
+        color: var(--primary-color);
+      }
+
+      /* API Access Section (Dark) */
+      .api-section {
+        background-color: var(--dark-bg);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .api-content {
+        max-width: 850px;
+      }
+
+      .api-content h2 {
+        font-family: var(--header-font);
+        color: #ffffff;
+        font-size: 2.5rem;
+        margin: 0 0 15px 0;
+      }
+
+      .api-content p {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 1.1rem;
+        line-height: 1.65;
+        margin: 0 0 35px 0;
+      }
+
+      /* Mount Containers for Gateway and Footer with EarthCODE Spacing */
+      #gateway-mount {
+        margin-top: 40px;
+      }
+
+      #footer-mount {
+        margin-top: 20px;
+        padding-bottom: 40px;
+      }
+
       .error-message {
         color: #d32f2f;
         background-color: #ffebee;
@@ -231,99 +326,309 @@
         margin-top: 16px;
         border: 1px solid #ffcdd2;
       }
+
+      esa-card {
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
-    <div class="container welcome-section">
-      <h1 class="welcome-title">Welcome to the Open Science Catalogue</h1>
 
-      <p>
-        A catalogue of publicly available geoscience products, datasets and
-        resources developed in the frame of scientific research Projects funded
-        by ESA EO (Earth Observation). Products vary in geographical and
-        temporal extent, production methodology, validation and quality. Please
-        refer to the documentation of each product for details.
-      </p>
-
-      <p>
-        <strong>What products can I find here?</strong>
-      </p>
-
-      <p>
-        The majority of pages on opensciencedata.esa.int only hold metadata for
-        each product and project. The actual data and its documentation are
-        maintained and accessible at the data providers, outside of esa.int, for
-        the majority of cases. This catalogue provides the metadata and links to
-        the data as it exists in those many other locations.
-      </p>
-
-      <p>
-        Explore the catalogue, consisting of
-        <a href="/eo-missions/catalog" target="_parent">EO Missions</a>,
-        <a href="/experiments/catalog" target="_parent">Experiments</a>,
-        <a href="/products/catalog" target="_parent">Products</a>,
-        <a href="/projects/catalog" target="_parent">Projects</a>,
-        <a href="/data-collections/catalog" target="_parent">Data Collections</a
-        >, <a href="/themes/catalog" target="_parent">Themes</a>,
-        <a href="/variables/catalog" target="_parent">Variables</a> and
-        <a href="/workflows/catalog" target="_parent">Workflows</a>.
-      </p>
-
-      <p>Choose a theme below to explore available products/projects!</p>
-
-      <p>
-        To suggest changes and/or contribute to the continuously growing number
-        of available products, you can do so directly via the
-        <a
-          href="https://github.com/ESA-EarthCODE/open-science-catalog-metadata"
-          target="_blank"
-          >STAC catalog hosted on GitHub</a
-        >, or use the tools and services provided by
-        <a href="https://earthcode.esa.int/" target="_blank">EarthCODE</a>.
-      </p>
-
-      <p>
-        If you have any questions or feedback regarding Open Science Catalogue,
-        please contact us at
-        <a href="mailto:opensciencedata@esa.int">opensciencedata@esa.int</a>.
-      </p>
-
-      <p>
-        <a href="/metrics" target="_parent" class="btn-primary">
-          <i class="mdi mdi-poll"></i>
-          Metrics
-        </a>
-        <a href="/search" target="_parent" class="btn-primary">
-          <i class="mdi mdi-magnify"></i>
-          Search
-        </a>
-        <a href="/fair" target="_parent" class="btn-primary">
-          <i class="mdi mdi-information-outline"></i>
-          FAIR Principles
-        </a>
-        <a id="api-access-btn" href="#" target="_blank" class="btn-primary">
-          <i class="mdi mdi-xml"></i>
-          API Access
-          <i class="mdi mdi-open-in-new"></i>
-        </a>
-      </p>
-    </div>
-
-    <div class="container">
-      <div id="themes-container" class="themes-grid">
-        <!-- Skeleton Loaders -->
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1 class="welcome-title">Welcome to the Open Science Catalogue</h1>
+        <p class="hero-subtitle">
+          A catalogue of publicly available geoscience products, datasets and resources developed in the frame of scientific research Projects funded by ESA EO (Earth Observation).
+        </p>
+        <div class="hero-buttons">
+          <a href="/catalog" target="_parent" class="btn-cta primary">
+            <i class="mdi mdi-compass"></i> Explore Catalogue
+          </a>
+          <a href="/search" target="_parent" class="btn-cta secondary">
+            <i class="mdi mdi-magnify"></i> Search
+          </a>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <script>
+    <!-- White Section: What products can I find here? -->
+    <section class="white-section">
+      <div class="container">
+        <h2 class="section-heading-light">What products can I find here?</h2>
+        <p class="section-lead-light">
+          The majority of pages on opensciencedata.esa.int only hold metadata for each product and project. The actual data and its documentation are maintained and accessible at the data providers, outside of esa.int, for the majority of cases. Products vary in geographical and temporal extent, production methodology, validation and quality. Please refer to the documentation of each product for details. Explore the catalogue, consisting of:
+        </p>
+
+        <esa-cards>
+          <esa-card
+            light
+            title="EO Missions"
+            description="Browse datasets and research products across Earth science."
+            action="LEARN MORE"
+            link="/eo-missions/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Experiments"
+            description="Explore ESA-funded research projects and their outputs."
+            action="LEARN MORE"
+            link="/experiments/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Products"
+            description="Discover science by domain — Atmosphere, Oceans, Land and more."
+            action="LEARN MORE"
+            link="/products/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Data Collections"
+            description="Find scientific workflows and reusable processing pipelines."
+            action="LEARN MORE"
+            link="/data-collections/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Themes"
+            description="Find scientific workflows and reusable processing pipelines."
+            action="LEARN MORE"
+            link="/themes/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Variables"
+            description="Find scientific workflows and reusable processing pipelines."
+            action="LEARN MORE"
+            link="/variables/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Projects"
+            description="Find scientific workflows and reusable processing pipelines."
+            action="LEARN MORE"
+            link="/projects/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            title="Workflows"
+            description="Find scientific workflows and reusable processing pipelines."
+            action="LEARN MORE"
+            link="/workflows/catalog"
+          ></esa-card>
+        </esa-cards>
+      </div>
+    </section>
+
+    <!-- Dark Feature Band: Quick Guide Cards using esa-cards & esa-card -->
+    <section class="feature-section">
+      <div class="container">
+        <esa-cards>
+          <esa-card
+            light
+            tag="EXPLORE"
+            title="Browse The Catalogue"
+            description="Browse EO Missions, Experiments, Products, Projects, Data Collections, Themes, Variables and Workflows."
+            action="LEARN MORE"
+            link="/catalog"
+          ></esa-card>
+
+          <esa-card
+            light
+            tag="THEMES"
+            title="Choose A Theme"
+            description="Browse by theme to explore available products/projects in your area of interest."
+            action="LEARN MORE"
+            link="#themes-section"
+          ></esa-card>
+
+          <esa-card
+            light
+            tag="COMMUNITY"
+            title="Improve The Catalogue"
+            description="Suggest changes and/or contribute to the continuously growing number of available products."
+            action="LEARN MORE"
+            link="https://github.com/ESA-EarthCODE/open-science-catalog-metadata"
+          ></esa-card>
+
+          <esa-card
+            light
+            tag="CONTACT"
+            title="Get In Touch"
+            description="If you have any questions or feedback regarding Open Science Catalogue, please contact us."
+            action="LEARN MORE"
+            link="mailto:opensciencedata@esa.int"
+          ></esa-card>
+        </esa-cards>
+      </div>
+    </section>
+
+    <!-- Dark Section: Explore by Theme -->
+    <section id="themes-section" class="themes-section">
+      <div class="container">
+        <h2 class="section-heading-dark">Explore by theme</h2>
+        <p class="section-subtitle-dark">Choose a theme below to explore available product or projects.</p>
+
+        <esa-cards id="themes-container">
+          <!-- Skeleton Loaders -->
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </esa-cards>
+      </div>
+    </section>
+
+    <!-- White Section: Community Contributions -->
+    <section class="community-section">
+      <div class="container">
+        <h2 class="section-heading-light">The Open Science Catalogue grows through community contributions.</h2>
+        <div class="community-grid">
+          
+          <div class="community-col">
+            <h3>Contribute</h3>
+            <p>
+              To suggest changes and/or contribute to the continuously growing number of available products, you can do so directly via the STAC catalog hosted on GitHub, or use the tools and services provided by EarthCODE.
+            </p>
+            <div class="community-links">
+              <a href="https://github.com/ESA-EarthCODE/open-science-catalog-metadata" target="_blank" class="btn-cta primary">
+                STAC catalogue on GitHub
+              </a>
+              <a href="https://earthcode.esa.int/" target="_blank" class="btn-cta primary">
+                EarthCODE
+              </a>
+            </div>
+          </div>
+
+          <div class="community-col">
+            <h3>Get in touch</h3>
+            <p>
+              If you have any questions or feedback regarding Open Science Catalogue, please contact us at
+              <a href="mailto:opensciencedata@esa.int" class="link-email">opensciencedata@esa.int</a>.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Dark Section: API Access -->
+    <section class="api-section">
+      <div class="container">
+        <div class="api-content">
+          <h2>API Access</h2>
+          <p>
+            Programmatic access to the Open Science Catalogue through the STAC API. Use the API to search collections, retrieve metadata, access items and integrate the catalog into your own applications and workflows.
+          </p>
+          <a id="api-access-btn-2" href="#" target="_blank" class="btn-cta primary">
+            Open API Access <i class="mdi mdi-arrow-right" style="margin-left:4px; margin-right:0;"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Container for dynamically mounted ESA Gateway -->
+    <div id="gateway-mount"></div>
+
+    <!-- Container for dynamically mounted ESA Footer -->
+    <div id="footer-mount"></div>
+
+    <script type="module">
+      import "https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/components/card.js";
+      import "https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/components/gateway.js";
+      import "https://cdn.jsdelivr.net/npm/@eox/esa-ui@1.19.0/components/footer.js";
+
+      // Helper to handle link navigation from shadow DOM <esa-card>
+      document.addEventListener("click", (e) => {
+        const card = e.target.closest("esa-card");
+        if (card) {
+          const link = card.getAttribute("link");
+          if (link) {
+            e.preventDefault();
+            if (link.startsWith("http://") || link.startsWith("https://") || link.startsWith("mailto:")) {
+              window.open(link, "_blank");
+            } else if (link.startsWith("#")) {
+              const targetEl = document.querySelector(link);
+              if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+            } else {
+              window.parent.location.href = link;
+            }
+          }
+        }
+      });
+
+      // Mount ESA Gateway dynamically
+      const gatewayItems = [
+        {
+          title: "ESA Open Science Vision",
+          links: [
+            { name: "ESA EO Science Strategy 2024", href: "https://doi.org/10.5281/zenodo.13819557" }
+          ]
+        },
+        {
+          title: "ESA's Earth Observation Programme",
+          links: [
+            { name: "Observing the Earth", href: "https://www.esa.int/Applications/Observing_the_Earth" },
+            { name: "EO Science for Society", href: "https://eo4society.esa.int" }
+          ]
+        },
+        {
+          title: "Research at ESA",
+          links: [
+            { name: "Earth System Science Hub", href: "https://sciencehub.esa.int" },
+            { name: "ESA Science Clusters", href: "https://eo4society.esa.int/communities/scientists/" }
+          ]
+        },
+        {
+          title: "Opportunities",
+          links: [
+            { name: "Network of Resources", href: "https://nor-discover.org" }
+          ]
+        }
+      ];
+
+      await customElements.whenDefined("esa-gateway");
+      const gateway = document.createElement("esa-gateway");
+      gateway.items = gatewayItems;
+      document.getElementById("gateway-mount").appendChild(gateway);
+
+      // Mount ESA Footer dynamically
+      const footerItems = [
+        [
+          { href: "https://www.esa.int/", title: "ESA Portal" },
+          { href: "https://www.esa.int/About_Us/Corporate_news", title: "About ESA" },
+          { href: "https://www.esa.int/esashop", title: "ESA Space Shop" }
+        ],
+        [
+          { href: "https://www.esa.int/Services/Terms_and_conditions", title: "Terms and Conditions" },
+          { href: "https://www.esa.int/Services/Cookies_notice", title: "Cookies Notice" }
+        ],
+        [
+          { href: "/privacy-notice", title: "Privacy Notice" }
+        ]
+      ];
+
+      await customElements.whenDefined("esa-footer");
+      const footer = document.createElement("esa-footer");
+      footer.setAttribute("title", "Want to get in touch?");
+      footer.setAttribute("contact-link", "mailto:opensciencedata@esa.int");
+      footer.setAttribute("description", "For advice and guidance in using any material from this site, please do not hesitate to contact ESA's Branding and Partnerships Office. We are here to help.");
+      footer.footerItems = footerItems;
+      document.getElementById("footer-mount").appendChild(footer);
+
+      // Dynamic Theme Fetching & Rendering using <esa-card>
       (async function () {
         const themesContainer = document.getElementById("themes-container");
 
         try {
-          // Parse query parameters
           const urlParams = new URLSearchParams(window.location.search);
           const baseUrl =
             urlParams.get("baseUrl") ||
@@ -334,10 +639,15 @@
 
           const apiUrl =
             urlParams.get("apiUrl") ||
-            "https://eoapi.workspace.earthcode-staging.earthcode.eox.at/stac";
+            "https://eoapi.workspace.earthcode.eox.at/stac";
+          
           const apiAccessBtn = document.getElementById("api-access-btn");
+          const apiAccessBtn2 = document.getElementById("api-access-btn-2");
           if (apiAccessBtn) {
             apiAccessBtn.href = apiUrl + "/api.html";
+          }
+          if (apiAccessBtn2) {
+            apiAccessBtn2.href = apiUrl + "/api.html";
           }
 
           // Fetch the themes catalog
@@ -354,11 +664,10 @@
             (link) => link.rel === "child"
           );
 
-          // Fetch details for each theme to get the preview image
+          // Fetch details for each theme to get the preview image and dynamic child count
           const themesWithImages = await Promise.all(
             themeLinks.map(async (themeLink) => {
               try {
-                // Resolve relative/absolute URL
                 let themeUrl;
                 if (
                   themeLink.href.startsWith("./") ||
@@ -372,7 +681,7 @@
 
                 const themeResponse = await fetch(themeUrl);
                 if (!themeResponse.ok) {
-                  return { ...themeLink, image: "" };
+                  return { ...themeLink, image: "", childCount: 0 };
                 }
 
                 const themeData = await themeResponse.json();
@@ -394,13 +703,19 @@
                   }
                 }
 
+                // Count child items/catalogs dynamically
+                const childCount = (themeData.links || []).filter(
+                  (l) => l.rel === "child" || l.rel === "item"
+                ).length;
+
                 return {
                   ...themeLink,
                   image: imageUrl,
+                  childCount: childCount,
                 };
               } catch (err) {
                 console.error(`Error loading theme ${themeLink.title}:`, err);
-                return { ...themeLink, image: "" };
+                return { ...themeLink, image: "", childCount: 0 };
               }
             })
           );
@@ -408,34 +723,33 @@
           // Clear skeleton loaders
           themesContainer.innerHTML = "";
 
-          // Render the cards
+          await customElements.whenDefined("esa-card");
+
+          // Render theme cards using <esa-card>
           themesWithImages.forEach((theme) => {
-            // Get router-compatible theme path: e.g. /themes/atmosphere/catalog or atmosphere/catalog
             let themePath = theme.href;
             if (themePath.startsWith("./")) {
               themePath = themePath.replace(/^\.\//, "");
             }
             themePath = themePath.replace(".json", "");
 
-            const cardLink = document.createElement("a");
-            cardLink.className = "theme-card";
-            cardLink.href = `/themes/${themePath}`;
-            cardLink.setAttribute("target", "_parent");
-
             const formattedTitle = theme.title
               ? theme.title.replace(/_/g, " ")
               : "";
 
-            cardLink.innerHTML = `
-              <div class="theme-card-content">
-                <div class="theme-image-wrapper" style="background-image: url('${
-                  theme.image || ""
-                }')"></div>
-                <span class="imageLabel">${formattedTitle}</span>
-              </div>
-            `;
+            const card = document.createElement("esa-card");
+            card.setAttribute("dark", "");
+            if (theme.image) {
+              card.setAttribute("image", theme.image);
+            }
+            // Dynamic count tag based on fetched catalog links
+            const tagLabel = theme.childCount > 0 ? `${theme.childCount} PRODUCTS` : "THEME";
+            card.setAttribute("tag", tagLabel);
+            card.setAttribute("title", formattedTitle);
+            card.setAttribute("action", "EXPLORE THEME");
+            card.setAttribute("link", `/themes/${themePath}`);
 
-            themesContainer.appendChild(cardLink);
+            themesContainer.appendChild(card);
           });
         } catch (error) {
           console.error("Error in index rendering:", error);

@@ -33,6 +33,6 @@ export default {
 <style scoped>
 .iframe-wrapper {
   width: 100%;
-  height: calc(100vh - 101px); /* Header 64px + compact footer 37px */
+  height: calc(100vh - 140px);
 }
 </style>

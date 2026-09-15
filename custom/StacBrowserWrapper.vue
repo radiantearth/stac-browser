@@ -1,64 +1,17 @@
 <template>
   <div id="app-shell">
     
-    <!-- Top Nav Bar (Vanilla HTML/CSS) -->
-    <header class="esa-header" v-if="!isEmbed">
-      <button class="menu-toggle-btn" @click="drawerOpen = !drawerOpen" aria-label="Toggle Menu">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-        </svg>
-      </button>
-      <router-link to="/" class="esa-brand">Open Science Catalogue</router-link>
-      
-      <!-- Right-aligned ESA Logo -->
-      <div class="esa-header-logo">
-        <a href="https://www.esa.int/" target="_blank">
-          <img src="/img/ESA_Logo.svg" alt="ESA Logo" height="30" />
-        </a>
-      </div>
+    <!-- ESA-UI Mobile Menu (Drawer) -->
+    <esa-menu ref="esaMenu" v-if="!isEmbed"></esa-menu>
+
+    <!-- Header Container: Top ESA-UI Header + ESA-UI Navbar -->
+    <header class="esa-header-wrapper" v-if="!isEmbed">
+      <esa-header></esa-header>
+      <esa-navbar
+        ref="esaNavbar"
+        brand-title="Open Science Catalogue"
+      ></esa-navbar>
     </header>
-
-    <!-- Drawer Overlay -->
-    <div v-if="!isEmbed" class="esa-drawer-overlay" :class="{ 'open': drawerOpen }" @click="drawerOpen = false"></div>
-
-    <!-- Side Menu Drawer (Vanilla HTML/CSS) -->
-    <aside v-if="!isEmbed" class="esa-drawer" :class="{ 'open': drawerOpen }">
-      <div class="esa-drawer-header">
-        <span class="esa-drawer-title">Menu</span>
-        <button class="close-drawer-btn" @click="drawerOpen = false" aria-label="Close Menu">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-          </svg>
-        </button>
-      </div>
-      <nav class="esa-drawer-nav">
-        <router-link to="/" class="nav-item" @click="drawerOpen = false">
-          <i class="mdi mdi-home esa-nav-icon"></i>
-          Home
-        </router-link>
-        <router-link to="/catalog" class="nav-item" @click="drawerOpen = false">
-          <i class="mdi mdi-compass esa-nav-icon"></i>
-          Catalogue
-        </router-link>
-        <router-link to="/metrics" class="nav-item" @click="drawerOpen = false">
-          <i class="mdi mdi-poll esa-nav-icon"></i>
-          Metrics
-        </router-link>
-        <router-link to="/search" class="nav-item" @click="drawerOpen = false">
-          <i class="mdi mdi-magnify esa-nav-icon"></i>
-          Search
-        </router-link>
-        <router-link to="/fair" class="nav-item" @click="drawerOpen = false">
-          <i class="mdi mdi-information-outline esa-nav-icon"></i>
-          FAIR Principles
-        </router-link>
-        <a :href="apiAccessUrl" target="_blank" class="nav-item" @click="drawerOpen = false">
-          <i class="mdi mdi-xml esa-nav-icon"></i>
-          API Access
-          <i class="mdi mdi-open-in-new esa-nav-icon-right"></i>
-        </a>
-      </nav>
-    </aside>
 
     <!-- Main Content Area containing our Router View -->
     <main class="flex-grow-1 position-relative">
@@ -81,7 +34,7 @@
     </div>
 
     <!-- Footer (Vanilla HTML/CSS) -->
-    <footer class="esa-footer" v-if="!isEmbed">
+    <footer class="esa-footer" v-if="!isEmbed && !isLandingPage">
       <div class="esa-footer-container">
         <div class="footer-left">
           &copy; {{ new Date().getFullYear() }} by 
@@ -97,7 +50,7 @@
           <a href="https://github.com/EOEPCA/open-science-catalog-stac-browser" target="_blank" class="esa-footer-link">open-science-catalog</a>
           <span> v{{ appVersion }} by</span>
           <a href="https://eox.at" target="_blank" class="esa-footer-link ms-1">
-            <img src="/img/EOX_Logo_weiss.svg" alt="EOX Logo" height="11" style="vertical-align: middle; margin-top: -3px;" />
+            <img src="/img/EOX_Logo_weiss.svg" alt="EOX Logo" height="11" style="height: 11px !important; max-height: 11px !important; width: auto !important; vertical-align: middle; margin-top: -3px;" />
           </a>
         </div>
       </div>
@@ -137,14 +90,25 @@
 
 <script>
 import CONFIG from '@/merged-config';
+import "@eox/esa-ui/components/header.js";
+import "@eox/esa-ui/components/navbar.js";
+import "@eox/esa-ui/components/menu.js";
 
 export default {
   name: "StacBrowserWrapper",
   data: () => ({
-    drawerOpen: false,
     showCookieBanner: false
   }),
   mounted() {
+    Promise.all([
+      customElements.whenDefined("esa-header"),
+      customElements.whenDefined("esa-navbar"),
+      customElements.whenDefined("esa-menu")
+    ]).then(() => {
+      this.initEsaUi();
+    });
+    this.initEsaUi();
+
     const consent = localStorage.getItem('esa-cookies-consent');
     const hasCookieConsent = document.cookie.includes("mtm_cookie_consent") || document.cookie.includes("mtm_consent_removed");
     if (!consent && !hasCookieConsent) {
@@ -153,6 +117,7 @@ export default {
   },
   watch: {
     $route(to) {
+      this.updateEsaUi();
       if (to.fullPath.startsWith("/catalog")) {
         return;
       }
@@ -168,6 +133,82 @@ export default {
     }
   },
   methods: {
+    initEsaUi() {
+      this.updateEsaUi();
+      this.attachShadowNavListeners();
+    },
+    updateEsaUi() {
+      this.$nextTick(() => {
+        const nav = this.$refs.esaNavbar || document.querySelector("esa-navbar");
+        const menu = this.$refs.esaMenu || document.querySelector("esa-menu");
+        const items = this.menuItems;
+        if (nav) {
+          nav.menuItems = items;
+          if (nav.render) nav.render();
+        }
+        if (menu) {
+          menu.menuItems = items;
+          if (menu.render) menu.render();
+        }
+        this.attachShadowNavListeners();
+      });
+    },
+    attachShadowNavListeners() {
+      const handleAnchorClick = (event, anchor) => {
+        const href = anchor.getAttribute("href");
+        if (!href) return;
+        if (href.startsWith("http") || anchor.getAttribute("target") === "_blank") {
+          event.preventDefault();
+          window.open(href, "_blank");
+        } else if (href.startsWith("/")) {
+          event.preventDefault();
+          this.$router.push(href);
+        }
+      };
+
+      const nav = this.$refs.esaNavbar || document.querySelector("esa-navbar");
+      const menu = this.$refs.esaMenu || document.querySelector("esa-menu");
+
+      // Wire hamburger button to open esa-menu
+      if (nav && nav.shadowRoot) {
+        const menuBtn = nav.shadowRoot.querySelector("#menu-open");
+        if (menuBtn && menu && menu.shadowRoot) {
+          menuBtn.onclick = () => {
+            const cMenu = menu.shadowRoot.querySelector(".c-menu");
+            if (cMenu) {
+              cMenu.classList.add("is-open");
+              document.body.classList.add("is-locked");
+            }
+          };
+        }
+      }
+
+      // Wire menu close button to close esa-menu
+      if (menu && menu.shadowRoot) {
+        const closeBtn = menu.shadowRoot.querySelector("#menu-close");
+        if (closeBtn) {
+          closeBtn.onclick = () => {
+            const cMenu = menu.shadowRoot.querySelector(".c-menu");
+            if (cMenu) {
+              cMenu.classList.remove("is-open");
+              document.body.classList.remove("is-locked");
+            }
+          };
+        }
+      }
+
+      [nav, menu].forEach((el) => {
+        if (el && el.shadowRoot && !el._routingAttached) {
+          el._routingAttached = true;
+          el.shadowRoot.addEventListener("click", (event) => {
+            const anchor = event.composedPath().find((target) => target.tagName === "A");
+            if (anchor) {
+              handleAnchorClick(event, anchor);
+            }
+          });
+        }
+      });
+    },
     consentCookies(status) {
       if (status === 'accepted') {
         if (window._paq) {
@@ -184,6 +225,15 @@ export default {
     }
   },
   computed: {
+    menuItems() {
+      return [
+        { title: "Catalogue", href: "/catalog" },
+        { title: "Metrics", href: "/metrics" },
+        { title: "Search", href: "/search" },
+        { title: "FAIR Principles", href: "/fair" },
+        { title: "API Access", href: this.apiAccessUrl }
+      ];
+    },
     isEmbed() {
       return this.$route.name === 'fair-preview' && this.$route.query.embed === 'true';
     },
@@ -191,8 +241,11 @@ export default {
       return "3.0.0-rc.10";
     },
     apiAccessUrl() {
-      const apiUrl = CONFIG.apiUrl || "https://eoapi.workspace.earthcode-staging.earthcode.eox.at/stac";
+      const apiUrl = CONFIG.apiUrl || "https://eoapi.workspace.earthcode.eox.at/stac";
       return apiUrl.replace(/\/$/, "") + "/api.html";
+    },
+    isLandingPage() {
+      return this.$route.name === 'landing' || this.$route.path === '/';
     },
     isCatalogPage() {
       return this.$route.name === 'catalog';
@@ -252,6 +305,7 @@ export default {
   --esa-primary-light: #004d66;
   --esa-border-color: #335e6f;
   --esa-text-light: #ffffff;
+  --esa-shell-offset: 177px;
 }
 
 html, body {
@@ -269,159 +323,27 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Header Styling */
-.esa-header {
-  background-color: var(--esa-primary);
-  border-bottom: 4px solid var(--esa-border-color);
-  color: var(--esa-text-light);
-  display: flex;
-  align-items: center;
-  height: 64px;
-  padding: 0 20px;
+/* Header Wrapper: Stays sticky at the top */
+.esa-header-wrapper {
   position: sticky;
   top: 0;
   z-index: 999;
+  height: 140px;
+  width: 100%;
+  background: #001923;
 }
 
-.menu-toggle-btn {
-  background: transparent;
-  border: none;
-  color: var(--esa-text-light);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  margin-right: 15px;
+esa-navbar {
+  --header-background: #001923;
 }
 
-.menu-toggle-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+esa-menu {
+  position: relative;
+  z-index: 10000001;
 }
 
-.esa-brand {
-  color: var(--esa-text-light);
-  font-size: 1.25rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  text-decoration: none;
-  font-family: "NotesESAbold", sans-serif;
-}
-
-.esa-brand:hover {
-  color: var(--esa-text-light);
-  text-decoration: none;
-}
-
-.esa-header-logo {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-}
-
-/* Side Drawer Styling */
-.esa-drawer-overlay {
-  background-color: rgba(0, 0, 0, 0.5);
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease;
-  z-index: 1000;
-}
-
-.esa-drawer-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.esa-drawer {
-  background-color: var(--esa-primary);
-  color: var(--esa-text-light);
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 280px;
-  max-width: 80vw;
-  height: 100vh;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 1001;
-  display: flex;
-  flex-direction: column;
-}
-
-.esa-drawer.open {
-  transform: translateX(0);
-}
-
-.esa-drawer-header {
-  border-bottom: 1px solid var(--esa-border-color);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  padding: 0 20px;
-}
-
-.esa-drawer-title {
-  font-size: 1.15rem;
-  font-weight: bold;
-}
-
-.close-drawer-btn {
-  background: transparent;
-  border: none;
-  color: var(--esa-text-light);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-}
-
-.close-drawer-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.esa-drawer-nav {
-  display: flex;
-  flex-direction: column;
-  padding: 15px 0;
-}
-
-.nav-item {
-  color: var(--esa-text-light);
-  text-decoration: none;
-  padding: 12px 25px;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.2s ease;
-}
-
-.nav-item:hover,
-.nav-item.router-link-exact-active {
-  background-color: var(--esa-primary-light);
-  color: var(--esa-text-light);
-  text-decoration: none;
-}
-
-.esa-nav-icon {
-  margin-right: 12px;
-  font-size: 1.25rem;
-}
-
-.esa-nav-icon-right {
-  margin-left: auto;
-  font-size: 1rem;
-  opacity: 0.7;
+body.is-locked {
+  overflow: hidden;
 }
 
 /* Footer Styling */
@@ -435,12 +357,32 @@ html, body {
   position: relative;
 }
 
+.footer-right img {
+  height: 11px !important;
+  max-height: 11px !important;
+  width: auto !important;
+}
+
 .esa-footer-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  max-width: 100%;
+  width: 100%;
+  max-width: calc(1400px + 4rem);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 45em) {
+  .esa-footer-container {
+    max-width: calc(1400px + 3rem);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .esa-footer-link {
