@@ -4,3 +4,9 @@
 .share>.btn-group>a#popover-link-btn {
   border-radius: .25rem !important;
 }
+
+#stac-browser:has(.osc-product-header) {
+  > header {
+    display: none !important;
+  }
+}

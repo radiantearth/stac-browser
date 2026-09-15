@@ -62,9 +62,9 @@ export default {
     requestQueryParameters: {},
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: (stac) => {
-        if(stac.type === "Feature") {
+        if (Array.isArray(stac.links)) {
             stac.links = stac.links.map(link => {
-                if (link.rel === "child") {
+                if (stac.type === "Feature" && link.rel === "child") {
                     link.rel = "related";
                     if (link.href.includes("/experiments/")) {
                       link.title = `Experiment: ${link.title}`;
@@ -76,8 +76,18 @@ export default {
                       link.title = `Product: ${link.title}`;
                     }
                 }
+                // Suppress duplicate OSC metadata links from "Additional Resources" / "Related Links"
+                if (link.href && (
+                    link.href.includes("/projects/") ||
+                    link.href.includes("/themes/") ||
+                    link.href.includes("/variables/") ||
+                    link.href.includes("/eo-missions/") ||
+                    link.href.includes("/missions/")
+                )) {
+                    link.rel = "osc:metadata";
+                }
                 return link;
-            })
+            });
         }
         return stac;
     },

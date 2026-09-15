@@ -25,6 +25,7 @@ export const stacBrowserSpecialHandling = [
   'collections-search',
   'icon', // Other v
   'license',
+  'osc:metadata',
 ].concat(hierarchical).concat(pagination).concat(queryables);
 
 // OGC APIs

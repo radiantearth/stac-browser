@@ -8,6 +8,15 @@
     "Time of Data begins": "Start date",
     "Time of Data ends": "End date"
   },
+  "source": {
+    "label": "STAC source"
+  },
+  "partOfProject": "Part of the project:",
+  "themes": "Theme(s):",
+  "variables": "Variable(s):",
+  "missions": "Mission(s):",
+  "region": "Region:",
+  "status": "Status:",
   "browse": "Overview",
   "topics": "Related EarthCODE Forum Topics",
   "fairAssessment": "FAIR Assessment"
