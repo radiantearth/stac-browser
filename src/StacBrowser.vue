@@ -1,4 +1,7 @@
 <template>
+  <teleport to="head">
+    <link v-if="faviconImage" rel="icon" :href="faviconImage">
+  </teleport>
   <Loading v-if="!browserReady" fill />
   <b-container v-else id="stac-browser">
     <WidgetHook id="root-start" />
