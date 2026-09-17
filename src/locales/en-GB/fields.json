@@ -1,5 +1,6 @@
 {
   "Anonymized Location": "Anonymised Location",
+  "Canceled (delivery stopped)": "Cancelled (delivery stopped)",
   "Center Frequency": "Centre Frequency",
   "Cloud Cover": "Cloud Cover",
   "Cloud Storage": "Cloud Storage",
@@ -15,7 +16,7 @@
   "Parent STAC Catalog": "Parent STAC Catalogue",
   "Point (at pixel center)": "Point (at pixel centre)",
   "Polarizations": "Polarisations",
-  "Processing inctructions/code": "Processing instructions/code",
+  "Processing instructions/code": "Processing instructions/code",
   "RGB color with relief": "RGB colour with relief",
   "RGB color without relief": "RGB colour without relief",
   "Root STAC Catalog": "Root STAC Catalogue",
