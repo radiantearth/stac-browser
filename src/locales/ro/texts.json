@@ -126,9 +126,9 @@
   "externalInfo": "Acest {type} este oferit de un furnizor extern de date",
   "favorites": {
     "add": "Adaugă la favorite",
-    "empty": "",
+    "empty": "Nu au fost adăugate elemente preferate. Pentru adăuga la secțiunea de elemente preferate folosiți butonul „Preferate” de pe pagina unui catalog, colecții sau unui element.",
     "export": "Export",
-    "exportDescription": "",
+    "exportDescription": "Exportați elementele preferate într-un fișier, de exemplu să le importați în alt browser.",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
@@ -136,12 +136,12 @@
       "stac": "Catalog STAC"
     },
     "import": "Import",
-    "importDescription": "",
-    "importInvalid": "",
+    "importDescription": "Importați elemente preferate dintr-un fișier exportat.",
+    "importInvalid": "Fișierul selectat nu conține elemente preferate.",
     "imported": "{count} Favorite au fost importate.",
     "label": "Favorite",
-    "localOnly": "",
-    "remove": "",
+    "localOnly": "Elementele preferate sunt stocate local doar în acest web browser. Acestea nu sunt sincronizate între dispozitive sau browsere.",
+    "remove": "Elimină dintre elementele preferate",
     "title": "Favorite"
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
@@ -159,7 +159,7 @@
   "goBack": {
     "description": "Reveniți la {type}",
     "label": "Înapoi",
-    "refererDescription": ""
+    "refererDescription": "Mergi înapoi la ultima pagină vizitată din catalog"
   },
   "goToCollection": {
     "description": "Accesați colecția asociată",
@@ -184,7 +184,7 @@
   },
   "items": {
     "filter": "Filtrat",
-    "filterChangesNotApplied": "",
+    "filterChangesNotApplied": "Filtrele au fost schimbate dar schimbările nu au fost aplicate încă.",
     "hideFilter": "Ascunde filtrele",
     "noTime": "Niciun timp selectat",
     "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
@@ -193,9 +193,9 @@
   "loading": "Încărcare...",
   "manage": {
     "addCollection": "Adaugă colecție",
-    "addItem": "",
+    "addItem": "Adaugă element",
     "confirmDeleteTitle": "Confirmă ștergerea",
-    "confirmDeleteMessage": "",
+    "confirmDeleteMessage": "Sunteți sigur că doriți să ștergeți această resursă STAC?",
     "create": "Creează",
     "delete": "Șterge",
     "discardDraft": "Ignoră modificările restaurate",
@@ -203,10 +203,10 @@
     "edit": "Editare",
     "leavePage": "",
     "save": "Salvare",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
+    "noUndo": "Această acțiune nu poate fi anulată.",
+    "unsavedChangesLeave": "Aveți modificări nesalvate. Sunteți siguri că doriți să părăsiți această pagină?",
+    "unsavedChangesTitle": "Modificări nesalvate",
+    "validate": "Validează"
   },
   "map": "Hartă",
   "mapping": {
@@ -233,7 +233,7 @@
     "close": "Închidere",
     "displayLimit": {
       "message": "",
-      "showAnyway": "",
+      "showAnyway": "Afișează oricum",
       "title": ""
     },
     "fit": "",
