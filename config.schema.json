@@ -103,6 +103,9 @@
       "type": "string",
       "enum": ["list", "cards"]
     },
+    "omitTimeForMidnight": {
+      "type": "boolean"
+    },
     "showFavorites": {
       "type": "boolean"
     },
