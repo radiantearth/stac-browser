@@ -237,6 +237,7 @@
       "title": "Großer Datensatz"
     },
     "fit": "Ansicht an räumliche Ausdehnung anpassen",
+    "focusHint": "Karte anklicken oder antippen, um zu zoomen und zu verschieben",
     "layers": {
       "base": "Grundkarten",
       "footprint": "Räumliche Ausdehnung",

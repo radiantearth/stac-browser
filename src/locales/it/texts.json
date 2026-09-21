@@ -237,6 +237,7 @@
       "title": "Set di dati di grandi dimensioni"
     },
     "fit": "Adatta alla estensione",
+    "focusHint": "Clicca o tocca per zoomare e spostare la mappa",
     "layers": {
       "base": "Livelli di base",
       "footprint": "Impronta a terra",
