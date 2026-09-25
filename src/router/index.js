@@ -103,7 +103,7 @@ function getRoutes(config) {
   });
 
   // if you add new routes that may include .../external/... in the path make sure
-  // to add the new path prefix to the fromBrowserPath regexp in store/index.js
+  // to add the new path prefix to the externalBrowserPathRE regexp in utils.js
 
   return routes;
 }

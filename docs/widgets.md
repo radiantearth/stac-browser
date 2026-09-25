@@ -12,6 +12,7 @@ content you need - using either the pre-defined widgets or your own Vue componen
 - [Pre-defined Widgets](#pre-defined-widgets)
   - [AlertBox](#alertbox)
   - [CustomText](#customtext)
+  - [ExternalWarning](#externalwarning)
   - [Featured](#featured)
 - [Hooks](#hooks)
   - [StacBrowser.vue](#stacbrowservue)
@@ -122,6 +123,24 @@ Renders a simple text with a heading.
 | `title`     | String  | `''`    | Rendered as an `<h3>` heading. |
 | `text`      | String  | `''`    | Rendered as the body, CommonMark (Markdown) is supported. |
 | `allowHTML` | Boolean | `false` | Allows HTML tags in the `text`. |
+
+### ExternalWarning
+
+Renders a banner indicating that the shown catalog, collection or item is not
+part of the configured catalog (i.e. external content, see the [`allowExternalAccess`](options.md#allowexternalaccess) option).
+This helps users understand that they left the configured catalog and are now looking at
+data provided by an external data source.
+
+The widget only renders on external content, so no `condition` is required.
+It has no effect if no `catalogUrl` is configured, as in that case there is no catalog
+to distinguish external content from.
+
+A typical placement is the `view-catalog-meta-start` and `view-item-secondary-start` hooks,
+which show the banner above the description.
+
+| Props     | Type   | Default  | Description |
+| --------- | ------ | -------- | ----------- |
+| `variant` | String | `'info'` | Color variant: `'info'`, `'warning'`, `'danger'`, etc. |
 
 ### Featured
 

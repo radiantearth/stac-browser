@@ -65,21 +65,25 @@ export default {
       return TYPES[this.type];
     },
 
+    conformanceContext() {
+      return this.parent?.isSTAC ? this.parent : null;
+    },
+
     canSort() {
-      return this.supportsConformance(this.conformances.Sort);
+      return this.supportsConformance(this.conformances.Sort, this.conformanceContext);
     },
     canFilterExtents() {
-      return this.supportsConformance(this.conformances.BasicFilters);
+      return this.supportsConformance(this.conformances.BasicFilters, this.conformanceContext);
     },
     canFilterFreeText() {
-      return this.supportsConformance(this.conformances.FreeText);
+      return this.supportsConformance(this.conformances.FreeText, this.conformanceContext);
     },
     cql() {
-      if (!this.supportsConformance(this.conformances.CqlFilters)) {
+      if (!this.supportsConformance(this.conformances.CqlFilters, this.conformanceContext)) {
         return null;
       }
-      let textMode = this.supportsConformance(CQL_TEXT);
-      let jsonMode = this.supportsConformance(CQL_JSON);
+      let textMode = this.supportsConformance(CQL_TEXT, this.conformanceContext);
+      let jsonMode = this.supportsConformance(CQL_JSON, this.conformanceContext);
       if (!textMode && !jsonMode) {
         return null;
       }
@@ -87,8 +91,8 @@ export default {
       return {
         textMode,
         jsonMode,
-        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON),
-        arrayOperators: this.supportsConformance(CQL_ARRAY_OPERATORS),
+        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON, this.conformanceContext),
+        arrayOperators: this.supportsConformance(CQL_ARRAY_OPERATORS, this.conformanceContext),
       };
     }
   }

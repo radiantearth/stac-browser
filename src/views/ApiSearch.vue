@@ -35,7 +35,7 @@
         <template v-else>
           <WidgetHook id="view-search-results-start" />
           <div id="search-map" v-if="data">
-            <MapView :stac="parent" :children="data" onfocusOnly popover />
+            <MapView :stac="parent" :children="data" popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -349,6 +349,7 @@ export default defineComponent({
         this.data = null;
       }
       else if (this.searchLink) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         await this.loadResults(this.searchLink);
       }
     },

@@ -19,7 +19,7 @@ so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) install
 You can run the following commands (see also "[Get started](README.md#get-started)" in the README):
 
 - Getting Started
-  - `npm run install`: Install the dependencies, this is required once at the beginning.
+  - `npm install`: Install the dependencies, this is required once at the beginning.
   - `npm start`: Start the development server
 - Linting
   - `npm run lint`: Lint the source code files

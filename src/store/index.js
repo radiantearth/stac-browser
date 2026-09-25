@@ -4,7 +4,7 @@ import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
-import Utils, { BrowserError } from '../utils';
+import Utils, { BrowserError, externalBrowserPathRE } from '../utils';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
@@ -48,20 +48,22 @@ function getApiChildrenLoading(state, stac) {
 // Combines a list of children received from the API with the children linked to
 // from the STAC entity, depending on the given priority (see apiCatalogPriority).
 // Optionally includes the item links of the entity and pagination links for the API list.
-function combineChildren(stac, apiList, priority, { items = [], prev = false, next = false } = {}) {
-  const showCollections = !priority || priority === 'collections';
+// The priority only applies to catalogs and collections, items are always included (#990).
+function combineChildren(stac, apiList, priority, { type = null, items = [], prev = false, next = false } = {}) {
+  const showApiList = type === 'items' || !priority || priority === 'collections';
   const showChilds = !priority || priority === 'childs';
   let children = [];
-  if (showCollections && apiList.length > 0) {
+  if (showApiList && apiList.length > 0) {
     children = apiList.slice(0);
   }
   if (showChilds) {
-    children = addMissingChildren(children, stac).concat(items);
+    children = addMissingChildren(children, stac);
   }
-  if (showCollections && prev) {
+  children = children.concat(items);
+  if (showApiList && prev) {
     children = [prev].concat(children);
   }
-  if (showCollections && next) {
+  if (showApiList && next) {
     children.push(next);
   }
   return children;
@@ -125,6 +127,8 @@ function getStore(config, router) {
     stateQueryParameters: {
       // The currently selected language
       language: null,
+      // The browser path of the page in the catalog from which external content was reached
+      referer: null,
       // Expanded Asset and Item Assets
       asset: [],
       itemdef: [],
@@ -344,9 +348,17 @@ function getStore(config, router) {
 
         return null;
       },
-      supportsConformance: state => classes => {
+      // The conformance classes only apply to the configured (or selected) catalog itself.
+      // If a context (a STAC entity or a URL) is given, reports false for external content.
+      supportsConformance: (state, getters) => (classes, context = null) => {
         if (!Array.isArray(classes)) {
           return classes;
+        }
+        if (context) {
+          const contextUrl = context.isSTAC ? context.getAbsoluteUrl() : context;
+          if ((hasText(contextUrl) || contextUrl instanceof urijs) && getters.isExternalUrl(contextUrl, false)) {
+            return false;
+          }
         }
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
@@ -418,10 +430,13 @@ function getStore(config, router) {
         }
         if (apiChildren instanceof Loading) {
           // The first page of children is still being loaded
-          apiChildren = { list: [], prev: false, next: false };
+          apiChildren = { type: null, list: [], prev: false, next: false };
         }
+        // Item links are only used when no items were loaded from the API (as in the items getter)
+        const hasApiItems = apiChildren.type === 'items' && apiChildren.list.length > 0;
         return combineChildren(stac, apiChildren.list, priority, {
-          items: stac.getLinksWithRels(['item']),
+          type: apiChildren.type,
+          items: hasApiItems ? [] : stac.getLinksWithRels(['item']),
           prev: apiChildren.prev,
           next: apiChildren.next
         });
@@ -468,7 +483,7 @@ function getStore(config, router) {
         }
       },
       fromBrowserPath: (state, getters) => url => {
-        const externalRE = /^\/((search|validation|management\/[\w-]+)\/)?external\//;
+        const externalRE = externalBrowserPathRE;
         if (!hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
@@ -505,6 +520,8 @@ function getStore(config, router) {
         const relativeStr = relative.toString();
         return !relativeStr.startsWith('//') && !relativeStr.startsWith('../');
       },
+      // Whether the currently shown page is not part of the configured (or selected) catalog
+      isExternalContext: (state, getters) => Boolean(state.url && getters.isExternalUrl(state.url, false)),
       isExternalUrl: (state, getters) => (absoluteUrl, whitelist = true) => {
         if (!state.catalogUrl) {
           return false;
@@ -550,7 +567,6 @@ function getStore(config, router) {
           return url;
         }
       },
-
       acceptedLanguages: state => {
         const languages = {};
         // Implement in ascending order so that the higher priority entries override previous ones
@@ -1243,7 +1259,7 @@ function getStore(config, router) {
           }
 
           let sort = null;
-          if (cx.getters.supportsConformance(TYPES.Items.Sort)) {
+          if (cx.getters.supportsConformance(TYPES.Items.Sort, baseUrl)) {
             sort = cx.state.defaultItemSort;
           }
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
@@ -1348,11 +1364,11 @@ function getStore(config, router) {
           }
           link = stac.getLinkWithRel('data');
           let sort = null;
-          if (cx.getters.supportsConformance(TYPES.Collections.Sort)) {
+          if (cx.getters.supportsConformance(TYPES.Collections.Sort, stac)) {
             sort = cx.state.defaultCollectionSort;
           }
           const filters = {};
-          if (cx.getters.supportsConformance(TYPES.Collections.FreeText) && searching && size(q) > 0) {
+          if (cx.getters.supportsConformance(TYPES.Collections.FreeText, stac) && searching && size(q) > 0) {
             filters.q = q;
           }
           link = Utils.addFiltersToLink(link, filters, cx.state.collectionsPerPage, sort);

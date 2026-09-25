@@ -35,6 +35,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)
 - Localized catalog metadata updates immediately when switching languages
 
+## [5.1.0] - 2026-09-07
+
+### Added
+
+- A "Back" button on pages with external content returns to the page in the catalog from which the external content was reached
+- The source popover indicates when the shown data is not part of the configured catalog
+- Widget `ExternalWarning`: Shows an information on the page of a catalog, collection or item that is not part of the configured catalog
+
+### Changed
+
+- Show favorite button in the search cards by default
+- Maps don't trap page scrolling: scroll-wheel zoom and one-finger panning require a click/tap on the map first, indicated by a hint and a highlight
+
+### Fixed
+
+- The Docker entrypoint and Vite config now support both forms of the JSON Schema `type` keyword (a string or an array of strings), fixing a `jq` error when setting `SB_footerLinks` via environment variables
+- Tile URL templates keep their variables intact instead of percent-encoding them
+- `apiCatalogPriority: "childs"` doesn't hide collection items in the sidebar anymore
+- The conformance classes of the configured catalog are no longer applied to external content,
+  e.g. sorting and filtering are no longer offered for (and sent to) external APIs that may not support them
+- The map renders very small footprints instead of staying empty
+- Maps can be panned and zoomed with the keyboard after focusing them
+
 ## [5.1.0-rc.1] - 2026-08-15
 
 ### Added
@@ -311,7 +334,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/radiantearth/stac-browser/compare/v5.1.0-rc.1...v5.1.0
 [5.1.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...v5.1.0-rc.1
 [5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...v5.0.0
 [5.0.0-rc.2]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0-rc.2
