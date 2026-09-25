@@ -10,6 +10,7 @@
         <b-form-input 
           id="url" 
           type="url" 
+          dir="ltr"
           :model-value="url" 
           @update:model-value="setUrl"
           placeholder="https://..."

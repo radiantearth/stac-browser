@@ -27,7 +27,7 @@
         <div class="col">
           <ValidationResult
             id="core" :errors="report.results.core" :warnings="report.messages"
-            :locale="locale" :context="report"
+            :locale="validationLocale" :context="report"
           />
         </div>
         <div
@@ -36,7 +36,7 @@
           :key="key"
         >
           <ValidationResult
-            :id="key" :errors="errors" :locale="locale" :context="report"
+            :id="key" :errors="errors" :locale="validationLocale" :context="report"
           />
         </div>
       </div>
@@ -66,7 +66,7 @@ export default defineComponent({
       working: true,
       report: null,
       internalError: null,
-      locale: null
+      validationLocale: null
     };
   },
   computed: {
@@ -85,7 +85,7 @@ export default defineComponent({
     uiLanguage: {
       immediate: true,
       async handler(locale) {
-        this.locale = await loadValidationLocale(locale);
+        this.validationLocale = await loadValidationLocale(locale);
       }
     }
   },

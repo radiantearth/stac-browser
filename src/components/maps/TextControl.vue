@@ -57,7 +57,7 @@ export default {
 .ol-textcontrol {
   position: absolute;
   top: 0.5em;
-  left: calc(2.375em + 6px);
+  inset-inline-start: calc(2.375em + 6px);
   max-width: calc(100% - 2*(2.375em + 6px));
   box-sizing: border-box;
   color: var(--ol-foreground-color);

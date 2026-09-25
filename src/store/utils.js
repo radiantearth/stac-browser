@@ -5,8 +5,20 @@ import Queryable from '../models/cql2/queryable';
 
 export class Loading {
 
-  constructor(show = false) {
+  constructor(show = false, waitable = false) {
     this.show = Boolean(show);
+    if (waitable) {
+      this.promise = new Promise(resolve => {
+        this.resolve = resolve;
+      });
+    }
+  }
+
+  finish(value) {
+    if (this.resolve) {
+      this.resolve(value);
+      this.resolve = null;
+    }
   }
 
 }

@@ -916,12 +916,12 @@ export default defineComponent({
   min-width: 400px;
 
   .b-form-group {
-    padding-left: 1em;
+    padding-inline-start: 1em;
     margin-bottom: 1em;
 
     > label,
     > legend {
-      margin-left: -1em;
+      margin-inline-start: -1em;
       font-weight: 600;
     }
 

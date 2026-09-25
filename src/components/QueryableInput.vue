@@ -414,8 +414,8 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 0.25em;
-    border-left: 2px solid var(--bs-border-color);
-    padding-left: 0.5em;
+    border-inline-start: 2px solid var(--bs-border-color);
+    padding-inline-start: 0.5em;
 
     .date-row {
       display: flex;

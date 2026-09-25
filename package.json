@@ -98,6 +98,7 @@
     "globals": "^17.2.0",
     "msw": "^2.12.10",
     "playwright-msw": "^3.0.1",
+    "postcss-rtlcss": "^6.0.0",
     "remark-cli": "^12.0.1",
     "remark-gfm": "^4.0.1",
     "remark-lint-no-literal-urls": "^4.0.1",

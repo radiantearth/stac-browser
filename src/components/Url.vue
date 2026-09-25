@@ -1,7 +1,7 @@
 <template>
   <b-form-group :label="label" :label-for="id">
     <b-input-group size="sm">
-      <b-form-input :id="id" :model-value="url" readonly />
+      <b-form-input :id="id" :model-value="url" dir="ltr" readonly />
       <template #append>
         <CopyButton :copyText="url" variant="primary" />
         <b-button v-if="open" :href="url" target="_blank" rel="noopener noreferrer" variant="primary" :title="$t('open')"><b-icon-arrow-up-right-square /></b-button>
