@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- SVG icons, thumbnails and previews (`image/svg+xml`) are shown, SVG files are offered for download instead of being opened
+
+### Fixed
+
+- Icons, logos and thumbnails that fail to load are hidden, cards fall back to the next thumbnail
 
 ## [5.1.0] - 2026-09-07
 

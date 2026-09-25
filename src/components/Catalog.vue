@@ -1,7 +1,7 @@
 <template>
   <b-card no-body :class="classes" v-visible.400="load" :img-placement="isList ? 'end' : undefined">
     <div class="card-img-wrapper">
-      <AuthImage v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
+      <AuthImage v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy @error="nextThumbnail" />
     </div>
     <b-card-body>
       <b-card-title>

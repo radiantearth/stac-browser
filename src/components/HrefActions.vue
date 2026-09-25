@@ -238,6 +238,10 @@ export default {
       if (this.useAltDownloadMethod)  {
         return false;
       }
+      // SVG files opened in the browser can run scripts, so they are downloaded instead
+      if (typeof this.data?.type === 'string' && this.data.type.toLowerCase().startsWith('image/svg+xml')) {
+        return false;
+      }
       if (this.data.canBrowserDisplayImage()) {
         return true;
       }
