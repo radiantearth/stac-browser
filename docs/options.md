@@ -62,6 +62,7 @@ The override order for the configuration is:
   - [allowExternalAccess](#allowexternalaccess)
   - [allowedDomains](#alloweddomains)
   - [crossOriginMedia](#crossoriginmedia)
+  - [SVG images](#svg-images)
   - [authConfig](#authconfig)
     - [API Keys](#api-keys)
     - [HTTP Basic](#http-basic)
@@ -248,6 +249,12 @@ Domain and subdomain patterns ignore schema, userinfo, port, path, query and fra
 ### crossOriginMedia
 
 The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
+
+### SVG images
+
+STAC Browser shows SVG images (`image/svg+xml`), e.g. icons and thumbnails.
+SVG files can contain scripts, which don't run when the image is shown in STAC Browser, but may run when a user opens the file directly.
+We recommend to serve SVG data from a different origin (domain) than STAC Browser and to set a [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP) without `unsafe-inline` for STAC Browser.
 
 ### authConfig
 
