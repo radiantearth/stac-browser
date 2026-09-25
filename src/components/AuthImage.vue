@@ -1,9 +1,9 @@
 <template>
   <img
-    v-if="displaySrc" :src="displaySrc" :alt="alt" :title="title"
+    v-if="displaySrc && !broken" :src="displaySrc" :alt="alt" :title="title"
     :crossorigin="crossorigin" :class="placement ? `card-img-${placement}` : null"
     :loading="lazy ? 'lazy' : null" :width="width" :height="height"
-    @load="$emit('load', $event)" @error="$emit('error', $event)"
+    @load="$emit('load', $event)" @error="onError"
   >
 </template>
 
@@ -22,8 +22,9 @@ import { acquire, needsAuthenticatedFetch, release } from '../models/authMedia';
  * never receive credentials.
  *
  * Failed authenticated requests fall back to loading the image directly
- * (without the headers) and never open the login dialog; errors are
- * reported through the `error` event.
+ * (without the headers) and never open the login dialog. Images that fail
+ * to load are hidden and reported through the `error` event, e.g. so that
+ * parents can fall back to another image.
  */
 export default {
   name: 'AuthImage',
@@ -70,6 +71,8 @@ export default {
       // The URL currently held in the authMedia cache
       acquiredUrl: null,
       failed: false,
+      // Whether the image element failed to load the image
+      broken: false,
       disposed: false,
       // Whether a lazy image is close enough to the viewport to be loaded
       nearViewport: false,
@@ -103,6 +106,7 @@ export default {
     },
     src() {
       this.failed = false;
+      this.broken = false;
       this.resolve();
     },
     requestHeaders: {
@@ -110,6 +114,7 @@ export default {
       handler() {
         // Re-resolve after login/logout
         this.failed = false;
+        this.broken = false;
         this.resolve();
       }
     }
@@ -149,6 +154,10 @@ export default {
     this.releaseAcquired();
   },
   methods: {
+    onError(event) {
+      this.broken = true;
+      this.$emit('error', event);
+    },
     disconnectObserver() {
       if (this.observer) {
         this.observer.disconnect();
@@ -177,7 +186,7 @@ export default {
         this.releaseAcquired();
         this.acquiredUrl = url;
         this.blobUrl = blobUrl;
-      } catch (error) {
+      } catch {
         if (this.disposed || url !== this.src || !this.useAuthenticatedFetch) {
           return;
         }
@@ -188,7 +197,6 @@ export default {
         // reports the failure through the error event of the element.
         this.failed = true;
         this.blobUrl = null;
-        this.$emit('error', error);
       }
     },
     releaseAcquired() {

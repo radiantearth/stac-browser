@@ -5,12 +5,12 @@
     </div>
     <div class="content">
       <a
-        v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="hrefs[thumbnail.href] || thumbnail.getAbsoluteUrl()"
+        v-for="thumbnail in shownThumbnails" :key="thumbnail.href" :href="hrefs[thumbnail.href] || thumbnail.getAbsoluteUrl()"
         target="_blank" rel="noopener noreferrer" download
       >
         <AuthImage
           class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia"
-          @resolved="url => hrefs[thumbnail.href] = url"
+          @resolved="url => hrefs[thumbnail.href] = url" @error="broken[thumbnail.href] = true"
         />
       </a>
     </div>
@@ -37,11 +37,16 @@ export default {
     return {
       // The URLs the thumbnails are shown from (incl. credentials / object URLs),
       // so that the download links download what is shown
-      hrefs: {}
+      hrefs: {},
+      // The thumbnails that failed to load, they are hidden
+      broken: {}
     };
   },
   computed: {
-    ...mapState(['crossOriginMedia'])
+    ...mapState(['crossOriginMedia']),
+    shownThumbnails() {
+      return this.thumbnails.filter(thumbnail => !this.broken[thumbnail.href]);
+    }
   }
 };
 </script>
