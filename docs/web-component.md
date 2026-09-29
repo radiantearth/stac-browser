@@ -1,240 +1,349 @@
-# Embedding STAC Browser as a Web Component
+# Web Component <!-- omit in toc -->
 
-STAC Browser can be embedded into any web page — regardless of framework — as a
-[custom element](https://developer.mozilla.org/en-US/docs/Web/API/Web_components):
+STAC Browser can be embedded into any web page as a [web component](https://developer.mozilla.org/en-US/docs/Web/API/Web_components).
+It works with plain HTML and with any framework.
 
 ```html
 <stac-browser url="https://example.com/catalog.json"></stac-browser>
 <script type="module" src="/path/to/stac-browser.js"></script>
 ```
 
-Load only the module: the component fetches its stylesheet into the shadow root
-itself (see [Styling and isolation](#styling-and-isolation)), so you must deploy
-`stac-browser.css` next to `stac-browser.js` but must not `<link>` it on the host
-page — a host `<link>` would leak Bootstrap's global styles into the host page
-and defeat the isolation.
-
-The element renders into a **shadow root**, so its styles are isolated from the
-host page and vice versa. It runs STAC Browser in [embedded mode](#embedded-mode):
-it routes in-memory (it never changes the host page's address bar), does not
-touch the host page's `document.title` and never blocks it from navigating away.
-
-- [Building the bundle](#building-the-bundle)
+- [Build and deploy](#build-and-deploy)
 - [Configuration](#configuration)
+  - [Attributes](#attributes)
+  - [Config property](#config-property)
+  - [Changing options](#changing-options)
 - [Events](#events)
 - [Methods](#methods)
-- [Reading the current content](#reading-the-current-content)
-- [Embedded mode](#embedded-mode)
-- [Isolation modes](#isolation-modes)
-- [Styling and isolation](#styling-and-isolation)
+  - [navigate(to)](#navigateto)
+  - [navigateToStac(url)](#navigatetostacurl)
+  - [setData(data, url)](#setdatadata-url)
+- [Properties](#properties)
+- [Differences to the standalone version](#differences-to-the-standalone-version)
+  - [Authentication](#authentication)
+- [Layout](#layout)
+  - [inline](#inline)
+  - [isolated](#isolated)
+- [Styling](#styling)
+  - [Colors](#colors)
+  - [Light and dark mode](#light-and-dark-mode)
+- [Limitations](#limitations)
 
-## Building the bundle
+## Build and deploy
+
+Build the web component with the following command:
 
 ```bash
 npm run build:web-component
 ```
 
-This produces the custom element and its assets in `dist/`:
+The files are written to the `dist/` folder:
 
-- `stac-browser.js` — registers the `<stac-browser>` custom element on import
-- `stac-browser.css` — the component's styles, loaded automatically into its
-  shadow root (do not link it on the host page, see above)
-- additional code-split chunks (routes, locale files, async components)
+- `stac-browser.js`: The main file. It registers the `<stac-browser>` element when it is loaded.
+- `stac-browser.css`: The styles of the component.
+- Several other JavaScript files, e.g. for routes, languages and components that are loaded on demand.
 
-The build is code-split rather than a single file, so deploy the whole `dist/`
-output together and load only the module on your page (see the snippet above);
-the browser fetches the CSS and the other chunks itself, relative to the module
-URL. A ready-to-run example is in [`web-component.html`](../src/web-component.html).
+Copy all files from the `dist/` folder to your web server.
+On your page, only include `stac-browser.js` as shown above.
+The browser loads the CSS and the other files automatically from the same folder.
+
+> [!IMPORTANT]
+> Don't add a `<link>` for `stac-browser.css` to your page.
+> The component loads the styles itself.
+> If you link it on your page, the Bootstrap styles would also apply to your page.
+
+A working example can be found in [`src/web-component.html`](../src/web-component.html).
 
 ## Configuration
 
-Common options can be set as **attributes**:
+### Attributes
 
-| Attribute       | Config option  | Description                                       |
-| --------------- | -------------- | ------------------------------------------------- |
-| `url`           | `catalogUrl`   | The STAC catalog or API to show.                  |
-| `catalog-title` | `catalogTitle` | A custom title for the catalog.                   |
-| `locale`        | `locale`       | The UI language, e.g. `de`.                       |
-| `history-mode`  | `historyMode`  | `memory` (default when embedded), `hash`, `history`. |
-| `isolation`     | —              | `inline` (default) or `isolated`; see [Isolation modes](#isolation-modes). |
+All [options](options.md) with a single value (a string, number or boolean) can be set as attributes on the element.
+The name of the attribute is the name of the option in kebab-case, e.g. `card-view-mode` for `cardViewMode`.
+The only exception is `catalogUrl`, which is set through the `url` attribute.
 
-For anything not covered by an attribute — including options that are functions
-(e.g. `getMapSourceOptions`) — set the full [config object](options.md) via the
-`config` DOM property:
+```html
+<stac-browser
+  url="https://example.com/catalog.json"
+  catalog-title="My Catalog"
+  card-view-mode="list"
+  items-per-page="24"
+  show-favorites="false"
+></stac-browser>
+```
+
+The values are converted to the type of the option:
+
+- Booleans: `true` or `false`.
+  An empty value is `true`, like for other HTML attributes, e.g. `<stac-browser display-geo-tiff-by-default>`.
+- Numbers: e.g. `24`.
+- Options that can be `null`: an empty value sets them to `null`, e.g. `catalog-title=""`.
+
+Invalid values, e.g. `card-view-mode="grid"`, are ignored with a warning in the browser console.
+The default value is used instead.
+
+Options with lists, objects or functions can't be set as attributes.
+Use the [`config` property](#config-property) for them.
+
+Additionally, there's the `isolation` attribute, which is not an option of STAC Browser.
+It can be `inline` (default) or `isolated`, see [Layout](#layout).
+
+Please note that `locale` is only the default language.
+If the user selected a language before, or the language of the browser is supported, that language is used instead.
+To always use the given language, set [`detectLocaleFromBrowser`](options.md#detectlocalefrombrowser) and [`storeLocale`](options.md#storelocale) to `false`.
+
+### Config property
+
+All [options](options.md) can be set through the `config` property of the element.
+This includes lists, objects and functions, e.g. `supportedLocales` or `getMapSourceOptions`.
 
 ```js
 const el = document.querySelector('stac-browser');
 el.config = {
   catalogUrl: 'https://example.com/catalog.json',
-  cardViewMode: 'list',
-  crossOriginMedia: 'anonymous'
+  supportedLocales: ['en', 'de'],
+  requestHeaders: { 'X-Api-Key': 'abc' }
 };
 ```
 
-Attributes and the `config` property are merged on top of the
-[default configuration](../config.js), with the `config` property taking
-precedence. Setting `config` merges into (patches) the current configuration.
+The options are combined in the following order, later ones override earlier ones:
 
-Once the element is connected, only these options update the running browser:
-`catalogTitle`, `cardViewMode`, `enforcedColorMode` and `locale` (and the
-`--bs-*` custom properties). Every other option — including `url`/`catalogUrl`
-and `historyMode` — is read once when the element first connects; change it by
-re-creating the element.
+1. The [default configuration](../config.js), with `historyMode` set to `memory`
+2. The attributes
+3. The `config` property
+
+If an option is set in the `config` property, changes to the attribute of the same option are ignored.
+
+If you set `config` again, the given options are added to the ones you set before.
+Reading `config` returns the options you set through the property, but not the attributes and defaults.
+
+### Changing options
+
+STAC Browser starts when the element is added to the page.
+Most options are only read at that moment.
+
+Afterwards, only the following options can be changed:
+
+| Option              | Attribute             |
+| ------------------- | --------------------- |
+| `catalogTitle`      | `catalog-title`       |
+| `locale`            | `locale`              |
+| `cardViewMode`      | `card-view-mode`      |
+| `enforcedColorMode` | `enforced-color-mode` |
+
+You can change them through the attribute or the `config` property.
+If you remove the attribute, the default value is used again.
+The [CSS variables](#colors) can be changed at any time, too.
+
+```js
+el.setAttribute('catalog-title', 'My Catalog');
+el.config = { cardViewMode: 'list' };
+```
+
+Changes to all other options are ignored while STAC Browser is running.
+This includes `catalogUrl` (the `url` attribute) and `historyMode` (the `history-mode` attribute).
+To apply them, remove the element from the page and add it again.
+The element keeps its attributes and its `config`, so STAC Browser restarts with the new options.
+You can also replace the element with a new one.
+
+```js
+el.setAttribute('url', 'https://example.com/other/catalog.json');
+const parent = el.parentNode;
+el.remove();
+parent.appendChild(el);
+```
+
+> [!NOTE]
+> A restart resets STAC Browser, e.g. it goes back to the start page.
+> This also happens if you move the element to another place in your page.
 
 ## Events
 
-The element emits bubbling, composed `CustomEvent`s so the host page can react:
+The element emits events so that your page can react to changes in STAC Browser.
+All events are [`CustomEvent`s](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent).
+They bubble and can be caught outside of the element.
+The event data is available in `event.detail`.
 
-| Event            | `detail`                       | When                                         |
-| ---------------- | ------------------------------ | -------------------------------------------- |
-| `navigate`       | `{ path, url, title }`         | On every in-app navigation.                  |
-| `data`           | `{ url, data }`                | The displayed entity changed; `data` is its STAC JSON (see [Reading the current content](#reading-the-current-content)). |
-| `title`          | the document title string      | The page title changed.                      |
-| `description`    | a summary string, or `null`    | The page description changed.                |
-| `locale`         | the UI language code           | The UI language changed.                     |
-| `structuredData` | the schema.org object, or `null` | The structured data (JSON-LD) changed.     |
-| `error`          | the global error payload       | When a global error is shown.                |
+| Event            | `detail`                      | Emitted when...                                         |
+| ---------------- | ----------------------------- | ------------------------------------------------------- |
+| `navigate`       | `{ path, url, title }`        | the user navigates to another page.                     |
+| `data`           | `{ url, data }`               | the shown STAC entity changes. `data` is the STAC JSON. |
+| `title`          | The page title (string)       | the page title changes.                                 |
+| `description`    | A summary (string) or `null`  | the page description changes.                           |
+| `locale`         | The language code (string)    | the language of the interface changes.                  |
+| `structuredData` | A schema.org object or `null` | the structured data (JSON-LD) changes.                  |
+| `error`          | The error                     | an error is shown.                                      |
 
-Note that `navigate` fires when the route changes, while the entity's data may
-still be loading; `data` fires once it is available. Its `url` is the STAC URL
-the path corresponds to; for app pages that don't show a STAC resource (e.g.
-`/search`) it is `null`.
+Example:
 
 ```js
-el.addEventListener('navigate', (e) => {
-  console.log('now showing', e.detail.url);
+el.addEventListener('navigate', (event) => {
+  console.log('Now showing', event.detail.url);
 });
 ```
 
-The `title` / `description` / `locale` / `structuredData` events exist so the
-host page can manage its own document head (tab title, `<meta>` tags, JSON-LD).
-This is the same page metadata that the standalone app writes to the document by
-default; embedding leaves that to the host instead. The default writer lives
-outside the Vue components (`src/document-head.js`, fed by `src/page-metadata.js`),
-so the app produces the metadata once and either consumer — the default document
-head or these events — reacts to it.
+Please note:
+
+- `navigate` is emitted when the page changes, but the data may still be loading.
+  Use the `data` event if you need the data.
+- The `url` is `null` for pages that don't show a STAC entity, e.g. the search page (`/search`).
+
+The standalone STAC Browser updates the head of the page (title, `<meta>` tags, JSON-LD) itself.
+The web component doesn't do that, as the head belongs to your page.
+If you want to update it, use the events `title`, `description`, `locale` and `structuredData`.
 
 ## Methods
 
-All methods can be called right after creating the element; calls made while it
-is still initializing are applied once it is ready.
+You can call the methods right after creating the element.
+If the element isn't ready yet, the call is executed once it is ready.
+All methods return a Promise.
 
-- `navigate(to)` — navigate the embedded browser programmatically, e.g.
-  `el.navigate('/')` to go back to the root or `el.navigate('/search')`. Accepts
-  anything the router accepts: a browser path or a location object
-  (`{ name, params }`). Returns the router's navigation promise.
-- `navigateToStac(url)` — navigate to a STAC catalog, collection or item by its
-  URL, e.g. `el.navigateToStac('https://example.com/collections/foo')`. URLs
-  outside the configured catalog require `allowExternalAccess`. Returns the
-  router's navigation promise.
-- `setData(data, url)` — show custom STAC data (a plain object, not a JSON
-  string) as if it had been loaded from `url`: the data is migrated to the
-  latest STAC version, cached under that URL and displayed; relative links
-  resolve against it and clicking them browses on as usual. Calling it again
-  with the same URL updates the view in place, e.g. for an editor live preview:
+### navigate(to)
 
-  ```js
-  el.setData(collectionJson, 'https://example.com/collections/draft');
-  ```
-
-## Reading the current content
-
-The element exposes what is currently displayed:
-
-- `el.url` — the URL of the displayed STAC resource, or `null`. (The `url`
-  *attribute* is the initially configured catalog and is not updated.)
-- `el.data` — the displayed entity's STAC JSON (migrated to the latest STAC
-  version) as a plain object, or `null` while loading. It is a copy: changing it
-  does not affect the browser.
+Opens a page in STAC Browser.
+`to` is either a path or a location object of the router (e.g. `{ name, params }`).
 
 ```js
-el.addEventListener('data', (e) => {
-  console.log(e.detail.url, e.detail.data?.extent?.spatial?.bbox);
+el.navigate('/'); // Start page
+el.navigate('/search'); // Search page
+```
+
+### navigateToStac(url)
+
+Opens the STAC Catalog, Collection or Item at the given URL.
+
+```js
+el.navigateToStac('https://example.com/collections/foo');
+```
+
+URLs outside of the configured catalog only work if [`allowExternalAccess`](options.md#allowexternalaccess) is enabled.
+
+### setData(data, url)
+
+Shows your own STAC data as if it was loaded from the given URL.
+`data` must be an object, not a JSON string.
+
+```js
+el.setData(collectionJson, 'https://example.com/collections/draft');
+```
+
+The data is migrated to the latest STAC version.
+Relative links are resolved against `url`, so users can continue browsing from there.
+
+If you call `setData` again with the same URL, the view is updated.
+This is useful for a live preview in an editor, for example.
+
+## Properties
+
+The element has two properties to get the content that is currently shown:
+
+- `url`: The URL of the STAC entity, or `null`.
+  Please note that the `url` attribute doesn't change, it always contains the initial URL.
+- `data`: The STAC JSON of the entity (migrated to the latest STAC version), or `null` while it is loading.
+  This is a copy, so changing it doesn't change what STAC Browser shows.
+
+Alternatively, you can listen to the `data` event, which is emitted whenever the shown entity changes:
+
+```js
+el.addEventListener('data', (event) => {
+  console.log(event.detail.url, event.detail.data?.extent?.spatial?.bbox);
 });
 ```
 
-The `data` event (see [Events](#events)) pushes the same information whenever
-the displayed entity changes, including when its data finishes loading after a
-`navigate` event.
+## Differences to the standalone version
 
-## Embedded mode
+The web component behaves slightly different than the standalone STAC Browser, so that it doesn't interfere with your page:
 
-The web component runs STAC Browser in *embedded mode*. This is not a config
-option you can set — the wrapper enables it internally (it is derived from the
-shadow-root mount target), so it has no effect when set on the standalone app.
-In embedded mode STAC Browser:
+- The URL in the address bar of the browser doesn't change.
+  STAC Browser uses the [`memory` history mode](options.md#memory) by default.
+  If you want the URL to change, set the `history-mode` attribute to `hash` or `history`.
+- The title of the page (`document.title`) doesn't change.
+  You can use the `title` event to set it yourself.
+- STAC Browser never prevents users from leaving your page.
+  There's no warning about running downloads,
+  and the editor doesn't ask about unsaved changes (they are still kept as drafts).
 
-- routes with `historyMode: 'memory'` by default, so the host page's URL is never
-  touched (override with the `history-mode` attribute if you want URL syncing);
-- does not set `document.title` (the host page owns the tab title);
-- never blocks the host page from navigating away: the `beforeunload` download
-  guard is not installed and the editor's unsaved-changes prompt is disabled
-  (drafts still preserve unsaved edits).
+These differences are always active in the web component and can't be configured.
 
-Authentication note: OpenID Connect (`openIdConnect`) requires a redirect back to
-a real page URL and is therefore only available with `historyMode: 'history'`. In
-the default `memory` mode it is not offered, since the memory router has no host
-URL for the identity provider to redirect to. HTTP Basic and API-key schemes work
-in all modes. To use OIDC in an embedded browser, set `history-mode="history"` and
-make sure the host serves the browser's `/auth` callback routes.
+### Authentication
 
-## Isolation modes
+OpenID Connect (`openIdConnect`) only works if `history-mode` is set to `history`.
+The reason is that the identity provider needs to redirect users back to a real URL after login.
+Your server must also serve the `/auth` callback routes of STAC Browser.
 
-The `isolation` attribute controls how the component coexists with the host page:
+HTTP Basic and API keys work with all history modes.
 
-- **`inline`** (default) — the element grows with its content and the host page
-  scrolls. Overlays (modals, the sidebar) are `position: fixed` and can span the
-  whole page, like a normal full-screen dialog. There are no size requirements,
-  and the component inherits the host page's background, text color and
-  typography so it blends into the surrounding content.
-- **`isolated`** — the element behaves like an `<iframe>`: it owns its own scroll
-  viewport and establishes a containing block, so overlays are contained within
-  the element's box and never cover the host page. It also styles itself (its own
-  background, text color and typography) rather than inheriting the host's. This
-  requires you to give `<stac-browser>` a **definite height** (e.g. an explicit
-  `height` or a flex/grid cell); otherwise it has nothing to scroll in and collapses.
+## Layout
+
+The `isolation` attribute defines how the element fits into your page.
+
+### inline
+
+This is the default.
+
+- The element grows with its content and your page scrolls as usual.
+- Dialogs and the sidebar can cover the whole page.
+- The element uses the background, text color and fonts of your page, so that it blends in.
+- The element doesn't need a specific size.
+
+### isolated
+
+The element works similar to an `<iframe>`.
+
+- The element has its own scrollbar.
+- Dialogs and the sidebar stay within the element.
+- The element uses its own background, text color and fonts, like the standalone STAC Browser.
+- The element needs a fixed height, e.g. set via CSS or as a flex/grid item.
+  Otherwise it has a height of zero and you won't see anything.
 
 ```html
-<stac-browser url="…" isolation="isolated" style="height: 600px"></stac-browser>
+<stac-browser url="..." isolation="isolated" style="height: 600px"></stac-browser>
 ```
 
-In both modes the styles are isolated in the shadow root (see below); the mode
-only changes scrolling and how far overlays reach. Isolation sets up the scroll
-viewport when the element connects, so switch it by re-creating the element.
+Set the `isolation` attribute before the element is added to the page.
+If you change it later, some parts (e.g. the sticky header) don't adapt to the new mode.
+To switch the mode, restart STAC Browser as described in [Changing options](#changing-options).
 
-## Styling and isolation
+## Styling
 
-The element renders into a shadow root and injects its stylesheet there, so the
-host page's selectors and STAC Browser's styles (Bootstrap included) do not cross
-the boundary in either direction: host rules don't match elements inside, and
-STAC Browser's rules don't leak out. Popovers, tooltips, dropdowns, modals and
-the sidebar are teleported inside the shadow root so they stay isolated too.
+The web component uses a [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM).
+This means that the CSS of your page doesn't apply to STAC Browser,
+and the CSS of STAC Browser (including Bootstrap) doesn't apply to your page.
+This also applies to popovers, tooltips, dropdowns, dialogs and the sidebar.
 
-Inherited CSS properties are the exception: in the default `inline` mode STAC
-Browser deliberately inherits typography and colors from the host page (see
-below), so those properties do cross the boundary by design. `isolated` mode
-re-applies its own base styles and does not inherit them.
+The only exception are the background, text color and fonts in the [`inline` mode](#inline).
+They are taken from your page on purpose.
 
-There is no `<body>` inside the shadow root to carry the base page styles
-(background, text color and typography). In [`isolated`](#isolation-modes) mode
-the component re-applies them to its root container so it renders the same as the
-standalone app; in `inline` mode it deliberately leaves them unset and inherits
-them from the host page, to blend in.
+### Colors
 
-To theme the browser, set Bootstrap CSS custom properties on the element — the
-component forwards them into the shadow root:
+To change the colors, set the Bootstrap CSS variables in the `style` of the element.
+They are passed on to STAC Browser and can be changed at any time.
 
 ```js
 el.style.setProperty('--bs-primary', '#7c3aed');
 el.style.setProperty('--bs-primary-rgb', '124, 58, 237');
 ```
 
-Setting `--bs-primary` also recolors the site header, which follows the primary
-color by default. To style the header independently, set `--sb-header` (its
-background base color) and `--sb-header-color` (the text and links on it).
+You can also set them in the `style` attribute in HTML:
 
-Light/dark is controlled by the `enforcedColorMode` config option and applied
-only inside the shadow root, not to the host page.
+```html
+<stac-browser url="..." style="--bs-primary: #7c3aed; --bs-primary-rgb: 124, 58, 237"></stac-browser>
+```
 
-A single instance per page is assumed: two instances with different UI languages
-would compete over the shared `stac-fields` translations.
+Please note that CSS variables set in your stylesheets, e.g. `stac-browser { --bs-primary: #7c3aed; }`, don't work.
+STAC Browser overrides them with its own theme.
+
+The header uses the primary color by default.
+To set the colors of the header separately, use `--sb-header` for the background and `--sb-header-color` for the text and links.
+
+See the [styling documentation](styling.md#available-css-variables) for more CSS variables.
+
+### Light and dark mode
+
+Use the [`enforcedColorMode`](options.md#enforcedcolormode) option to choose between light and dark mode.
+It only applies to STAC Browser, not to your page.
+
+## Limitations
+
+- Only one STAC Browser per page is supported.
+  Multiple instances with different languages would conflict with each other, because they share some translations.

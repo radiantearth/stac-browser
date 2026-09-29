@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - STAC Browser can be embedded into any web page, regardless of framework, as a `<stac-browser>` web component
   (custom element) rendered into an isolated shadow root. See [docs/web-component.md](docs/web-component.md).
   - Built with `npm run build:web-component` into `stac-browser.js`, `stac-browser.css` and additional code-split chunks in `dist/`; deploy the whole directory
-  - Configurable via attributes (`url`, `catalog-title`, `locale`, `history-mode`, `isolation`) and a `config` DOM property
+  - Configurable via a `config` DOM property and via attributes: all config options with a scalar value in kebab-case
+    (e.g. `card-view-mode`, typed per `config.schema.json`), `url` for `catalogUrl`, and `isolation`
   - Emits `navigate`, `title`, `description`, `locale`, `structuredData` and `error` events so the host page can react
     and manage its own document head
   - Exposes `navigate(to)` and `navigateToStac(url)` methods for programmatic navigation by route or STAC URL
@@ -41,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Options set at runtime (via `runtime-config.js`) are no longer overwritten with build-time defaults
   for options with non-null primitive defaults (e.g. `detectLocaleFromBrowser`, `cardViewMode`)
+- The options `showKeywordsInItemCards` and `showKeywordsInCatalogCards` were missing in the config schema,
+  so they were not parsed as booleans when set via `SB_*` environment variables
 - Dark-mode basemap variants (e.g. `earth-dark`) are now found when `ssys:targets` uses different casing (e.g. `Earth`)
 - Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
   both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed

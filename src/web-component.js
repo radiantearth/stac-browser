@@ -3,14 +3,52 @@
 // default. See docs/web-component.md for configuration, events and methods.
 import createStacBrowser from './app';
 import defaultConfig from '../config.js';
+import configSchema from '../config.schema.json';
 import { pageTitle, pageDescription, pageLocale, pageStructuredData } from './page-metadata';
 
-const ATTRIBUTE_MAP = {
-  'url': 'catalogUrl',
-  'catalog-title': 'catalogTitle',
-  'locale': 'locale',
-  'history-mode': 'historyMode'
-};
+const elementDefaults = Object.assign({}, defaultConfig, { historyMode: 'memory' });
+
+// Every config option with a scalar type in the config schema can be set as an
+// attribute, named in kebab-case (e.g. `cardViewMode` as `card-view-mode`).
+// `catalogUrl` is the exception and keeps the shorter `url`.
+const SCALAR_TYPES = ['string', 'number', 'integer', 'boolean', 'null'];
+const ATTRIBUTE_MAP = { 'url': 'catalogUrl' };
+for (const [key, schema] of Object.entries(configSchema.properties)) {
+  const types = [].concat(schema.type);
+  if (key === 'catalogUrl' || key === 'RUNTIME' || schema.format === 'function' || !types.every(type => SCALAR_TYPES.includes(type))) {
+    continue;
+  }
+  ATTRIBUTE_MAP[key.replace(/[A-Z]/g, char => `-${char.toLowerCase()}`)] = key;
+}
+
+// Attribute values are strings, convert them to the type given in the config
+// schema. Booleans accept `true`, `false` and an empty value (true, like other
+// boolean HTML attributes); an empty value is null for nullable options.
+// Returns undefined for values that don't match the schema.
+function parseAttribute(key, value) {
+  const schema = configSchema.properties[key];
+  const types = [].concat(schema.type);
+  let parsed;
+  if (types.includes('boolean') && ['', 'true', 'false'].includes(value)) {
+    parsed = value !== 'false';
+  }
+  else if (types.includes('null') && value === '') {
+    parsed = null;
+  }
+  else if ((types.includes('number') || types.includes('integer')) && value.trim() !== '' && !Number.isNaN(Number(value))) {
+    parsed = Number(value);
+    if (!types.includes('number') && !Number.isInteger(parsed)) {
+      parsed = undefined;
+    }
+  }
+  else if (types.includes('string')) {
+    parsed = value;
+  }
+  if (parsed !== undefined && Array.isArray(schema.enum) && !schema.enum.includes(parsed)) {
+    parsed = undefined;
+  }
+  return parsed;
+}
 
 // Config options that can update a running instance (plus `locale`, handled via
 // switchLocale). Everything else is init-only and read once on connect.
@@ -136,10 +174,21 @@ export class StacBrowserElement extends HTMLElement {
     const config = {};
     for (const [attr, key] of Object.entries(ATTRIBUTE_MAP)) {
       if (this.hasAttribute(attr)) {
-        config[key] = this.getAttribute(attr);
+        const value = this._parseAttribute(attr, this.getAttribute(attr));
+        if (value !== undefined) {
+          config[key] = value;
+        }
       }
     }
     return config;
+  }
+
+  _parseAttribute(attr, value) {
+    const parsed = parseAttribute(ATTRIBUTE_MAP[attr], value);
+    if (parsed === undefined) {
+      console.warn(`<stac-browser>: Invalid value "${value}" for attribute "${attr}", ignoring it.`);
+    }
+    return parsed;
   }
 
   async connectedCallback() {
@@ -155,8 +204,7 @@ export class StacBrowserElement extends HTMLElement {
 
     const config = cloneConfig(Object.assign(
       {},
-      defaultConfig,
-      { historyMode: 'memory' },
+      elementDefaults,
       this._attributeConfig(),
       this._configProp
     ));
@@ -346,8 +394,14 @@ export class StacBrowserElement extends HTMLElement {
       return;
     }
     const key = ATTRIBUTE_MAP[name];
-    if (key) {
-      this._applyConfig({ [key]: newValue });
+    // The config property takes precedence over attributes.
+    if (!key || key in this._configProp) {
+      return;
+    }
+    // A removed attribute falls back to the default.
+    const value = newValue === null ? elementDefaults[key] : this._parseAttribute(name, newValue);
+    if (value !== undefined) {
+      this._applyConfig({ [key]: value });
     }
   }
 

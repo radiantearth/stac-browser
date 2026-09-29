@@ -403,6 +403,54 @@ test.describe('<stac-browser> web component', () => {
     await expect(page.getByRole('heading', { name: /Live Preview/i })).toBeVisible();
   });
 
+  test('reads scalar config options from attributes, typed per the config schema', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // Replace the demo's element (which also sets a `config` property) with one
+    // configured by attributes only.
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      el.setAttribute('show-favorites', 'false');
+      el.setAttribute('display-preview', '');
+      el.setAttribute('items-per-page', '5');
+      el.setAttribute('catalog-title-after-image', '');
+      el.setAttribute('card-view-mode', 'grid'); // not in the enum, ignored
+      document.querySelector('main').replaceChildren(el);
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const state = await page.locator('stac-browser').evaluate((el) => {
+      const s = el._instance.store.state;
+      return {
+        showFavorites: s.showFavorites,
+        displayPreview: s.displayPreview,
+        itemsPerPage: s.itemsPerPage,
+        catalogTitleAfterImage: s.catalogTitleAfterImage,
+        cardViewMode: s.cardViewMode
+      };
+    });
+    expect(state).toEqual({
+      showFavorites: false,
+      displayPreview: true,
+      itemsPerPage: 5,
+      catalogTitleAfterImage: null,
+      cardViewMode: 'cards'
+    });
+
+    // Options that can't change while running apply after re-adding the element.
+    const itemsPerPage = await page.locator('stac-browser').evaluate(async (el) => {
+      el.setAttribute('items-per-page', '7');
+      const parent = el.parentNode;
+      el.remove();
+      parent.appendChild(el);
+      await el.navigate('/');
+      return el._instance.store.state.itemsPerPage;
+    });
+    expect(itemsPerPage).toBe(7);
+  });
+
   test('exposes a navigateToStac() method that maps a STAC URL to a route', async ({ page, worker }) => {
     await embed(page, worker);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
