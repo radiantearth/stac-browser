@@ -110,6 +110,23 @@ export default class Utils {
   }
 
   /**
+   * Appends path segments to the path of a URL.
+   *
+   * The result is the same whether or not the URL has a trailing slash,
+   * e.g. for `https://example.com/collections/abc` and `https://example.com/collections/abc/`.
+   * The segments are percent-encoded, the query and fragment of the URL are kept.
+   *
+   * @param {string} url - The URL to append the segments to
+   * @param {...string} segments - The path segments to append
+   * @returns {URI} The resulting URL
+   */
+  static appendPath(url, ...segments) {
+    const uri = URI(url);
+    const path = Utils.removeTrailingSlash(uri.path());
+    return uri.path(`${path}/${segments.map(segment => encodeURIComponent(segment)).join('/')}`);
+  }
+
+  /**
    * Restores URL template placeholders such as `{z}/{x}/{y}` that got
    * percent-encoded, e.g. through URL normalization.
    * Only placeholders that occur in the original URL are restored.

@@ -12,7 +12,7 @@ import { STAC } from 'stac-js';
 import auth from './auth.js';
 import favorites from './favorites.js';
 import manager from './manager.js';
-import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
+import { addQueryIfNotExists, getResponseUrl, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
@@ -996,13 +996,19 @@ function getStore(config, router) {
             if (!isObject(response.data)) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
-            data = createSTAC(response.data, url, cx);
+            // Relative links must be resolved against the URL after redirects (RFC 3986, section 5.1.3)
+            const responseUrl = getResponseUrl(response, url);
+            data = createSTAC(response.data, responseUrl, cx);
             if (!(data instanceof STAC)) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
               throw new BrowserError(i18n.global.t('errors.apiListRequested'));
             }
             cx.commit('loaded', { url, data });
+            if (responseUrl !== url) {
+              // Make the entity also available under the URL it was redirected to
+              cx.commit('loaded', { url: responseUrl, data });
+            }
 
             if (show) {
               // If we prefer another language abort redirect to the new language
@@ -1131,6 +1137,8 @@ function getStore(config, router) {
             throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
           }
           else {
+            // Relative links of the Items are resolved against the URL of this response (RFC 3986)
+            const responseUrl = getResponseUrl(response, response.config?.url) || baseUrl;
             // todo: Convert data to stac-js
             response.data.features = response.data.features.map(item => {
               try {
@@ -1141,27 +1149,21 @@ function getStore(config, router) {
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
                 let url;
                 if (selfLink?.href) {
-                  url = toAbsolute(selfLink.href, baseUrl, false);
+                  url = toAbsolute(selfLink.href, responseUrl, false);
                 }
                 else if (typeof item.id !== 'undefined') {
-                  let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
-                  if (apiCollectionsLink) {
-                    apiCollectionsLink = URI(apiCollectionsLink);
+                  // No self link: Construct the URL from the path templates of OGC API - Features.
+                  // Utils.appendPath gives the same result with and without a trailing slash in the base URL.
+                  const itemId = String(item.id);
+                  const apiCollectionsLink = cx.getters.root?.getApiCollectionsLink();
+                  if (baseUrl) {
+                    url = Utils.appendPath(baseUrl, 'items', itemId);
                   }
-                  if (baseUrl && baseUrl.path().endsWith('/')) {
-                    url = toAbsolute(`items/${item.id}`, baseUrl, false);
+                  else if (collectionId && apiCollectionsLink) {
+                    url = Utils.appendPath(apiCollectionsLink.getAbsoluteUrl(), collectionId, 'items', itemId);
                   }
-                  else if (baseUrl) {
-                    url = toAbsolute(`${collectionId}/items/${item.id}`, baseUrl, false);
-                  }
-                  else if (apiCollectionsLink?.path().endsWith('/')) {
-                    url = toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink, false);
-                  }
-                  else if (apiCollectionsLink) {
-                    url = toAbsolute(`collections/${collectionId}/items/${item.id}`, apiCollectionsLink, false);
-                  }
-                  else if (cx.state.catalogUrl) {
-                    url = toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl, false);
+                  else if (collectionId && cx.state.catalogUrl) {
+                    url = Utils.appendPath(cx.state.catalogUrl, 'collections', collectionId, 'items', itemId);
                   }
                   else {
                     return null;
@@ -1276,22 +1278,21 @@ function getStore(config, router) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
           else {
+            // Relative links of the Collections are resolved against the URL of this response (RFC 3986)
+            const responseUrl = getResponseUrl(response, response.config?.url) || cx.state.url || stac.getAbsoluteUrl();
             // todo: Convert data to stac-js
             response.data.collections = response.data.collections.map(collection => {
               let selfLink = Utils.getLinkWithRel(collection.links, 'self');
               let url;
               if (selfLink?.href) {
-                url = toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
+                url = toAbsolute(selfLink.href, responseUrl, false);
               }
-              else {
+              else if (typeof collection.id !== 'undefined') {
+                // No self link: Construct the URL from the path templates of OGC API - Features.
                 // see https://github.com/radiantearth/stac-browser/issues/486
-                let baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
+                const baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
                 if (baseUrl) {
-                  baseUrl = URI(baseUrl);
-                  if (!baseUrl.path().endsWith('/')) {
-                    baseUrl.path(`${baseUrl.path()}/`);
-                  }
-                  url = toAbsolute(`collections/${collection.id}`, baseUrl, false);
+                  url = Utils.appendPath(baseUrl, 'collections', String(collection.id));
                 }
               }
               if (!url) {
