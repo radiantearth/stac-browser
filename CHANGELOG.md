@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- Fixed a small typo in the Romanian locale
 
 ## [5.1.0] - 2026-09-07
 
