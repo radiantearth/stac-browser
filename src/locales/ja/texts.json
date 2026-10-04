@@ -128,7 +128,7 @@
     "add": "お気に入りに追加",
     "empty": "お気に入りはまだ追加されていません。お気に入りを追加するには、カタログ、コレクション、またはアイテムのページの「お気に入り」ボタンを使用してください。",
     "export": "エクスポート",
-    "exportDescription": "お気に入りをファイルにエクスポートします。例: 別のブラウザーでインポート",
+    "exportDescription": "お気に入りをファイルにエクスポートします。例: 別のブラウザーでインポート。",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
@@ -203,7 +203,7 @@
     "edit": "編集",
     "leavePage": "ページを離れる",
     "save": "保存",
-    "noUndo": "この操作は元に戻せません",
+    "noUndo": "この操作は元に戻せません。",
     "unsavedChangesLeave": "未保存の変更があります。本当にこのページを離れますか？",
     "unsavedChangesTitle": "未保存の変更",
     "validate": "検証"
@@ -449,7 +449,7 @@
       "failingKeyword": "キーワードの失敗",
       "format": "フォーマット",
       "i": "最初のアイテム",
-      "j": "2つ目のアイテム",
+      "j": "ふたつめのアイテム",
       "limit": "制限",
       "maxContains": "に含まれている最大数",
       "minContains": "少なくとも含む",
@@ -487,7 +487,7 @@
   "thumbnails": "サムネイル",
   "tree": {
     "moreCollectionPagesAvailable": "さらに利用可能なページがあります",
-    "noChildren": "利用可能な子要素はありません"
+    "noChildren": "利用可能な子要素はありません。"
   },
   "view": {
     "list": {
