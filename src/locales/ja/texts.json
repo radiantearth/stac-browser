@@ -26,15 +26,33 @@
       "metadata": "メタデータ"
     },
     "showOnMap": "地図上に表示",
-    "showThumbnail": "サムネイルを表示"
+    "showThumbnail": "サムネイルを表示",
+    "shown": "表示"
   },
   "authentication": {
     "button": {
+      "login": "ログイン",
+      "logout": "ログアウト",
       "title": "資格情報の入力または更新"
     },
+    "chooseMethod": "認証方法を選択",
     "description": "要求されたページには認証が必要です。以下のテキストフィールドに認証情報を入力してください。",
-    "schemeTypes": {},
-    "title": "認証"
+    "loggedOut": "ログアウトに成功しました。このウィンドウを閉じることができます。",
+    "password": "パスワード",
+    "required": "認証が必要",
+    "schemeTypes": {
+      "apiKey": "API キー",
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "署名付きURL"
+    },
+    "title": "認証",
+    "unauthorized": "このデータにアクセスする権限がありません。ログインしてください。",
+    "unsupported": "非対応",
+    "unsupportedLong": "申し訳ありませんが、認証方法 {method} はSTACブラウザでサポートされていません。",
+    "user": "ユーザー"
   },
   "browse": "ブラウズ",
   "cancel": "キャンセル",
@@ -52,8 +70,12 @@
     "false": "いいえ",
     "true": "はい"
   },
+  "close": "閉じる",
   "copy": "コピー",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "コピーできません。ブラウザの権限を確認してください。",
+    "unsupported": "このブラウザーではクリップボードを使用できません。"
+  },
   "default": "デフォルト",
   "defaultWithValue": "デフォルト ({value})",
   "deprecated": "非推奨",
@@ -62,12 +84,14 @@
     "latestVersion": "最新バージョン:",
     "otherVersionsNotice": "この {type} は非推奨では *ありません* が、他のバージョンが利用可能です:",
     "otherVersionsTitle": "他のバージョンが利用可能です",
+    "outdatedTitle": "期限切れ",
     "predecessorVersion": "前のバージョン",
     "successorVersion": "次のバージョン",
     "warning": "この {type} は非推奨であり、いつでも削除される可能性があります。 できるだけ早く移行すべきです。新しいプロジェクトで使用しないでください。"
   },
   "description": "説明",
   "errors": {
+    "apiListRequested": "リクエストが無効です。/collections と .../items エンドポイントへの直接リクエストは現在サポートされていません。",
     "authFailed": "リクエストがエラーになりました。認証情報が正しくない可能性があります。",
     "badRequest": "リクエストが無効です。パラメータが有効なものでない （例: 検索リクエスト） か、STACブラウザのバグである可能性があります。",
     "contactProvider": "この問題を解決するには、サービス担当者にお問い合わせください。",
@@ -86,18 +110,46 @@
     "loadApiItemsFailed": "APIアイテムを読み込めませんでした。",
     "loadFilteredItems": "フィルタされたアイテム一覧の読み込みに失敗しました。",
     "loadItems": "STACアイテム一覧の読み込みに失敗しました。",
+    "missingPermissions": "このリクエストに指定された資格情報には必要な権限がありません。",
     "networkError": "この問題は、サーバーが Web ブラウザを介して外部アクセスを許可しない場合に発生することがあります (CORS ヘッダーが存在しない場合など)。 @:errors.contactProvider",
     "noExternalAccess": "外部カタログへのアクセスは許可されていません",
     "notFound": "要求されたリソースは存在しません。@:errors.contactProvider",
     "serverError": "サーバーに問題が発生しました。@:errors.contactProvider",
+    "title": "エラー",
     "unauthorized": "リクエストには認証情報がありません（例:APIトークン。）認証情報を入力して再度お試し下さい。"
   },
-  "exampleCode": {},
+  "exampleCode": {
+    "title": "コード例",
+    "storeAs": "ストアコード名:",
+    "installDependencies": "依存関係のインストール:"
+  },
+  "externalInfo": "この {type} は外部データソースによって提供されています。",
   "favorites": {
-    "exportFormats": {}
+    "add": "お気に入りに追加",
+    "empty": "お気に入りはまだ追加されていません。お気に入りを追加するには、カタログ、コレクション、またはアイテムのページの「お気に入り」ボタンを使用してください。",
+    "export": "エクスポート",
+    "exportDescription": "お気に入りをファイルにエクスポートします。例: 別のブラウザーでインポート。",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "STAC カタログ"
+    },
+    "import": "Import",
+    "importDescription": "以前にエクスポートしたファイルからお気に入りをインポートします。",
+    "importInvalid": "選択したファイルにお気に入りが含まれていません。",
+    "imported": "{count} の新しいお気に入りがインポートされました。",
+    "label": "お気に入り",
+    "localOnly": "お気に入りはこのWebブラウザにのみローカルに保存されます。デバイスやブラウザ間で同期されません。",
+    "remove": "お気に入りから削除",
+    "title": "お気に入り"
   },
   "featureExperimental": "この機能はまだ実験的で、予期しない結果をもたらす可能性があります。",
-  "features": {},
+  "features": {
+    "empty": "利用可能な機能はありません。",
+    "noProperties": "プロパティが提供されていません。",
+    "title": "機能 | 機能"
+  },
   "fullscreen": {
     "exit": "全画面表示を終了",
     "exitLabel": "✕",
@@ -106,7 +158,8 @@
   },
   "goBack": {
     "description": "{type} に戻る",
-    "label": "戻る"
+    "label": "戻る",
+    "refererDescription": "最後に訪問したカタログページに戻る"
   },
   "goToCollection": {
     "description": "関連するコレクションに移動",
@@ -131,15 +184,37 @@
   },
   "items": {
     "filter": "フィルター",
+    "filterChangesNotApplied": "フィルタは変更されましたが、変更はまだ適用されていません。",
     "hideFilter": "フィルターを非表示",
+    "noTime": "時間なし",
     "noneAvailableForCollection": "このコレクションに利用可能なアイテムはありません。",
     "showFilter": "フィルターを表示"
   },
   "loading": "読み込み中...",
-  "manage": {},
+  "manage": {
+    "addCollection": "コレクションを追加",
+    "addItem": "アイテムを追加",
+    "confirmDeleteTitle": "削除を確認",
+    "confirmDeleteMessage": "このSTACリソースを削除してもよろしいですか？",
+    "create": "作成",
+    "delete": "削除",
+    "discardDraft": "復元した変更を破棄する",
+    "draftRestored": "以前のセッションからの未保存の変更が復元されました。",
+    "edit": "編集",
+    "leavePage": "ページを離れる",
+    "save": "保存",
+    "noUndo": "この操作は元に戻せません。",
+    "unsavedChangesLeave": "未保存の変更があります。本当にこのページを離れますか？",
+    "unsavedChangesTitle": "未保存の変更",
+    "validate": "検証"
+  },
   "map": "マップ",
   "mapping": {
-    "attribution": {},
+    "attribution": {
+      "collapseLabel": "✕",
+      "description": "属性",
+      "label": "i"
+    },
     "bboxSelect": {
       "error": {}
     },
@@ -244,7 +319,9 @@
     "notFullySupported": "すべてのオプションがサポートされているわけではありません。",
     "notSupported": "アイテム検索はこのAPIではサポートされていません。",
     "placeholder": "検索...",
+    "removeDate": "日付を削除",
     "selectCollections": "1つ以上のコレクションを選択...",
+    "selectDateRange": "日付範囲を選択します",
     "selectForItemSearch": "アイテム検索用に選択",
     "spatialExtent": "場所の範囲",
     "tabs": {
@@ -273,6 +350,8 @@
   "source": {
     "conformanceClasses": "準拠クラス",
     "detailsAboutSource": "STACソースの詳細",
+    "extension": "拡張子",
+    "externalData": "外部データソース",
     "fileFormat": "ファイル形式",
     "id": "ID",
     "invalid": "無効",
@@ -284,6 +363,7 @@
       "switch": "言語の切り替え"
     },
     "locatedAt": "STACメタデータファイルは以下の場所にあります:",
+    "manage": "管理",
     "share": {
       "bsky": "Bluesky",
       "email": "Eメール",
@@ -295,11 +375,33 @@
       "withOthers": "このページを共有しましょう",
       "x": "X (Twitter)"
     },
+    "stacExtension": "STAC エクステンション",
+    "stacVersion": "STACバージョン",
     "statistics": "統計",
     "title": "ソースデータ",
     "valid": "有効",
     "validating": "検証中...",
-    "validationParams": {},
+    "validationNA": "なし",
+    "validationParams": {
+      "additionalProperty": "追加プロパティ",
+      "allowedValue": "許可された値",
+      "allowedValues": "許可された値",
+      "comparison": "比較",
+      "depsCount": "カウント",
+      "exclusive": "境界を除外する",
+      "failingKeyword": "キーワードの失敗",
+      "format": "フォーマット",
+      "i": "最初のアイテム",
+      "j": "ふたつめのアイテム",
+      "limit": "制限",
+      "maxContains": "に含まれている最大数",
+      "minContains": "少なくとも含む",
+      "missingProperty": "不足しているプロパティ",
+      "pattern": "パターン",
+      "property": "属性",
+      "propertyName": "属性名",
+      "type": "タイプ"
+    },
     "validationReport": {
       "disclaimer": "検証レポートはスキーマに基づいて生成されますが、網羅していないことがあります。 これらはSTAC仕様とその拡張のすべてをカバーするわけではありません。 この検証レポートは、STACエンティティが仕様およびその拡張に完全に準拠している保証ではありません。",
       "result": "結果",
@@ -309,8 +411,11 @@
   "stacAssets": "アセット",
   "stacCatalog": "カタログ",
   "stacCollection": "コレクション",
+  "stacEntity": "リソース | リソース",
   "stacItem": "アイテム",
   "submit": "送信",
+  "switchToDarkMode": "ダークモードに切り替える",
+  "switchToLightMode": "ライトモードに切り替え",
   "table": {
     "emptyFilteredText": "リクエストにマッチするレコードはありません",
     "emptyText": "表示するレコードがありません",
@@ -322,7 +427,8 @@
   },
   "thumbnails": "サムネイル",
   "tree": {
-    "moreCollectionPagesAvailable": "さらに利用可能なページがあります"
+    "moreCollectionPagesAvailable": "さらに利用可能なページがあります",
+    "noChildren": "利用可能な子要素はありません。"
   },
   "view": {
     "list": {
@@ -335,5 +441,7 @@
     },
     "title": "表示オプション"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": "特徴"
+  }
 }

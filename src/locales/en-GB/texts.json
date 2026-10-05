@@ -24,11 +24,20 @@
   "deprecation": {},
   "errors": {
     "labels": {},
+    "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g. when CORS headers are not present). @:errors.contactProvider",
     "noExternalAccess": "Accessing external catalogues is not allowed!"
   },
   "exampleCode": {},
   "favorites": {
-    "exportFormats": {}
+    "empty": "No favourites have been added yet. To add favourites, use the 'Favourite' button on the page of a catalogue, collection, or item.",
+    "exportFormats": {
+      "stac": "STAC Catalogue"
+    },
+    "imported": "{count} new favourites were imported.",
+    "label": "Favourite",
+    "localOnly": "Favourites are stored only locally in this web browser. They are not synchronized across devices or browsers.",
+    "remove": "Remove from favourites",
+    "title": "Favourites"
   },
   "features": {},
   "fullscreen": {},
