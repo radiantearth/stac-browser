@@ -352,7 +352,6 @@
   "Processing Level": "Processing Level",
   "Processing Status": "Processing Status",
   "Processing Time": "Processing Time",
-  "Processing instructions/code": "Processing instructions/code",
   "Processor Version": "Processor Version",
   "Product": "Product",
   "Product Type": "Product Type",
@@ -566,5 +565,6 @@
   "°": "°",
   "°E": "°E",
   "°N": "°N",
-  "μm": "μm"
+  "μm": "μm",
+  "Processing instructions/code": "Processing instructions/code"
 }
