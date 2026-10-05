@@ -33,7 +33,7 @@ export default {
     stacLayerOptions() {
       const options = {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
-        crossOriginMedia: this.crossOriginMedia,
+        crossOrigin: this.crossOriginMedia,
         displayPreview: this.displayPreview,
         displayOverview: this.displayOverview,
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
