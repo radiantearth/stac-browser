@@ -216,39 +216,12 @@
       "label": "i"
     },
     "bboxSelect": {
-      "add": "",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "",
-      "southLat": "",
-      "westLon": ""
+      "error": {}
     },
     "close": "閉じる",
-    "displayLimit": {
-      "message": "",
-      "showAnyway": "",
-      "title": ""
-    },
-    "fit": "",
-    "focusHint": "",
-    "layers": {
-      "base": "",
-      "footprint": "",
-      "title": "",
-      "unnamed": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "displayLimit": {},
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "拡大",
@@ -281,16 +254,7 @@
     "previous": "‹ 前"
   },
   "poweredBy": "提供: {link}",
-  "programming": {
-    "csharp": "",
-    "curl": "",
-    "go": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
-  },
+  "programming": {},
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "ファイルシステム (ローカル)",
@@ -320,28 +284,12 @@
   "reset": "リセット",
   "search": {
     "addCollections": "Enterキーを押してコレクションを追加",
-    "addDate": "",
     "addFilter": "フィルターを追加",
     "additionalFilters": "追加のフィルター",
     "addItemIds": "Enterキーを押してアイテムIDを追加",
     "addSearchTerm": "Enter キーを押して検索語句を追加",
-    "arrayInput": {
-      "addValue": "",
-      "helpText": ""
-    },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
-    "between": "",
-    "betweenOperatorDescription": "",
+    "arrayInput": {},
     "dateDescription": "すべての時刻はUTC (協定世界時) です",
-    "disabledDueToSingleDate": "",
-    "droppedFilters": "",
     "enterCollections": "1つ以上のコレクションIDを入力してください...",
     "enterItemIds": "1つ以上のアイテムIDを入力してください...",
     "enterSearchTerms": "1つ以上の検索語句を入力してください...",
@@ -352,8 +300,6 @@
     "freeTextDescription": "タイトルや説明などのフィールドで、与えられた語句のうち少なくとも1つを検索します。",
     "greaterThan": "より大きい",
     "greaterThanEqual": "以上",
-    "in": "",
-    "inOperatorDescription": "",
     "itemIds": "アイテム ID",
     "itemsPerPage": "ページあたりの件数",
     "itemsPerPageDescription": "ページあたりのアイテム表示件数 （最大 {maxItems} 件）",
@@ -362,15 +308,12 @@
     "likeOperatorDescription": "ワイルドカード文字を使用できます。 `_` は1文字にマッチし、 `%` は任意の文字数にマッチします。 ワイルドカード文字自体を検索するには、文字の前に `\\` を付ける必要があります。",
     "logical": {
       "and": "すべてのフィルターにマッチ (AND)",
-      "or": "いずれかのフィルターにマッチ (OR)",
-      "not": ""
+      "or": "いずれかのフィルターにマッチ (OR)"
     },
     "matches": "マッチ",
     "metaDescription": "{title} のデータを検索します。",
     "modifyCriteria": "検索条件を変更してください。",
-    "noFurtherItemsFound": "",
     "noItemsFound": "指定されたフィルターにアイテムが見つかりませんでした。",
-    "noOperatorsError": "",
     "noOptions": "まだ何も入力されていません",
     "notEqualTo": "等しくない",
     "notFullySupported": "すべてのオプションがサポートされているわけではありません。",
@@ -454,8 +397,6 @@
       "maxContains": "に含まれている最大数",
       "minContains": "少なくとも含む",
       "missingProperty": "不足しているプロパティ",
-      "multipleOf": "",
-      "passingSchemas": "",
       "pattern": "パターン",
       "property": "属性",
       "propertyName": "属性名",
