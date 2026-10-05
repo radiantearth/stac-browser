@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
 
+### Fixed
+
+- Scientific publications without a DOI show "n/a" instead of escaped HTML, and DOI links use HTTPS
+- Typo in the label for processing instructions/code links
+
 ## [5.1.0] - 2026-09-07
 
 ### Added
