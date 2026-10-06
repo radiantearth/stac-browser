@@ -4,7 +4,8 @@ import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
-import Utils, { BrowserError, externalBrowserPathRE } from '../utils';
+import Utils, { BrowserError } from '../utils';
+import { escapedBrowserPathRE, externalBrowserPathRE, reservedBrowserPathSegments } from '../router/index.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
@@ -464,12 +465,18 @@ function getStore(config, router) {
           return path;
         }
         else {
-          return `/${relative.toString()}`;
+          const path = relative.toString();
+          const firstSegment = path.split(/[/?#]/, 1)[0];
+          return reservedBrowserPathSegments.includes(firstSegment) ? `/browse/${path}` : `/${path}`;
         }
       },
       fromBrowserPath: (state, getters) => url => {
         const externalRE = externalBrowserPathRE;
-        if (!hasText(url) || url === '/') {
+        const escaped = !state.allowSelectCatalog && state.catalogUrl && hasText(url) ? url.match(escapedBrowserPathRE) : null;
+        if (escaped) {
+          url = hasText(escaped[1]) ? toAbsolute(escaped[1], state.catalogUrl, false) : state.catalogUrl;
+        }
+        else if (!hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
         else if (url.match(externalRE)) {
