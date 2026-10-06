@@ -21,6 +21,11 @@ export default defineComponent({
   components: {
     Catalogs
   },
+  inject: {
+    isFrontpage: {
+      default: false
+    }
+  },
   props: {
     entities: {
       type: Array,
@@ -43,15 +48,12 @@ export default defineComponent({
       // Plain text passes through unchanged, locale keys get translated
       return this.$t(this.title || 'widgets.featured');
     },
-    // The root catalog, if the landing page or the frontpage is shown
+    // The root catalog, but only if the root catalog or the frontpage is shown
     base() {
-      if (this.data instanceof STAC && this.root && this.data.is(this.root)) {
-        return this.data;
+      if (this.data instanceof STAC) {
+        return this.root && this.data.is(this.root) ? this.data : null;
       }
-      if (this.$route.name === 'frontpage' && this.root instanceof STAC) {
-        return this.root;
-      }
-      return null;
+      return this.isFrontpage && this.root instanceof STAC ? this.root : null;
     },
     resolvedEntities() {
       if (!this.base) {

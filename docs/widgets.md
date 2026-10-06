@@ -148,8 +148,25 @@ which show the banner above the description.
 ### Featured
 
 Renders a list of "featured" STAC catalogs or collections.
-A typical placement is the `view-catalog-catalogs-start` hook, which shows the featured entities right above the regular collection list.
-The widget only renders on the landing page (the root catalog) and on the [frontpage](pages.md#frontpage).
+
+The widget only renders on the page of the root catalog and on the [frontpage](pages.md#frontpage).
+It's never shown on other pages, e.g. sub-catalogs, collections, items, search or [custom pages](pages.md), even if it's placed in a hook that is shown there.
+Configure where it's shown through the hooks, for example in the collection overview, on the frontpage, or both:
+
+```js
+export default {
+  // Above the collection list of the root catalog
+  'view-catalog-catalogs-start': [
+    { id: 'Featured', props: { entities: ['sentinel-2-l2a'] } }
+  ],
+  // At the beginning of the frontpage
+  'frontpage-start': [
+    { id: 'Featured', props: { entities: ['sentinel-2-l2a'], view: 'list' } }
+  ]
+};
+```
+
+On a frontpage that consists of widgets, the widget can also be added to the list of widgets of the frontpage instead.
 
 | Props      | Type   | Default      | Description |
 | ---------- | ------ | ------------ | ----------- |

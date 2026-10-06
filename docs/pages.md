@@ -193,7 +193,7 @@ The widget hooks `frontpage-start` and `frontpage-end` are shown at the beginnin
 The root catalog moves from `/` to `/browse/`, all other paths stay the same.
 The title in the header links to the frontpage.
 If the frontpage is not available (see [Conditions](#conditions)), the root catalog is shown at `/` instead.
-The [`Featured`](widgets.md#featured) widget shows the featured entities on the frontpage, too.
+The [`Featured`](widgets.md#featured) widget can be shown on the frontpage, in the collection overview of the root catalog, or both.
 
 **Without a `catalogUrl`:**
 The frontpage replaces the selection of a catalog.

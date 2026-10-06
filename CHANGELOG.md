@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Links to custom pages in the header, in the footer (also via `footerLinks`), in Markdown (`page:` links) and in Vue components (`PageLink`)
 - Custom frontpage, see `pages.config.js` and the new config option `frontpage`; with a `catalogUrl` the root catalog moves to `/browse/`
 - Widget `SelectDataSource`: The selection of a catalog, which can be added to a custom frontpage
-- Widget `Featured` also renders on the frontpage
+- Widget `Featured` can also be shown on the frontpage, e.g. in the new widget hook `frontpage-start`
 
 ### Changed
 
