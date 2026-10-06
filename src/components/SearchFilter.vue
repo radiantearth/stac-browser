@@ -671,7 +671,7 @@ export default defineComponent({
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
           if (this.collectionsLoadingTimer && CollectionCollection.isResponse(response.data)) {
-            const stac = createSTAC(response.data, null, this.$store);
+            const stac = createSTAC(response.data, null, this.$store, false, 'CollectionCollection');
             this.collections = this.prepareCollections(stac.getAll());
             if (typeof stac.numberMatched === 'number') {
               this.additionalCollectionCount = stac.numberMatched - this.collections.length;
@@ -702,7 +702,7 @@ export default defineComponent({
           return {};
         }
 
-        const stac = createSTAC(response.data, null, this.$store);
+        const stac = createSTAC(response.data, null, this.$store, false, 'CollectionCollection');
         if (typeof stac.getQueryablesLink === 'function') {
           data.queryableLink = stac.getQueryablesLink();
         }

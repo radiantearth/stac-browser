@@ -309,7 +309,7 @@ export default defineComponent({
         }
         else {
           const url = this.link.getAbsoluteUrl();
-          const data = createSTAC(response.data, url, this.$store);
+          const data = createSTAC(response.data, url, this.$store, false, this.isCollectionSearch ? 'CollectionCollection' : 'ItemCollection');
           this.data = data;
           // Remember the shown results so that they can be restored when the
           // user returns to the Search page

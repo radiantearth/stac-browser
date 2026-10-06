@@ -18,28 +18,36 @@ export function processSTAC(stac, store) {
   return markRaw(stac);
 }
 
-export function createSTAC(data, url = null, store = null, incomplete = false) {
-  // Migrate STAC to latest version
-  let original = data._original ?? structuredClone(data);
-  data = Migrate.stac(data, false);
+const TYPES = {
+  Item: { Class: Item, migrate: data => Migrate.item(data, null, false) },
+  ItemCollection: { Class: ItemCollection, migrate: data => Migrate.itemCollection(data, false) },
+  Collection: { Class: Collection, migrate: data => Migrate.collection(data, false) },
+  CollectionCollection: { Class: CollectionCollection, migrate: data => Migrate.collectionCollection(data, false) },
+  Catalog: { Class: Catalog, migrate: data => Migrate.catalog(data, false) }
+};
 
-  // Create stac-js object based on STAC type
-  let obj;
+function detectType(data) {
   if (data.type === 'Feature') {
-    obj = new Item(data, url);
+    return 'Item';
   }
   else if (data.type === 'FeatureCollection') {
-    obj = new ItemCollection(data, url);
+    return 'ItemCollection';
+  }
+  // OGC API - Records requires the /collections response to be a catalog with "type": "Collection"
+  else if (!data.stac_version && Array.isArray(data.collections)) {
+    return 'CollectionCollection';
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
-    obj = new Collection(data, url);
+    return 'Collection';
   }
-  else if (!data.type && Array.isArray(data.collections)) {
-    obj = new CollectionCollection(data, url);
-  }
-  else {
-    obj = new Catalog(data, url);
-  }
+  return 'Catalog';
+}
+
+export function createSTAC(data, url = null, store = null, incomplete = false, type = null) {
+  let original = data._original ?? structuredClone(data);
+  const { Class, migrate } = TYPES[type || detectType(data)];
+  data = migrate(data);
+  let obj = new Class(data, url);
 
   // Set stac-browser internal properties
   if (obj.isApiCollection) {

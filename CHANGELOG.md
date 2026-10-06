@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
 
+### Fixed
+
+- Collection search works with OGC API - Records, whose `/collections` response has `"type": "Collection"`
+
 ## [5.1.0] - 2026-09-07
 
 ### Added
