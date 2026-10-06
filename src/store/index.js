@@ -18,6 +18,7 @@ import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 import search, { freshSearchState } from './modules/search.js';
+import { getPageTitle, isPageVisible, mergePages, PAGE_PATH_PREFIX } from '../pages.js';
 
 // type is either 'collections' or 'items', depending on which endpoint the list was loaded from
 function updateApiChildrenState(state, stac, type, list, next = false, prev = false) {
@@ -205,6 +206,16 @@ function getStore(config, router) {
       browserReady: false,
     }),
     getters: {
+      pages: state => mergePages(state.pages),
+      visiblePages: (state, getters) => Object.fromEntries(
+        Object.entries(getters.pages).filter(([id, page]) => isPageVisible(id, page, state, getters))
+      ),
+      getPage: (state, getters) => id => getters.visiblePages[id] || null,
+      pageLink: (state, getters) => id => getters.getPage(id) ? PAGE_PATH_PREFIX + encodeURIComponent(id) : null,
+      pageTitle: (state, getters) => id => {
+        const page = getters.getPage(id);
+        return page ? getPageTitle(page, id, state.uiLanguage, state.fallbackLocale) : null;
+      },
       isRoot: (state, getters) => {
         if (state.data instanceof STAC) {
           return state.data.is(getters.root);

@@ -7,6 +7,7 @@
 - [Loading local files](./docker.md)
 - [Metadata rendering](./metadata.md)
 - [Options](./options.md)
+- [Pages](./pages.md)
 - [Release process](./release.md)
 - [Styling & Theming](./styling.md)
 - [Widgets](./widgets.md)
