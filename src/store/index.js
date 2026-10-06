@@ -467,7 +467,7 @@ function getStore(config, router) {
         else {
           const path = relative.toString();
           const firstSegment = path.split(/[/?#]/, 1)[0];
-          return reservedBrowserPathSegments.includes(firstSegment) ? `/browse/${path}` : `/${path}`;
+          return reservedBrowserPathSegments.includes(firstSegment.toLowerCase()) ? `/browse/${path}` : `/${path}`;
         }
       },
       fromBrowserPath: (state, getters) => url => {
