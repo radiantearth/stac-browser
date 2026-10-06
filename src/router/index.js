@@ -6,7 +6,7 @@ export const externalBrowserPathRE = /^\/((search|validation|management\/[\w-]+)
 
 // First path segments that are taken by routes other than browse, browser paths starting with them get the /browse prefix.
 // Add new top-level routes.
-export const reservedBrowserPathSegments = ['auth', 'browse', 'external', 'favorites', 'management', 'search', 'validation'];
+export const reservedBrowserPathSegments = ['auth', 'browse', 'external', 'favorites', 'management', 'pages', 'search', 'validation'];
 export const escapedBrowserPathRE = /^\/?browse(?:\/(.*))?$/;
 
 function catchAllString(route) {
@@ -22,15 +22,18 @@ function getPath(route, config) {
   return {path};
 }
 
-function getRoutes(config) {
+function getRoutes(config, hasFrontpage = false) {
   let routes = [];
 
-  if (!config.catalogUrl) {
+  if (!config.catalogUrl || hasFrontpage) {
     routes.push({
       path: "/",
-      name: "select",
-      component: () => import("../views/SelectDataSource.vue")
+      name: "frontpage",
+      component: () => import("../views/Frontpage.vue")
     });
+  }
+
+  if (!config.catalogUrl) {
     routes.push({
       path: "/search/external/:pathMatch(.*)*",
       name: "search",
@@ -72,9 +75,18 @@ function getRoutes(config) {
     routes.push({
       path: "/favorites",
       name: "favorites",
-      component: () => import("../views/Favorites.vue")
+      component: () => import("../views/Favorites.vue"),
+      meta: { stac: false }
     });
   }
+
+  routes.push({
+    path: "/pages/:id(.*)",
+    name: "page",
+    component: () => import("../views/Page.vue"),
+    props: true,
+    meta: { stac: false }
+  });
 
   routes.push({
     path: "/management/edit/:pathMatch(.*)*",

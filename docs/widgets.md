@@ -14,12 +14,13 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [CustomText](#customtext)
   - [ExternalWarning](#externalwarning)
   - [Featured](#featured)
+  - [SelectDataSource](#selectdatasource)
 - [Hooks](#hooks)
   - [StacBrowser.vue](#stacbrowservue)
   - [views/ApiSearch.vue](#viewsapisearchvue)
   - [views/Catalog.vue](#viewscatalogvue)
   - [views/Item.vue](#viewsitemvue)
-  - [views/SelectDataSource.vue](#viewsselectdatasourcevue)
+  - [views/Page.vue](#viewspagevue)
 - [Developer Guide](#developer-guide)
   - [Creating a New Widget](#creating-a-new-widget)
   - [Adding a New Hook](#adding-a-new-hook)
@@ -33,6 +34,8 @@ The file exports an object where each key is a **hook ID** (the location on the 
 and each value is an **array of widget definitions** to render at that location.
 
 Multiple widgets can be added to the same hook — they render in array order.
+
+Widgets can also be used as the content of [pages](pages.md#widgets).
 
 After editing the file, restart or rebuild STAC Browser for changes to take effect.
 
@@ -145,8 +148,25 @@ which show the banner above the description.
 ### Featured
 
 Renders a list of "featured" STAC catalogs or collections.
-A typical placement is the `view-catalog-catalogs-start` hook, which shows the featured entities right above the regular collection list.
-The widget only renders on the landing page (the root catalog).
+
+The widget only renders on the page of the root catalog and on the [frontpage](pages.md#frontpage).
+It's never shown on other pages, e.g. sub-catalogs, collections, items, search or [custom pages](pages.md), even if it's placed in a hook that is shown there.
+Configure where it's shown through the hooks, for example in the collection overview, on the frontpage, or both:
+
+```js
+export default {
+  // Above the collection list of the root catalog
+  'view-catalog-catalogs-start': [
+    { id: 'Featured', props: { entities: ['sentinel-2-l2a'] } }
+  ],
+  // At the beginning of the frontpage
+  'frontpage-start': [
+    { id: 'Featured', props: { entities: ['sentinel-2-l2a'], view: 'list' } }
+  ]
+};
+```
+
+On a frontpage that consists of widgets, the widget can also be added to the list of widgets of the frontpage instead.
 
 | Props      | Type   | Default      | Description |
 | ---------- | ------ | ------------ | ----------- |
@@ -167,6 +187,14 @@ Each entry in `entities` can be one of the following:
   Works for both STAC APIs and static catalogs. The object must contain a
   `self` link or (for APIs) an `id`, otherwise the entity is not shown.
   STAC Browser loads the full version of the entity when needed.
+
+### SelectDataSource
+
+Renders a form to enter the URL of a STAC catalog or API and a list of the catalogs and APIs from [STAC Index](https://stacindex.org).
+This is the default [frontpage](pages.md#frontpage) if no `catalogUrl` is set.
+The widget only renders if no [`catalogUrl`](options.md#catalogurl) is set.
+
+The widget has no props.
 
 ## Hooks
 
@@ -210,9 +238,10 @@ Each hook has an ID like `view-catalog-meta-start` that you use as the key in
 - `view-item-secondary-end`
 - `view-item-secondary-start`
 
-### views/SelectDataSource.vue
+### views/Page.vue
 
-- `view-select-data-source-start`
+- `frontpage-end`
+- `frontpage-start`
 <!-- END HOOKS -->
 
 *Note: This list is auto-generated. Run `npm run docs:hooks` to update it after adding new hooks.*

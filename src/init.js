@@ -4,19 +4,21 @@ import StacBrowser from "./StacBrowser.vue";
 import i18n, { loadDefaultMessages } from './i18n';
 import CONFIG from './merged-config';
 import getRoutes from "./router";
+import { getFrontpage } from "./pages.js";
 import getStore from "./store";
 
 import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
 import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
+import PageLink from "./components/PageLink.vue";
 
 export default function init() {
   return loadDefaultMessages().then(() => {
     // Setup router
     const router = createRouter({
       history: CONFIG.historyMode === 'history' ? createWebHistory(CONFIG.pathPrefix) : createWebHashHistory(CONFIG.pathPrefix),
-      routes: getRoutes(CONFIG),
+      routes: getRoutes(CONFIG, Boolean(getFrontpage(CONFIG.frontpage))),
       scrollBehavior: (to, from, savedPosition) => {
         if (to.path !== from.path) {
           return { left: 0, top: 0 };
@@ -32,8 +34,9 @@ export default function init() {
 
     const app = createApp(StacBrowser);
 
-    // Make WidgetHook available globally for convenience
+    // Make WidgetHook and PageLink available globally for convenience
     app.component('WidgetHook', WidgetHook);
+    app.component('PageLink', PageLink);
     
     // Add BootstrapVueNext plugin with minimal config
     // Components are auto-registered via BootstrapVueNextResolver in vue.config.js

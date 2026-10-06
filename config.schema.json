@@ -197,9 +197,28 @@
           "url": {
             "type": "string",
             "format": "uri"
+          },
+          "page": {
+            "type": "string"
           }
         },
-        "required": ["label", "url"]
+        "anyOf": [
+          {
+            "required": ["label", "url"]
+          },
+          {
+            "required": ["page"]
+          }
+        ]
+      }
+    },
+    "frontpage": {
+      "type": ["object", "null"]
+    },
+    "pages": {
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": "object"
       }
     }
   }

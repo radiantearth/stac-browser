@@ -31,6 +31,7 @@ certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
   - [Additional metadata fields](#additional-metadata-fields)
     - [Example](#example)
   - [Widgets](#widgets)
+  - [Pages](#pages)
   - [Metadata fields](#metadata-fields)
   - [Customization through root catalog](#customization-through-root-catalog)
   - [Custom extensions](#custom-extensions)
@@ -201,6 +202,12 @@ Registry.addMetadataField("radiant:public_access", {
 STAC Browser has a pluggable interface and allows to add additional content to the pages, which we call "widgets".
 
 More information about how to add or implement widgets can be found in the **[Widgets documentation](docs/widgets.md)**.
+
+### Pages
+
+STAC Browser can show additional pages with custom content, e.g. an imprint or a privacy policy, and a custom frontpage.
+
+More information about how to add pages can be found in the **[Pages documentation](docs/pages.md)**.
 
 ### Metadata fields
 

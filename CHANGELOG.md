@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- Custom pages with Markdown, widgets or Vue components, e.g. for an imprint or a privacy policy, see `pages.config.js` and the new config option `pages`
+- Links to custom pages in the header, in the footer (also via `footerLinks`), in Markdown (`page:` links) and in Vue components (`PageLink`)
+- Custom frontpage, see `pages.config.js` and the new config option `frontpage`; with a `catalogUrl` the root catalog moves to `/browse/`
+- Widget `SelectDataSource`: The selection of a catalog, which can be added to a custom frontpage
+- Widget `Featured` can also be shown on the frontpage, e.g. in the new widget hook `frontpage-start`
+
+### Changed
+
+- The widget hook `view-select-data-source-start` has been renamed to `frontpage-start`
 
 ### Fixed
 
@@ -19,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Typo in the label for processing instructions/code links
 - Catalogs, collections and items of a configured catalog in folders that share their name with a page of STAC Browser
   (e.g. `validation/` or `external/`) open correctly, their paths start with `/browse/`
+- Widgets with a custom `component` show the correct component when another hook contains a widget without `id` or with the same `id`
+- The description in the HTML metadata is cleared when navigating to a page without a description
 
 ## [5.1.0] - 2026-09-07
 

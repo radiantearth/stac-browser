@@ -52,6 +52,8 @@ The override order for the configuration is:
   - [catalogTitleAfterImage](#catalogtitleafterimage)
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
+  - [frontpage](#frontpage)
+  - [pages](#pages)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
@@ -147,6 +149,7 @@ Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
 ### footerLinks
 
 Array of links to display in the footer above the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
+To link to a [page](pages.md), provide the `page` ID instead of the `url`. The `label` is optional for pages and defaults to the title of the page.
 
 Example:
 
@@ -163,6 +166,55 @@ As an environment variable, provide the same value as a JSON string:
 
 ```bash
 SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"},{"label":"Privacy","url":"https://example.com/privacy"}]'
+```
+
+### frontpage
+
+A custom frontpage, shown at the root path `/`.
+The frontpage can also be defined in the `pages.config.js` file.
+Please see the [Pages documentation](pages.md#frontpage) for details.
+
+Example:
+
+```js
+frontpage: {
+  title: "Welcome",
+  widgets: [
+    { id: "CustomText", props: { text: "This catalog contains..." } },
+    { id: "Featured", props: { entities: ["sentinel-2-l2a"] } }
+  ]
+}
+```
+
+As an environment variable, provide the same value as a JSON string:
+
+```bash
+SB_frontpage='{"title":"Welcome","widgets":[{"id":"CustomText","props":{"text":"This catalog contains..."}}]}'
+```
+
+### pages
+
+Additional pages with custom content, e.g. an imprint or a privacy policy.
+The object maps the page IDs to the page definitions.
+Pages can also be defined in the `pages.config.js` file.
+Please see the [Pages documentation](pages.md) for details.
+
+Example:
+
+```js
+pages: {
+  imprint: {
+    title: { en: "Imprint", de: "Impressum" },
+    url: "https://example.com/imprint.md",
+    footer: true
+  }
+}
+```
+
+As an environment variable, provide the same value as a JSON string:
+
+```bash
+SB_pages='{"imprint":{"title":{"en":"Imprint","de":"Impressum"},"url":"https://example.com/imprint.md","footer":true}}'
 ```
 
 ### apiCatalogPriority

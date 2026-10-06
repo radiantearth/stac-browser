@@ -1,6 +1,5 @@
 <template>
-  <main class="select-data-source">
-    <WidgetHook id="view-select-data-source-start" />
+  <div v-if="allowSelectCatalog" class="select-data-source">
     <b-form @submit.prevent="go">
       <b-form-group
         id="select" :label="$t('index.specifyCatalog')" label-for="url"
@@ -43,11 +42,11 @@
         </template>
       </b-list-group>
     </b-form-group>
-  </main>
+  </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
@@ -65,6 +64,7 @@ export default defineComponent({
     };
   },
   computed: {
+    ...mapState(['allowSelectCatalog']),
     ...mapGetters(['toBrowserPath']),
     valid() {
       if (this.url.length === 0) {
@@ -91,8 +91,9 @@ export default defineComponent({
     }
   },
   async created() {
-    // Reset loaded STAC catalog
-    this.$store.commit('resetCatalog', true);
+    if (!this.allowSelectCatalog) {
+      return;
+    }
     // Load entries from STAC Index
     try {
       let response = await axios.get('https://stacindex.org/api/catalogs');
@@ -132,6 +133,14 @@ export default defineComponent({
 
 <style lang="scss">
 @import '../theme/variables.scss';
+
+#stac-browser .frontpage:has(.select-data-source),
+#stac-browser .widget:has(> .select-data-source) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
 
 #stac-browser .select-data-source {
   display: flex;

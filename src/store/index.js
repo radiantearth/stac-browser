@@ -18,6 +18,7 @@ import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 import search, { freshSearchState } from './modules/search.js';
+import { DEFAULT_FRONTPAGE, getFrontpage, getPageTitle, isPageVisible, mergePages, PAGE_PATH_PREFIX } from '../pages.js';
 
 // type is either 'collections' or 'items', depending on which endpoint the list was loaded from
 function updateApiChildrenState(state, stac, type, list, next = false, prev = false) {
@@ -205,6 +206,23 @@ function getStore(config, router) {
       browserReady: false,
     }),
     getters: {
+      pages: state => mergePages(state.pages),
+      activeFrontpage: (state, getters) => {
+        const frontpage = getFrontpage(state.frontpage);
+        if (frontpage && isPageVisible('frontpage', frontpage, state, getters)) {
+          return frontpage;
+        }
+        return state.allowSelectCatalog ? DEFAULT_FRONTPAGE : null;
+      },
+      visiblePages: (state, getters) => Object.fromEntries(
+        Object.entries(getters.pages).filter(([id, page]) => isPageVisible(id, page, state, getters))
+      ),
+      getPage: (state, getters) => id => Object.hasOwn(getters.visiblePages, id) ? getters.visiblePages[id] : null,
+      pageLink: (state, getters) => id => getters.getPage(id) ? PAGE_PATH_PREFIX + encodeURIComponent(id) : null,
+      pageTitle: (state, getters) => id => {
+        const page = getters.getPage(id);
+        return page ? getPageTitle(page, id, state.uiLanguage, state.fallbackLocale) : null;
+      },
       isRoot: (state, getters) => {
         if (state.data instanceof STAC) {
           return state.data.is(getters.root);
@@ -466,6 +484,10 @@ function getStore(config, router) {
         }
         else {
           const path = relative.toString();
+          // The frontpage takes the place of the root catalog
+          if ((path === '' || path === './') && getters.activeFrontpage) {
+            return '/browse/';
+          }
           const firstSegment = path.split(/[/?#]/, 1)[0];
           return reservedBrowserPathSegments.includes(firstSegment.toLowerCase()) ? `/browse/${path}` : `/${path}`;
         }
