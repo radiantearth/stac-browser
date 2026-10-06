@@ -30,6 +30,12 @@ export default defineComponent({
     Loading,
     WidgetList
   },
+  provide() {
+    // Lets widgets know whether they are shown on the frontpage
+    return {
+      isFrontpage: this.frontpage
+    };
+  },
   props: {
     id: {
       type: String,

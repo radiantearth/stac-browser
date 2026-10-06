@@ -219,10 +219,14 @@ export default defineConfig(async ({ mode }) => {
       // resolves its own copy of `ol`, and adding its LayerGroup to the app's
       // Map breaks OpenLayers' internal map wiring (the layer never gets a map).
       dedupe: ["ol", "stac-js"],
-      alias: {
-        "@": fileURLToPath(new URL("./src", import.meta.url)),
-        "@stac-browser-external-config": externalConfigPath,
-      },
+      alias: [
+        { find: "@", replacement: fileURLToPath(new URL("./src", import.meta.url)) },
+        { find: "@stac-browser-external-config", replacement: externalConfigPath },
+        // The e2e tests place widgets in hooks, which they enable per test
+        ...(process.env.STAC_BROWSER_E2E === "true"
+          ? [{ find: /^\.\.\/\.\.\/widgets\.config$/, replacement: fileURLToPath(new URL("./tests/e2e/widgets.config.js", import.meta.url)) }]
+          : []),
+      ],
     },
     server: {
       fs: {
