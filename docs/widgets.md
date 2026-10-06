@@ -14,12 +14,13 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [CustomText](#customtext)
   - [ExternalWarning](#externalwarning)
   - [Featured](#featured)
+  - [SelectDataSource](#selectdatasource)
 - [Hooks](#hooks)
   - [StacBrowser.vue](#stacbrowservue)
   - [views/ApiSearch.vue](#viewsapisearchvue)
   - [views/Catalog.vue](#viewscatalogvue)
   - [views/Item.vue](#viewsitemvue)
-  - [views/SelectDataSource.vue](#viewsselectdatasourcevue)
+  - [views/Page.vue](#viewspagevue)
 - [Developer Guide](#developer-guide)
   - [Creating a New Widget](#creating-a-new-widget)
   - [Adding a New Hook](#adding-a-new-hook)
@@ -148,7 +149,7 @@ which show the banner above the description.
 
 Renders a list of "featured" STAC catalogs or collections.
 A typical placement is the `view-catalog-catalogs-start` hook, which shows the featured entities right above the regular collection list.
-The widget only renders on the landing page (the root catalog).
+The widget only renders on the landing page (the root catalog) and on the [frontpage](pages.md#frontpage).
 
 | Props      | Type   | Default      | Description |
 | ---------- | ------ | ------------ | ----------- |
@@ -169,6 +170,14 @@ Each entry in `entities` can be one of the following:
   Works for both STAC APIs and static catalogs. The object must contain a
   `self` link or (for APIs) an `id`, otherwise the entity is not shown.
   STAC Browser loads the full version of the entity when needed.
+
+### SelectDataSource
+
+Renders a form to enter the URL of a STAC catalog or API and a list of the catalogs and APIs from [STAC Index](https://stacindex.org).
+This is the default [frontpage](pages.md#frontpage) if no `catalogUrl` is set.
+The widget only renders if no [`catalogUrl`](options.md#catalogurl) is set.
+
+The widget has no props.
 
 ## Hooks
 
@@ -212,9 +221,10 @@ Each hook has an ID like `view-catalog-meta-start` that you use as the key in
 - `view-item-secondary-end`
 - `view-item-secondary-start`
 
-### views/SelectDataSource.vue
+### views/Page.vue
 
-- `view-select-data-source-start`
+- `frontpage-end`
+- `frontpage-start`
 <!-- END HOOKS -->
 
 *Note: This list is auto-generated. Run `npm run docs:hooks` to update it after adding new hooks.*

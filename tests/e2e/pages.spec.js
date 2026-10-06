@@ -57,7 +57,7 @@ test.describe('Custom pages', () => {
     await expect(page.locator('main.custom-page h1')).toHaveText('Betreiber');
   });
 
-  for (const path of ['/pages/unknown', '/pages/imprint/sub']) {
+  for (const path of ['/pages/unknown', '/pages/imprint/sub', '/pages/toString']) {
     test(`shows an error for the unknown page ${path}`, async ({ page }) => {
       await setup(page);
       await page.goto(path);
@@ -115,6 +115,9 @@ test.describe('Custom pages', () => {
     await expect(page).toHaveURL(/\/pages\/privacy$/);
     await expect(heading(page)).toHaveText('Privacy');
     await expect(page.locator('main.custom-page')).toHaveText('We collect no data.');
+    // The description of the previous page must not remain in the metadata
+    await expect(page.locator('#meta-description')).toHaveAttribute('content', '');
+    await expect(page.locator('#og-description')).toHaveAttribute('content', '');
   });
 
   test('follows page: links in Markdown without reloading', async ({ page }) => {

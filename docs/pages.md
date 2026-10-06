@@ -1,6 +1,7 @@
 # Pages <!-- omit in toc -->
 
 STAC Browser can show additional pages with your own content, e.g. an imprint, a privacy policy or an about page.
+It can also show a custom [frontpage](#frontpage).
 
 - [Defining pages](#defining-pages)
   - [Configuration file](#configuration-file)
@@ -12,6 +13,7 @@ STAC Browser can show additional pages with your own content, e.g. an imprint, a
   - [Custom components](#custom-components)
 - [Localization](#localization)
 - [Conditions](#conditions)
+- [Frontpage](#frontpage)
 - [Linking to pages](#linking-to-pages)
   - [Header and footer](#header-and-footer)
   - [Markdown](#markdown-1)
@@ -162,6 +164,41 @@ orders: {
 ```
 
 Functions are not supported in environment variables.
+
+## Frontpage
+
+The frontpage is shown at the root path `/`. It's defined like any other page, with the same [properties](#page-properties),
+except for `menu` and `footer`. Usually, it consists of [widgets](#widgets):
+
+```js
+export default {
+  frontpage: {
+    title: { en: 'Welcome', de: 'Willkommen' },
+    widgets: [
+      { id: 'CustomText', props: { text: 'This catalog contains...' } },
+      { id: 'Featured', props: { entities: ['sentinel-2-l2a', 'landsat-c2-l2'] } }
+    ]
+  },
+  pages: {}
+};
+```
+
+The frontpage can be defined in `pages.config.js` (see above) or with the [`frontpage`](options.md#frontpage) option.
+If both are given, the frontpage from `pages.config.js` is used.
+
+If the frontpage has no `title` or `description`, the title and description of the root catalog are used.
+The widget hooks `frontpage-start` and `frontpage-end` are shown at the beginning and the end of the frontpage.
+
+**With a [`catalogUrl`](options.md#catalogurl):**
+The root catalog moves from `/` to `/browse/`, all other paths stay the same.
+The title in the header links to the frontpage.
+If the frontpage is not available (see [Conditions](#conditions)), the root catalog is shown at `/` instead.
+The [`Featured`](widgets.md#featured) widget shows the featured entities on the frontpage, too.
+
+**Without a `catalogUrl`:**
+The frontpage replaces the selection of a catalog.
+To keep it, add the [`SelectDataSource`](widgets.md#selectdatasource) widget to the frontpage.
+If no frontpage is defined (or it's not available), the default frontpage is shown, which only consists of the `SelectDataSource` widget.
 
 ## Linking to pages
 

@@ -52,6 +52,7 @@ The override order for the configuration is:
   - [catalogTitleAfterImage](#catalogtitleafterimage)
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
+  - [frontpage](#frontpage)
   - [pages](#pages)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
@@ -165,6 +166,30 @@ As an environment variable, provide the same value as a JSON string:
 
 ```bash
 SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"},{"label":"Privacy","url":"https://example.com/privacy"}]'
+```
+
+### frontpage
+
+A custom frontpage, shown at the root path `/`.
+The frontpage can also be defined in the `pages.config.js` file.
+Please see the [Pages documentation](pages.md#frontpage) for details.
+
+Example:
+
+```js
+frontpage: {
+  title: "Welcome",
+  widgets: [
+    { id: "CustomText", props: { text: "This catalog contains..." } },
+    { id: "Featured", props: { entities: ["sentinel-2-l2a"] } }
+  ]
+}
+```
+
+As an environment variable, provide the same value as a JSON string:
+
+```bash
+SB_frontpage='{"title":"Welcome","widgets":[{"id":"CustomText","props":{"text":"This catalog contains..."}}]}'
 ```
 
 ### pages
