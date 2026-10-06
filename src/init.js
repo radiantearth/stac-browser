@@ -4,6 +4,7 @@ import StacBrowser from "./StacBrowser.vue";
 import i18n, { loadDefaultMessages } from './i18n';
 import CONFIG from './merged-config';
 import getRoutes from "./router";
+import { getFrontpage } from "./pages.js";
 import getStore from "./store";
 
 import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
@@ -17,7 +18,7 @@ export default function init() {
     // Setup router
     const router = createRouter({
       history: CONFIG.historyMode === 'history' ? createWebHistory(CONFIG.pathPrefix) : createWebHashHistory(CONFIG.pathPrefix),
-      routes: getRoutes(CONFIG),
+      routes: getRoutes(CONFIG, Boolean(getFrontpage(CONFIG.frontpage))),
       scrollBehavior: (to, from, savedPosition) => {
         if (to.path !== from.path) {
           return { left: 0, top: 0 };

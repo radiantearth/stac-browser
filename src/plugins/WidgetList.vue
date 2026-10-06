@@ -23,6 +23,7 @@ export default {
   data() {
     return {
       definitions: [],
+      generation: 0
     };
   },
   computed: {
@@ -45,30 +46,42 @@ export default {
       });
     }
   },
-  created() {
-    if (!Array.isArray(this.widgets)) {
-      return;
+  watch: {
+    widgets: {
+      immediate: true,
+      handler() {
+        this.createDefinitions();
+      }
     }
-    this.widgets.forEach((widget, index) => {
-      let component = widget.component;
-      if (!component && !widget.id) {
-        console.error(`A widget for the ${this.source} defines neither an 'id' nor a 'component' and is not shown.`);
+  },
+  methods: {
+    createDefinitions() {
+      this.definitions = [];
+      this.generation++;
+      if (!Array.isArray(this.widgets)) {
         return;
       }
-      if (!component) {
-        component = defineAsyncComponent(
-          () => import(`../widgets/${widget.id}.vue`)
-        );
-      }
-      const id = widget.id || `Widget${index}`;
-      this.definitions.push({
-        id,
-        key: `${id}:${index}`,
-        component: markRaw(component),
-        condition: widget.condition,
-        props: widget.props || {},
+      this.widgets.forEach((widget, index) => {
+        let component = widget.component;
+        if (!component && !widget.id) {
+          console.error(`A widget for the ${this.source} defines neither an 'id' nor a 'component' and is not shown.`);
+          return;
+        }
+        if (!component) {
+          component = defineAsyncComponent(
+            () => import(`../widgets/${widget.id}.vue`)
+          );
+        }
+        const id = widget.id || `Widget${index}`;
+        this.definitions.push({
+          id,
+          key: `${this.generation}:${id}:${index}`,
+          component: markRaw(component),
+          condition: widget.condition,
+          props: widget.props || {},
+        });
       });
-    });
-  },
+    }
+  }
 };
 </script>

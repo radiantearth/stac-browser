@@ -43,13 +43,18 @@ export default defineComponent({
       // Plain text passes through unchanged, locale keys get translated
       return this.$t(this.title || 'widgets.featured');
     },
-    isLandingPage() {
-      return this.data instanceof STAC
-        && Boolean(this.root)
-        && this.data.is(this.root);
+    // The root catalog, if the landing page or the frontpage is shown
+    base() {
+      if (this.data instanceof STAC && this.root && this.data.is(this.root)) {
+        return this.data;
+      }
+      if (this.$route.name === 'frontpage' && this.root instanceof STAC) {
+        return this.root;
+      }
+      return null;
     },
     resolvedEntities() {
-      if (!this.isLandingPage) {
+      if (!this.base) {
         return [];
       }
       return this.entities
@@ -69,7 +74,7 @@ export default defineComponent({
   watch: {
     // Register the entities that are given as objects in the database so that
     // they keep a stable identity and are available to the rest of the app.
-    isLandingPage: {
+    base: {
       immediate: true,
       handler(shown) {
         if (shown) {
@@ -81,7 +86,7 @@ export default defineComponent({
   methods: {
     // Constructs the URL for a collection ID from the collections endpoint of the API
     urlForId(id) {
-      const link = this.data.getApiCollectionsLink();
+      const link = this.base.getApiCollectionsLink();
       if (!link) {
         return null;
       }
@@ -94,7 +99,7 @@ export default defineComponent({
       if (!url && hasText(entity.id)) {
         url = this.urlForId(entity.id);
       }
-      return url ? toAbsolute(url, this.data.getAbsoluteUrl()) : null;
+      return url ? toAbsolute(url, this.base.getAbsoluteUrl()) : null;
     },
     // Adds the (partially) complete STAC entities that are given as objects to
     // the database, flagged as incomplete so that the browser loads the full
@@ -134,12 +139,12 @@ export default defineComponent({
     // loads the entity through the background queue once it becomes visible.
     // Entities that failed to load are not shown.
     resolveUrl(url) {
-      const absoluteUrl = toAbsolute(url, this.data.getAbsoluteUrl());
+      const absoluteUrl = toAbsolute(url, this.base.getAbsoluteUrl());
       const stac = this.getStac(absoluteUrl, true);
       if (stac instanceof Error) {
         return null;
       }
-      return stac || new Link({ href: absoluteUrl, rel: 'child' }, this.data);
+      return stac || new Link({ href: absoluteUrl, rel: 'child' }, this.base);
     },
     // Entities given as objects have been added to the database by registerEntities,
     // so they resolve from there (or to the full version, if loaded meanwhile).

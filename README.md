@@ -205,7 +205,7 @@ More information about how to add or implement widgets can be found in the **[Wi
 
 ### Pages
 
-STAC Browser can show additional pages with custom content, e.g. an imprint or a privacy policy.
+STAC Browser can show additional pages with custom content, e.g. an imprint or a privacy policy, and a custom frontpage.
 
 More information about how to add pages can be found in the **[Pages documentation](docs/pages.md)**.
 

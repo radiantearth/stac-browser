@@ -1,14 +1,29 @@
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { getBest } from 'stac-js/src/locales';
-import pagesConfig from '../pages.config';
+import pagesConfig from '../pages.config.js';
 
 export const PAGE_PATH_PREFIX = '/pages/';
+
+// Used if no catalogUrl is set and no custom frontpage is available
+export const DEFAULT_FRONTPAGE = {
+  widgets: [{ id: 'SelectDataSource' }]
+};
+
+export function getFrontpage(runtimeFrontpage) {
+  if (isObject(pagesConfig?.frontpage)) {
+    if (isObject(runtimeFrontpage)) {
+      console.warn('The frontpage is defined in pages.config.js and in the frontpage option, using the one from pages.config.js.');
+    }
+    return pagesConfig.frontpage;
+  }
+  return isObject(runtimeFrontpage) ? runtimeFrontpage : null;
+}
 
 export function mergePages(runtimePages) {
   const pages = Object.assign({}, isObject(runtimePages) ? runtimePages : {});
   const buildPages = isObject(pagesConfig?.pages) ? pagesConfig.pages : {};
   for (const id in buildPages) {
-    if (pages[id]) {
+    if (Object.hasOwn(pages, id)) {
       console.warn(`The page '${id}' is defined in pages.config.js and in the pages option, using the one from pages.config.js.`);
     }
     pages[id] = buildPages[id];

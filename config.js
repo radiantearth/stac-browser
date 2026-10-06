@@ -69,5 +69,6 @@ export default {
   transactionsRequirePreflight: true,
   crs: {},
   footerLinks: null,
+  frontpage: null,
   pages: null
 };

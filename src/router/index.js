@@ -22,15 +22,18 @@ function getPath(route, config) {
   return {path};
 }
 
-function getRoutes(config) {
+function getRoutes(config, hasFrontpage = false) {
   let routes = [];
 
-  if (!config.catalogUrl) {
+  if (!config.catalogUrl || hasFrontpage) {
     routes.push({
       path: "/",
-      name: "select",
-      component: () => import("../views/SelectDataSource.vue")
+      name: "frontpage",
+      component: () => import("../views/Frontpage.vue")
     });
+  }
+
+  if (!config.catalogUrl) {
     routes.push({
       path: "/search/external/:pathMatch(.*)*",
       name: "search",

@@ -29,7 +29,10 @@
             </b-button-group>
           </nav>
           <div class="title">
-            <StacLink v-if="root" :data="root">
+            <router-link v-if="hasCustomFrontpage" to="/">
+              <HeaderTitle ref="headerTitle" />
+            </router-link>
+            <StacLink v-else-if="root" :data="root">
               <HeaderTitle ref="headerTitle" />
             </StacLink>
             <HeaderTitle v-else ref="headerTitle" />
@@ -75,7 +78,7 @@
               </b-button>
             </b-button-group>
           </nav>
-          <StacSource v-if="$route.meta.stac !== false" class="actions" :title="title" />
+          <StacSource v-if="isStacPage" class="actions" :title="title" />
         </b-col>
       </b-row>
     </header>
@@ -199,7 +202,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'pageLink', 'pageTitle', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath', 'visiblePages']),
+    ...mapGetters(['activeFrontpage', 'canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'pageLink', 'pageTitle', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath', 'visiblePages']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -217,7 +220,17 @@ export default defineComponent({
       return this.$route.name === 'favorites';
     },
     isServerSelector() {
-      return this.$route.name === 'select';
+      return this.$route.name === 'frontpage' && this.allowSelectCatalog;
+    },
+    hasCustomFrontpage() {
+      return Boolean(this.activeFrontpage) && !this.allowSelectCatalog;
+    },
+    // Whether the page shows a STAC entity (or a list of them)
+    isStacPage() {
+      if (this.$route.name === 'frontpage') {
+        return !this.activeFrontpage;
+      }
+      return this.$route.meta.stac !== false;
     },
     menuPages() {
       return Object.entries(this.visiblePages)

@@ -76,10 +76,7 @@ export default {
     description: {
       immediate: true,
       handler(description) {
-        if (!description) {
-          return;
-        }
-        const summary = Utils.summarizeMd(description, 200);
+        const summary = description ? Utils.summarizeMd(description, 200) : '';
         document.getElementById('meta-description').setAttribute("content", summary);
         document.getElementById('og-description').setAttribute("content", summary);
       }
