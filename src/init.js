@@ -10,6 +10,7 @@ import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
 import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
+import PageLink from "./components/PageLink.vue";
 
 export default function init() {
   return loadDefaultMessages().then(() => {
@@ -32,8 +33,9 @@ export default function init() {
 
     const app = createApp(StacBrowser);
 
-    // Make WidgetHook available globally for convenience
+    // Make WidgetHook and PageLink available globally for convenience
     app.component('WidgetHook', WidgetHook);
+    app.component('PageLink', PageLink);
     
     // Add BootstrapVueNext plugin with minimal config
     // Components are auto-registered via BootstrapVueNextResolver in vue.config.js

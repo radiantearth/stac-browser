@@ -280,6 +280,10 @@
     "next": "Next ›",
     "previous": "‹ Previous"
   },
+  "pages": {
+    "loadFailed": "The content of the page could not be loaded.",
+    "notFound": "The requested page does not exist."
+  },
   "poweredBy": "Powered by {link}",
   "programming": {
     "csharp": "C#",

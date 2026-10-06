@@ -10,7 +10,7 @@
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
-            <b-button-group v-if="canSearch || !isServerSelector || showFavoritesFromVueX">
+            <b-button-group v-if="canSearch || !isServerSelector || showFavoritesFromVueX || menuPages.length > 0">
               <b-button v-if="!isServerSelector" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list />
               </b-button>
@@ -19,6 +19,9 @@
               </b-button>
               <b-button v-if="showFavoritesFromVueX" variant="header" to="/favorites" :title="$t('favorites.title')" :pressed="isFavoritesPage">
                 <b-icon-star /><span class="button-label">{{ $t('favorites.title') }}</span>
+              </b-button>
+              <b-button v-for="item in menuPages" :key="item.id" variant="header" :to="item.link" :title="item.title" :pressed="isCurrentPage(item.id)">
+                <component :is="item.icon" /><span class="button-label">{{ item.title }}</span>
               </b-button>
               <b-button v-if="root" variant="header" id="popover-root-btn" tabindex="0">
                 <b-icon-database /><span class="button-label">{{ serviceType }}</span>
@@ -72,7 +75,7 @@
               </b-button>
             </b-button-group>
           </nav>
-          <StacSource v-if="!isFavoritesPage" class="actions" :title="title" />
+          <StacSource v-if="$route.meta.stac !== false" class="actions" :title="title" />
         </b-col>
       </b-row>
     </header>
@@ -82,9 +85,10 @@
     <!-- Footer -->
     <footer>
       <WidgetHook id="footer-start" />
-      <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-body-secondary">
-        <li v-for="link in footerLinksFromVueX" :key="link.url">
-          <a :href="link.url" target="_blank" rel="noopener noreferrer">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
+      <ul v-if="footerLinkItems.length > 0" class="footer-links text-body-secondary">
+        <li v-for="link in footerLinkItems" :key="link.key">
+          <router-link v-if="link.to" :to="link.to">{{ link.label }}</router-link>
+          <a v-else :href="link.url" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
         </li>
       </ul>
       <i18n-t tag="small" keypath="poweredBy" class="poweredby text-body-secondary" scope="global">
@@ -105,13 +109,14 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent } from 'vue';
+import { defineComponent, defineAsyncComponent, markRaw } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import { useColorMode } from 'bootstrap-vue-next';
 import CONFIG from './merged-config';
 
 // Import icons needed for dynamic component usage
+import BIconFileText from '~icons/bi/file-text';
 import BIconLock from '~icons/bi/lock';
 import BIconUnlock from '~icons/bi/unlock';
 
@@ -194,7 +199,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'pageLink', 'pageTitle', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath', 'visiblePages']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -213,6 +218,41 @@ export default defineComponent({
     },
     isServerSelector() {
       return this.$route.name === 'select';
+    },
+    menuPages() {
+      return Object.entries(this.visiblePages)
+        .filter(([, page]) => page.menu)
+        .map(([id, page]) => ({
+          id,
+          link: this.pageLink(id),
+          title: this.pageTitle(id),
+          icon: markRaw(page.icon || BIconFileText)
+        }));
+    },
+    footerLinkItems() {
+      const links = [];
+      const pageLink = (id, label) => {
+        const to = this.pageLink(id);
+        if (to && !links.some(link => link.to === to)) {
+          links.push({ key: to, to, label: hasText(label) ? this.footerLabel(label) : this.pageTitle(id) });
+        }
+      };
+      if (Array.isArray(this.footerLinksFromVueX)) {
+        for (const link of this.footerLinksFromVueX) {
+          if (hasText(link.page)) {
+            pageLink(link.page, link.label);
+          }
+          else if (hasText(link.url)) {
+            links.push({ key: link.url, url: link.url, label: this.footerLabel(link.label) });
+          }
+        }
+      }
+      for (const [id, page] of Object.entries(this.visiblePages)) {
+        if (page.footer) {
+          pageLink(id);
+        }
+      }
+      return links;
     },
     authIcon() {
       return this.isLoggedIn ? BIconUnlock : BIconLock;
@@ -546,6 +586,12 @@ export default defineComponent({
     this.scrollListener = null;
   },
   methods: {
+    isCurrentPage(id) {
+      return this.$route.name === 'page' && this.$route.params.id === id;
+    },
+    footerLabel(label) {
+      return this.$te(`footerLinks.${label}`) ? this.$t(`footerLinks.${label}`) : label;
+    },
     ...mapActions(['switchLocale', 'switchDataLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),

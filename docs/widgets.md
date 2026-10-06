@@ -34,6 +34,8 @@ and each value is an **array of widget definitions** to render at that location.
 
 Multiple widgets can be added to the same hook — they render in array order.
 
+Widgets can also be used as the content of [pages](pages.md#widgets).
+
 After editing the file, restart or rebuild STAC Browser for changes to take effect.
 
 ### Using Pre-defined Widgets

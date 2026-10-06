@@ -1,9 +1,10 @@
 <template>
-  <div class="styled-description" :class="{compact, inline}" v-html="formatted" />
+  <div class="styled-description" :class="{compact, inline}" v-html="formatted.html" @click="openPageLink" />
 </template>
 
 <script>
 import * as commonmark from 'commonmark';
+import { PAGE_PATH_PREFIX } from '../pages.js';
 
 export default {
   name: 'Description',
@@ -33,14 +34,44 @@ export default {
   methods: {
     markup(text) {
       if (typeof text !== 'string') {
-        return '';
+        return { html: '', pageLinks: {} };
       }
 
       // Parse CommonMark
       let reader = new commonmark.Parser();
       let writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
       let parsed = reader.parse(text);
-      return writer.render(parsed);
+      const pageLinks = text.includes('page:') ? this.resolvePageLinks(parsed) : {};
+      return { html: writer.render(parsed), pageLinks };
+    },
+    // Rewrites links to custom pages (e.g. `page:imprint`) to the corresponding routes
+    resolvePageLinks(parsed) {
+      const pageLinks = {};
+      if (!this.$router) {
+        return pageLinks;
+      }
+      const walker = parsed.walker();
+      let event;
+      while ((event = walker.next())) {
+        const node = event.node;
+        if (event.entering && node.type === 'link' && node.destination?.startsWith('page:')) {
+          const path = PAGE_PATH_PREFIX + encodeURIComponent(node.destination.slice(5));
+          node.destination = this.$router.resolve(path).href;
+          pageLinks[node.destination] = path;
+        }
+      }
+      return pageLinks;
+    },
+    openPageLink(event) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+      const link = event.target.closest('a');
+      const path = link && this.formatted.pageLinks[link.getAttribute('href')];
+      if (path) {
+        event.preventDefault();
+        this.$router.push(path);
+      }
     }
   }
 };
