@@ -5,7 +5,7 @@
  * navigating into collections/items, source view, and share functionality.
  */
 import { test, expect } from './fixtures.js';
-import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
+import { clearClipboard, mockStacResource, readClipboard, waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -264,6 +264,32 @@ test.describe('Catalog - Children', () => {
     
     // URL should update to the collection URL
     await expect(page).toHaveURL(new RegExp(collection.getBrowserPath()));
+  });
+
+  test('Catalog - a slow page does not replace the page navigated to in the meantime', async ({ page, worker }) => {
+    const root = 'https://stac.example/race/catalog.json';
+    const child = 'https://stac.example/race/slow/collection.json';
+    await mockStacResource(worker, root, {
+      type: 'Catalog', stac_version: '1.0.0', id: 'race', title: 'Root Catalog', description: 'Root',
+      links: [{ rel: 'self', href: root }, { rel: 'root', href: root }, { rel: 'child', href: child, title: 'Slow Child' }]
+    });
+    await mockStacResource(worker, child, {
+      type: 'Collection', stac_version: '1.0.0', id: 'slow', title: 'Slow Collection', description: 'Slow', license: 'CC0-1.0',
+      extent: { spatial: { bbox: [[-1, -1, 1, 1]] }, temporal: { interval: [[null, null]] } },
+      links: [{ rel: 'self', href: child }, { rel: 'root', href: root }, { rel: 'parent', href: root }]
+    }, { delay: 2000 });
+
+    await page.goto('/external/stac.example/race/catalog.json');
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: 'Root Catalog', level: 1 })).toBeVisible();
+
+    // Open the slow collection and go back before it has loaded
+    await page.getByRole('link', { name: /Slow Child/ }).first().click();
+    await page.goBack();
+
+    // Once the collection has loaded, its title shows up in the list of children
+    await expect(page.locator('.catalogs').getByText('Slow Collection')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Root Catalog');
   });
 
   // API tests
