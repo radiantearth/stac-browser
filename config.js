@@ -68,5 +68,6 @@ export default {
   transactionsRequireLogin: true,
   transactionsRequirePreflight: true,
   crs: {},
-  footerLinks: null
+  footerLinks: null,
+  faviconImage: null
 };
