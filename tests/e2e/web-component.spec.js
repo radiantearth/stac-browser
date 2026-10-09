@@ -198,6 +198,41 @@ test.describe('<stac-browser> web component', () => {
     expect(header).toBe('#123456');
   });
 
+  test('resolves the header and map colors without a primary color set by the host', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // The demo sets --bs-primary inline; a plain element must theme itself.
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      document.querySelector('main').replaceChildren(el);
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // The map styles are only loaded with a map, e.g. on a collection page.
+    await page.locator('stac-browser').evaluate((el) => el.setData({
+      type: 'Collection', stac_version: '1.0.0', id: 'map', description: 'Map', license: 'CC0-1.0', links: [],
+      extent: { spatial: { bbox: [[-10, -10, 10, 10]] }, temporal: { interval: [[null, null]] } }
+    }, 'https://stac.example/wc/map/collection.json'));
+    await expect(page.locator('stac-browser .ol-viewport')).toBeVisible();
+
+    const colors = await page.locator('stac-browser').evaluate((el) => {
+      const app = el.shadowRoot.querySelector('#stac-browser');
+      const site = el.shadowRoot.querySelector('#stac-browser > header .site');
+      return {
+        primary: getComputedStyle(app).getPropertyValue('--bs-primary').trim(),
+        header: getComputedStyle(site).getPropertyValue('--sb-header').trim(),
+        headerColor: getComputedStyle(site).getPropertyValue('--sb-header-color').trim(),
+        olBrand: getComputedStyle(app).getPropertyValue('--ol-brand-color').trim()
+      };
+    });
+    expect(colors.primary).not.toBe('');
+    expect(colors.header).toBe(colors.primary);
+    expect(colors.headerColor).not.toBe('');
+    expect(colors.olBrand).toBe(colors.primary);
+  });
+
   test('applies a config-driven option (catalog title) live, without reloading', async ({ page, worker }) => {
     await embed(page, worker);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
@@ -253,6 +288,25 @@ test.describe('<stac-browser> web component', () => {
     expect(isolated.fixedW).toBeLessThan(isolated.viewportW - 50);
     expect(Math.abs(isolated.fixedW - isolated.elW)).toBeLessThan(Math.abs(isolated.fixedW - isolated.viewportW));
     expect(isolated.backdropW).toBeLessThan(isolated.viewportW - 50);
+  });
+
+  test('only locks the host page scrolling for overlays in inline mode', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const openSidebar = async () => {
+      await page.locator('stac-browser header').getByTitle('Browse').click();
+      await expect(page.locator('stac-browser .offcanvas.show')).toBeVisible();
+      return page.evaluate(() => document.body.style.overflow);
+    };
+
+    // Inline: the sidebar covers the whole page, like a normal offcanvas.
+    expect(await openSidebar()).toBe('hidden');
+
+    await page.selectOption('#isolation', 'isolated');
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    // Isolated: the sidebar stays within the element, the host page keeps scrolling.
+    expect(await openSidebar()).not.toBe('hidden');
   });
 
   test('inline inherits host styling, isolated applies its own', async ({ page, worker }) => {
@@ -417,6 +471,8 @@ test.describe('<stac-browser> web component', () => {
       el.setAttribute('items-per-page', '5');
       el.setAttribute('catalog-title-after-image', '');
       el.setAttribute('card-view-mode', 'grid'); // not in the enum, ignored
+      el.setAttribute('search-results-per-page', '0'); // below the minimum, ignored
+      el.setAttribute('max-display-pixels', 'Infinity'); // not a finite number, ignored
       document.querySelector('main').replaceChildren(el);
     }, catalogUrl);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
@@ -428,7 +484,9 @@ test.describe('<stac-browser> web component', () => {
         displayPreview: s.displayPreview,
         itemsPerPage: s.itemsPerPage,
         catalogTitleAfterImage: s.catalogTitleAfterImage,
-        cardViewMode: s.cardViewMode
+        cardViewMode: s.cardViewMode,
+        searchResultsPerPage: s.searchResultsPerPage,
+        maxDisplayPixels: s.maxDisplayPixels
       };
     });
     expect(state).toEqual({
@@ -436,7 +494,9 @@ test.describe('<stac-browser> web component', () => {
       displayPreview: true,
       itemsPerPage: 5,
       catalogTitleAfterImage: null,
-      cardViewMode: 'cards'
+      cardViewMode: 'cards',
+      searchResultsPerPage: null,
+      maxDisplayPixels: null
     });
 
     // Options that can't change while running apply after re-adding the element.
@@ -461,5 +521,66 @@ test.describe('<stac-browser> web component', () => {
 
     await page.evaluate((url) => document.querySelector('stac-browser').navigateToStac(url), catalogUrl);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+  });
+
+  test('runs method calls made right after insertion only once the browser has started', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const result = await page.evaluate(async (url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      document.querySelector('main').replaceChildren(el);
+      await el.navigate('/search');
+      return {
+        browserReady: el._instance.store.state.browserReady,
+        path: el._instance.router.currentRoute.value.path
+      };
+    }, catalogUrl);
+    expect(result).toEqual({ browserReady: true, path: '/search' });
+  });
+
+  test('reports errors of method calls as rejected promises', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const results = await page.locator('stac-browser').evaluate(async (el) => {
+      const outcome = (call) => {
+        let promise;
+        try {
+          promise = call();
+        }
+        catch {
+          return 'thrown';
+        }
+        return promise.then(() => 'resolved', () => 'rejected');
+      };
+      return {
+        navigate: await outcome(() => el.navigate({ name: 'does-not-exist' })),
+        setData: await outcome(() => el.setData({ id: 'x', fn: () => {} }, 'https://stac.example/wc/fn.json'))
+      };
+    });
+    expect(results).toEqual({ navigate: 'rejected', setData: 'rejected' });
+  });
+
+  test('rejects method calls made after STAC Browser failed to start', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const results = await page.evaluate(async () => {
+      const el = document.createElement('stac-browser');
+      // A throwing catalogUrl function makes createStacBrowser() fail.
+      el.config = { catalogUrl: () => { throw new Error('boom'); } };
+      const outcome = (promise) => Promise.race([
+        promise.then(() => 'resolved', (error) => error.message),
+        new Promise((resolve) => setTimeout(() => resolve('pending'), 2000))
+      ]);
+      const early = el.navigate('/');
+      document.querySelector('main').replaceChildren(el);
+      const first = await outcome(early);
+      const later = await outcome(el.navigate('/'));
+      return { first, later };
+    });
+    expect(results).toEqual({ first: 'boom', later: 'boom' });
   });
 });

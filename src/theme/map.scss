@@ -10,13 +10,14 @@
   --ol-brand-color: var(--bs-primary);
 }
 
+// .stac-browser-root: the web component's themed mount point, see runtime-helpers.scss
 :root,
-:host {
+.stac-browser-root {
   --ol-subtle-foreground-lightness-change-percentage: 40;
   @include ol-theme-vars;
+}
 
-  [data-bs-theme="dark"] {
-    --ol-subtle-foreground-lightness-change-percentage: -20;
-    @include ol-theme-vars;
-  }
+[data-bs-theme="dark"] {
+  --ol-subtle-foreground-lightness-change-percentage: -20;
+  @include ol-theme-vars;
 }

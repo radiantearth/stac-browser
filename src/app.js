@@ -80,12 +80,19 @@ export default async function createStacBrowser(config, browserVersion = null, o
   // tooltips render fine in place in the standalone app; they only need
   // teleporting when embedded, to escape the host page's shadow root.
   const teleportDefault = { get teleportTo() { return teleportTarget.el; } };
+  // Overlays of an isolated web component stay within it, so they must not lock
+  // the scrolling of the host page's body.
+  const overlayDefault = {
+    get teleportTo() { return teleportTarget.el; },
+    get bodyScrolling() { return embedded && options.teleportTarget.dataset.isolation === 'isolated'; }
+  };
   const bootstrapDefaults = {
     BPopover: teleportDefault,
-    BOffcanvas: teleportDefault
+    BOffcanvas: overlayDefault
   };
   if (embedded) {
-    for (const component of ['BModal', 'BDropdown', 'BTooltip']) {
+    bootstrapDefaults.BModal = overlayDefault;
+    for (const component of ['BDropdown', 'BTooltip']) {
       bootstrapDefaults[component] = teleportDefault;
     }
   }

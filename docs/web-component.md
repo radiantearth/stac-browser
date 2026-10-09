@@ -77,6 +77,7 @@ The values are converted to the type of the option:
 - Booleans: `true` or `false`.
   An empty value is `true`, like for other HTML attributes, e.g. `<stac-browser display-geo-tiff-by-default>`.
 - Numbers: e.g. `24`.
+  They must be within the allowed range of the option, e.g. at least `1` for `items-per-page`.
 - Options that can be `null`: an empty value sets them to `null`, e.g. `catalog-title=""`.
 
 Invalid values, e.g. `card-view-mode="grid"`, are ignored with a warning in the browser console.
@@ -97,13 +98,17 @@ To always use the given language, set [`detectLocaleFromBrowser`](options.md#det
 All [options](options.md) can be set through the `config` property of the element.
 This includes lists, objects and functions, e.g. `supportedLocales` or `getMapSourceOptions`.
 
+Set `config` before you add the element to the page.
+Most options are only read when STAC Browser starts, see [Changing options](#changing-options).
+
 ```js
-const el = document.querySelector('stac-browser');
+const el = document.createElement('stac-browser');
 el.config = {
   catalogUrl: 'https://example.com/catalog.json',
   supportedLocales: ['en', 'de'],
   requestHeaders: { 'X-Api-Key': 'abc' }
 };
+document.body.appendChild(el);
 ```
 
 The options are combined in the following order, later ones override earlier ones:
@@ -195,8 +200,9 @@ If you want to update it, use the events `title`, `description`, `locale` and `s
 ## Methods
 
 You can call the methods right after creating the element.
-If the element isn't ready yet, the call is executed once it is ready.
+If STAC Browser hasn't finished starting yet, the call is executed once it has.
 All methods return a Promise.
+The Promise is rejected if STAC Browser fails to start, or if the element is removed from the page before it is ready.
 
 ### navigate(to)
 
@@ -291,7 +297,7 @@ This is the default.
 The element works similar to an `<iframe>`.
 
 - The element has its own scrollbar.
-- Dialogs and the sidebar stay within the element.
+- Dialogs and the sidebar stay within the element. Your page can still be scrolled while they are open.
 - The element uses its own background, text color and fonts, like the standalone STAC Browser.
 - The element needs a fixed height, e.g. set via CSS or as a flex/grid item.
   Otherwise it has a height of zero and you won't see anything.

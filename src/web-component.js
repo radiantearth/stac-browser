@@ -35,9 +35,9 @@ function parseAttribute(key, value) {
   else if (types.includes('null') && value === '') {
     parsed = null;
   }
-  else if ((types.includes('number') || types.includes('integer')) && value.trim() !== '' && !Number.isNaN(Number(value))) {
+  else if ((types.includes('number') || types.includes('integer')) && value.trim() !== '' && Number.isFinite(Number(value))) {
     parsed = Number(value);
-    if (!types.includes('number') && !Number.isInteger(parsed)) {
+    if ((!types.includes('number') && !Number.isInteger(parsed)) || parsed < schema.minimum || parsed > schema.maximum) {
       parsed = undefined;
     }
   }
@@ -77,6 +77,10 @@ function cloneStacData(data) {
   return data && typeof data.toJSON === 'function' ? structuredClone(data.toJSON()) : null;
 }
 
+function abortError() {
+  return new DOMException('The <stac-browser> element was removed before it was ready.', 'AbortError');
+}
+
 const browserVersion = typeof STAC_BROWSER_VERSION !== 'undefined' ? STAC_BROWSER_VERSION : null;
 
 export class StacBrowserElement extends HTMLElement {
@@ -106,13 +110,15 @@ export class StacBrowserElement extends HTMLElement {
     this._upgradeProperty('config');
   }
 
-  // Deferred that settles once an instance is mounted; created lazily so calls
-  // made before the first connect have something to await.
+  // Deferred that settles once the browser has finished starting; created lazily
+  // so calls made before the first connect have something to await.
   _ensureReady() {
     if (!this._ready) {
-      let resolve;
-      const promise = new Promise((res) => { resolve = res; });
-      this._ready = { promise, resolve };
+      let resolve, reject;
+      const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
+      // Only the callers' derived promises should report a rejection.
+      promise.catch(() => {});
+      this._ready = { promise, resolve, reject };
     }
     return this._ready;
   }
@@ -223,7 +229,18 @@ export class StacBrowserElement extends HTMLElement {
     // by the container's own theme, but an inline value on it wins.
     this._forwardCustomProps();
 
-    const instance = await createStacBrowser(config, browserVersion, { teleportTarget: this._mountPoint });
+    let instance;
+    try {
+      instance = await createStacBrowser(config, browserVersion, { teleportTarget: this._mountPoint });
+    }
+    catch (error) {
+      console.error(error);
+      // The rejected deferred is kept until disconnect, so later calls fail too.
+      if (generation === this._generation && this._ready === ready) {
+        ready.reject(error);
+      }
+      return;
+    }
     if (generation !== this._generation || !this.isConnected) {
       // Superseded by a disconnect or a newer connect while awaiting init.
       instance.app.unmount();
@@ -301,7 +318,13 @@ export class StacBrowserElement extends HTMLElement {
     // Replay options set while init was pending (the setter/attr callback bailed
     // with no instance yet).
     this._applyConfig({ ...this._attributeConfig(), ...this._configProp });
-    ready.resolve();
+
+    // StacBrowser's async created() still initializes router, locale and auth.
+    this._unwatchers.push(store.watch((state) => state.browserReady, (browserReady) => {
+      if (browserReady) {
+        ready.resolve();
+      }
+    }, { immediate: true }));
   }
 
   // Styles must live inside the shadow root. The built bundle extracts them next
@@ -375,11 +398,10 @@ export class StacBrowserElement extends HTMLElement {
       this._instance = null;
     }
     this._mountPoint = null;
-    // Settle a still-pending deferred (disconnected mid-init) so waiting method
-    // calls resolve (to undefined) instead of hanging forever, and drop it so
-    // the next connect starts a fresh one.
+    // Reject calls still waiting for a disconnected-mid-init instance instead of
+    // leaving them pending; the next connect starts a fresh deferred.
     if (this._ready) {
-      this._ready.resolve();
+      this._ready.reject(abortError());
       this._ready = null;
     }
   }
@@ -406,12 +428,14 @@ export class StacBrowserElement extends HTMLElement {
   }
 
   // Runs fn once initialization finished, so calls made while the async
-  // connectedCallback is pending aren't lost; always returns a promise.
+  // connectedCallback is pending aren't lost; errors in fn become rejections.
   _whenReady(fn) {
-    if (this._instance) {
-      return Promise.resolve(fn());
-    }
-    return this._ensureReady().promise.then(() => this._instance ? fn() : undefined);
+    return this._ensureReady().promise.then(() => {
+      if (!this._instance) {
+        throw abortError();
+      }
+      return fn();
+    });
   }
 
   // Navigate to a route: a browser path ('/search', '/external/…') or a
@@ -434,7 +458,13 @@ export class StacBrowserElement extends HTMLElement {
   // against it and browsing continuing as usual. Calling it again with the same
   // url updates the view in place (e.g. for an editor live preview).
   setData(data, url) {
-    const copy = structuredClone(data);
+    let copy;
+    try {
+      copy = structuredClone(data);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
     return this._whenReady(async () => {
       const { router, store } = this._instance;
       await store.dispatch('injectData', { data: copy, url });

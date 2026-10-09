@@ -186,13 +186,10 @@ a {
 // Non-color parts are baked from Sass (build-time theming);
 // color parts reference var(--bs-primary) so they stay live
 // and can be overridden at runtime in runtime-style.css.
-// :host is included so these apply inside the web component's shadow root too,
-// where :root (the document's <html>) is out of reach. Using :host (the shadow
-// host) rather than #stac-browser (the app container) keeps them inheritable, so
-// a host override forwarded onto the mount point and the dark-mode overrides set
-// on that themed container still win over these defaults.
+// In the web component, var() must resolve on the themed mount point, which has
+// --bs-*; host overrides are forwarded onto it as inline styles and still win.
 :root,
-:host {
+.stac-browser-root {
   // Sizing & spacing
   --sb-header-margin: #{$header-margin};
   --sb-block-gap: #{$block-gap};
