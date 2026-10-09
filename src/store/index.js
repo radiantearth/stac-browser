@@ -98,6 +98,16 @@ function getOrCreateStac(cx, data, url) {
 }
 
 function getStore(config, router) {
+  // Loads that show their page once finished. A navigation cancels them, so that
+  // a slow load can't replace the page that was navigated to in the meantime.
+  const pendingShows = new Set();
+  const cancelPendingShows = () => {
+    for (const loading of pendingShows) {
+      loading.show = false;
+    }
+    pendingShows.clear();
+  };
+
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -662,6 +672,9 @@ function getStore(config, router) {
         let data = state.database[url];
         if (data instanceof Loading) {
           data.show = show || data.show;
+          if (show) {
+            pendingShows.add(data);
+          }
         }
       },
       loading(state, { url, loading }) {
@@ -679,6 +692,7 @@ function getStore(config, router) {
         delete state.apiChildren[url];
       },
       resetCatalog(state, clearAll) {
+        cancelPendingShows();
         Object.assign(state, catalogDefaults());
         Object.assign(state, localDefaults());
         if (!state.supportedLocales.includes(state.locale)) {
@@ -698,6 +712,7 @@ function getStore(config, router) {
         }
       },
       resetPage(state) {
+        cancelPendingShows();
         Object.assign(state, localDefaults());
       },
       showPage(state, { url, stac, page }) {
@@ -986,6 +1001,9 @@ function getStore(config, router) {
           cx.commit('updateLoading', { url, show });
           return;
         }
+        if (show) {
+          pendingShows.add(loading);
+        }
 
         const hasData = data instanceof STAC && !data._incomplete;
         const isApiRequest = data instanceof STAC && data._incomplete;
@@ -1097,6 +1115,7 @@ function getStore(config, router) {
         }
 
         // All tasks finished, show the page if requested
+        pendingShows.delete(loading);
         if (loading.show) {
           cx.commit('showPage', { url });
           // If we don't have a catalogUrl but have a page to show,
