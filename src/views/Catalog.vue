@@ -126,7 +126,7 @@ export default defineComponent({
     ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading']),
     ignoredMetadataFields() {
-      return getIgnoredFields(this.data, 'CatalogLike');
+      return getIgnoredFields(this.data, 'CatalogLike', this.$store.state.ignoreMetadata);
     },
     cssStacType() {
       if (hasText(this.data?.type)) {

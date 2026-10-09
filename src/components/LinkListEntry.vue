@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     ignoredMetadataFields() {
-      return getIgnoredFields(this.link, 'Link');
+      return getIgnoredFields(this.link, 'Link', this.$store.state.ignoreMetadata);
     },
     popoverId() {
       return "popover-link-" + linkId;

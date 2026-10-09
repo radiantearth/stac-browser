@@ -62,6 +62,7 @@ export default {
   requestQueryParameters: {},
   socialSharing: ['email', 'bsky', 'mastodon', 'x'],
   preprocessSTAC: null,
+  ignoreMetadata: null,
   authConfig: null,
   transactions: 'auto',
   transactionsRequireLogin: true,

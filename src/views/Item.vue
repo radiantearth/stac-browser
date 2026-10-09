@@ -76,7 +76,7 @@ export default defineComponent({
     ...mapState(['data']),
     ...mapGetters(['collectionLink']),
     ignoredMetadataFields() {
-      return getIgnoredFields(this.data);
+      return getIgnoredFields(this.data, null, this.$store.state.ignoreMetadata);
     }
   }
 });

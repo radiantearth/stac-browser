@@ -130,6 +130,7 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
 - [Service Integration](#service-integration)
   - [socialSharing](#socialsharing)
 - [Advanced](#advanced)
+  - [ignoreMetadata](#ignoremetadata)
   - [preprocessSTAC](#preprocessstac)
   - [requestHeaders](#requestheaders)
   - [requestQueryParameters](#requestqueryparameters)
@@ -852,6 +853,14 @@ The following services are supported:
 - `x` (X, formerly Twitter)
 
 ## Advanced
+
+### ignoreMetadata
+
+A function that changes which fields are hidden in the metadata.
+It receives the entity, the fields hidden by default and the type of the entity, and returns the fields to hide.
+See [Hiding fields](./metadata.md#hiding-fields) for details and an example.
+
+Please note that this option can only be provided through a config file (or the `config` property of the [web component](./web-component.md)) and is not available via CLI/ENV.
 
 ### preprocessSTAC
 

@@ -173,6 +173,12 @@
       "noCLI": true,
       "noEnv": true
     },
+    "ignoreMetadata": {
+      "type": "null",
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
     "authConfig": {
       "type": "object",
       "allOf": [

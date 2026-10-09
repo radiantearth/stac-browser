@@ -604,4 +604,30 @@ test.describe('<stac-browser> web component', () => {
     await page.evaluate(() => document.querySelector('stac-browser').navigate('/search'));
     await expect(widget).toBeHidden();
   });
+  test('hides metadata fields through the ignoreMetadata option', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      el.config = {
+        ignoreMetadata: (object, fields, type) => type === 'CatalogLike' ? [...fields, 'custom:hidden'] : fields
+      };
+      document.querySelector('main').replaceChildren(el);
+      window.__fieldsEl = el;
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    await page.evaluate(() => {
+      return window.__fieldsEl.setData({
+        type: 'Collection', stac_version: '1.0.0', id: 'fields', description: 'Fields', license: 'CC0-1.0', links: [],
+        extent: { spatial: { bbox: [[-10, -10, 10, 10]] }, temporal: { interval: [[null, null]] } },
+        'custom:shown': 'shown-value',
+        'custom:hidden': 'hidden-value'
+      }, 'https://stac.example/wc/fields/collection.json');
+    });
+
+    await expect(page.locator('stac-browser').getByText('shown-value')).toBeVisible();
+    await expect(page.locator('stac-browser').getByText('hidden-value')).toHaveCount(0);
+  });
 });

@@ -35,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML
 
+### Changed
+
+- The function to hide metadata fields moved from `fields.config.js` to the new config option `ignoreMetadata`
+
 ### Removed
 
 - Removed the `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism to use runtime config options. Use `SB_RUNTIME` instead.
