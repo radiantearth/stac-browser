@@ -697,4 +697,27 @@ test.describe('<stac-browser> web component', () => {
     }, 'https://stac.example/wc/state/item.json'));
     await expect.poll(state).toEqual(['item']);
   });
+  test('hides the sidebar through the show-sidebar attribute, also while running', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      el.setAttribute('show-sidebar', 'false');
+      document.querySelector('main').replaceChildren(el);
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    const browse = page.locator('stac-browser header').getByTitle('Browse');
+    await expect(browse).toHaveCount(0);
+
+    await page.locator('stac-browser').evaluate((el) => el.setAttribute('show-sidebar', 'true'));
+    await expect(browse).toBeVisible();
+    await browse.click();
+    await expect(page.locator('stac-browser .offcanvas.show')).toBeVisible();
+
+    await page.locator('stac-browser').evaluate((el) => el.setAttribute('show-sidebar', 'false'));
+    await expect(browse).toHaveCount(0);
+    await expect(page.locator('stac-browser .offcanvas')).toHaveCount(0);
+  });
 });

@@ -52,7 +52,7 @@ function parseAttribute(key, value) {
 
 // Config options that can update a running instance (plus `locale`, handled via
 // switchLocale). Everything else is init-only and read once on connect.
-const LIVE_KEYS = ['catalogTitle', 'cardViewMode', 'enforcedColorMode'];
+const LIVE_KEYS = ['catalogTitle', 'cardViewMode', 'enforcedColorMode', 'showSidebar'];
 
 // Deep-clone config so each instance owns its mutable values (e.g.
 // requestHeaders, which the store mutates in place on login); otherwise those

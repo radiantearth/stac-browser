@@ -110,6 +110,7 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
   - [enforcedColorMode](#enforcedcolormode)
   - [cardViewMode](#cardviewmode)
   - [showFavorites](#showfavorites)
+  - [showSidebar](#showsidebar)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
   - [defaultThumbnailSize](#defaultthumbnailsize)
@@ -687,6 +688,12 @@ The favorites are only stored locally in the web browser of the user,
 they are not synchronized across devices or browsers.
 Users can export the favorites to a file and import them elsewhere.
 Set this option to `false` to disable the functionality.
+
+### showSidebar
+
+Enables the sidebar to browse the catalog if set to `true` (default).
+Users can open and close it through the "Browse" button in the header.
+Set this option to `false` to disable the sidebar, which also removes the "Browse" button.
 
 ### showKeywordsInItemCards
 

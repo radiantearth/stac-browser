@@ -108,6 +108,9 @@
     "showFavorites": {
       "type": "boolean"
     },
+    "showSidebar": {
+      "type": "boolean"
+    },
     "defaultItemSort": {
       "type": ["string", "null"]
     },

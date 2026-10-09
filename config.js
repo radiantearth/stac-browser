@@ -46,6 +46,7 @@ export default {
   historyMode: "history",
   cardViewMode: "cards",
   showFavorites: true,
+  showSidebar: true,
   defaultCollectionSort: "title",
   defaultItemSort: null,
   showKeywordsInItemCards: false,

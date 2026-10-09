@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Exposes the main elements as CSS parts and the current page as a custom state, e.g. `stac-browser:state(item)::part(header)`
 - New `memory` value for the `historyMode` option that keeps navigation entirely in memory without touching the
   browser URL (the default in the web component; not recommended for standalone deployments)
+- New config option `showSidebar` to disable the sidebar and its "Browse" button
 - New config option `basemaps` to customize the basemaps via JSON without code changes,
   e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
 - Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:

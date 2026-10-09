@@ -4,14 +4,14 @@
     <WidgetHook id="root-start" />
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar !== null" v-model="sidebar" part="sidebar" />
+    <Sidebar v-if="showSidebar && sidebar !== null" v-model="sidebar" part="sidebar" />
     <!-- Header -->
     <header ref="header" part="header" :class="{ scrolled, 'hide-site-header': hideSite }">
       <b-row class="site" part="site-header">
         <b-col md="12">
           <nav class="actions navigation">
-            <b-button-group v-if="canSearch || !isServerSelector || showFavorites">
-              <b-button v-if="!isServerSelector" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
+            <b-button-group v-if="canSearch || canBrowse || showFavorites">
+              <b-button v-if="canBrowse" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list />
               </b-button>
               <b-button v-if="canSearch" variant="header" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
@@ -160,7 +160,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowExternalAccess', 'allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'detectLocaleFromBrowser', 'enforcedColorMode', 'fallbackLocale', 'footerLinks', 'globalError', 'historyMode', 'loading', 'locale', 'showFavorites', 'stateQueryParameters', 'storeLocale', 'supportedLocales', 'uiLanguage', 'url']),
+    ...mapState(['allowExternalAccess', 'allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'detectLocaleFromBrowser', 'enforcedColorMode', 'fallbackLocale', 'footerLinks', 'globalError', 'historyMode', 'loading', 'locale', 'showFavorites', 'showSidebar', 'stateQueryParameters', 'storeLocale', 'supportedLocales', 'uiLanguage', 'url']),
     ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
@@ -172,6 +172,9 @@ export default defineComponent({
     },
     isServerSelector() {
       return this.$route.name === 'select';
+    },
+    canBrowse() {
+      return this.showSidebar && !this.isServerSelector;
     },
     authIcon() {
       return this.isLoggedIn ? BIconUnlock : BIconLock;

@@ -142,6 +142,7 @@ Afterwards, only the following options can be changed:
 | `locale`            | `locale`              |
 | `cardViewMode`      | `card-view-mode`      |
 | `enforcedColorMode` | `enforced-color-mode` |
+| `showSidebar`       | `show-sidebar`        |
 
 You can change them through the attribute or the `config` property.
 If you remove the attribute, the default value is used again.
