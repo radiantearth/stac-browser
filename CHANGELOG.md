@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Maps showing multiple Items now send the configured authentication (headers and query parameters) and apply the source/layer customizations and `maxDisplayPixels` for each Item
 - The `crossOriginMedia` option now applies to images on maps
+- The fallback description in the structured data (JSON-LD) shows the catalog title instead of "undefined"
 - Scientific publications without a DOI show "n/a" instead of escaped HTML, and DOI links use HTTPS
 - Typo in the label for processing instructions/code links
 
