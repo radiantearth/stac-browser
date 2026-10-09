@@ -583,4 +583,25 @@ test.describe('<stac-browser> web component', () => {
     });
     expect(results).toEqual({ first: 'boom', later: 'boom' });
   });
+  test('shows host content in the native slot of a widget hook', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    await page.locator('stac-browser').evaluate((el) => {
+      const widget = document.createElement('div');
+      widget.id = 'host-widget';
+      widget.slot = 'view-catalog-meta-start';
+      widget.textContent = 'Host widget';
+      el.appendChild(widget);
+    });
+    const widget = page.locator('stac-browser > #host-widget');
+    await expect(widget).toBeVisible();
+    // It is rendered at the hook's position inside the catalog's meta column.
+    const inMeta = await widget.evaluate((w) => w.assignedSlot?.closest('.meta') !== null);
+    expect(inMeta).toBe(true);
+
+    // The search page has no such hook, so the content is not shown there.
+    await page.evaluate(() => document.querySelector('stac-browser').navigate('/search'));
+    await expect(widget).toBeHidden();
+  });
 });

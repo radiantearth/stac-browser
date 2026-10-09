@@ -19,6 +19,7 @@ It works with plain HTML and with any framework.
   - [navigateToStac(url)](#navigatetostacurl)
   - [setData(data, url)](#setdatadata-url)
 - [Properties](#properties)
+- [Widgets](#widgets)
 - [Differences to the standalone version](#differences-to-the-standalone-version)
   - [Authentication](#authentication)
 - [Layout](#layout)
@@ -255,6 +256,31 @@ el.addEventListener('data', (event) => {
   console.log(event.detail.url, event.detail.data?.extent?.spatial?.bbox);
 });
 ```
+
+## Widgets
+
+You can show your own content at the [widget hooks](widgets.md#hooks) of STAC Browser.
+Add it as a child of the element and set the `slot` attribute to the ID of the hook:
+
+```html
+<stac-browser url="https://example.com/catalog.json">
+  <div slot="view-catalog-meta-start">Shown above the description of a catalog</div>
+</stac-browser>
+```
+
+The content can be anything that can be placed in your page: plain HTML, other web components, or components of your framework (e.g. Vue or React).
+It is shown whenever the current page has the hook, and hidden otherwise.
+
+Please note:
+
+- The content stays part of your page, so it is styled by the CSS of your page, not by STAC Browser.
+- It doesn't have access to STAC Browser internals.
+  Use the [events](#events) or [properties](#properties) to get the data that is shown, e.g. to show something only for Items.
+- You can add multiple elements for the same hook, they are shown in the order of your page.
+- If you use Vue, tell it that `stac-browser` is a custom element ([`compilerOptions.isCustomElement`](https://vuejs.org/api/application.html#app-config-compileroptions-iscustomelement)).
+  A Vue component with a `slot` attribute needs a single root element, which then receives the attribute.
+
+Widgets configured in [`widgets.config.js`](widgets.md) are shown before your content.
 
 ## Differences to the standalone version
 
