@@ -88,6 +88,7 @@ The override order for the configuration is:
 - [User Interface](#user-interface)
   - [enforcedColorMode](#enforcedcolormode)
   - [cardViewMode](#cardviewmode)
+  - [omitTimeForMidnight](#omittimeformidnight)
   - [showFavorites](#showfavorites)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
@@ -615,6 +616,10 @@ This config option allows to enforce a specific color mode, either `light` (defa
 ### cardViewMode
 
 The default view mode for lists of catalogs, collections and items. Either `"list"` or `"cards"` (default).
+
+### omitTimeForMidnight
+
+Omits the time from collection temporal extents when all defined interval boundaries are exactly midnight UTC. Defaults to `false`.
 
 ### showFavorites
 

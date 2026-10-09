@@ -5,7 +5,7 @@
  * item listing, and detail controls.
  */
 import { test, expect } from './fixtures.js';
-import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
+import { clearClipboard, configureBrowser, readClipboard, waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -71,6 +71,88 @@ test.describe('Collection Metadata', () => {
     // not just "bis jetzt" on its own.
     await expect(temporalValue).toContainText(year);
     await expect(temporalValue).toContainText('bis jetzt');
+  });
+
+  test('Catalog - optionally omits midnight from temporal extents', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    await configureBrowser(page, { omitTimeForMidnight: true });
+    await catalog.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+    await expect(temporalValue).toContainText('2020');
+    await expect(temporalValue).not.toContainText(/(?:12|0|00):00:00/);
+  });
+
+  test('Catalog - keeps midnight time by default', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    await catalog.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+    await expect(temporalValue).toContainText(/(?:12|0|00):00:00/);
+  });
+
+  test('Catalog - keeps meaningful times when midnight omission is enabled', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    collection.setMetadata({
+      extent: {
+        spatial: collection.getMetadata().extent.spatial,
+        temporal: { interval: [['2020-01-01T12:34:56Z', null]] }
+      }
+    });
+    await configureBrowser(page, { omitTimeForMidnight: true });
+    await catalog.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+    await expect(temporalValue).toContainText(/12:34:56/);
+  });
+
+  test('Catalog card - optionally omits midnight from temporal extents', async ({ page, worker }) => {
+    const { catalog } = createStaticCatalog();
+    await configureBrowser(page, { omitTimeForMidnight: true });
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const temporalValue = page.locator('.catalog-card .datetime');
+    await expect(temporalValue).toContainText('2020');
+    await expect(temporalValue).not.toContainText(/(?:12|0|00):00:00/);
+  });
+
+  test('Catalog card - keeps midnight time by default', async ({ page, worker }) => {
+    const { catalog } = createStaticCatalog();
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator('.catalog-card .datetime')).toContainText(/(?:12|0|00):00:00/);
+  });
+
+  test('Catalog card - keeps meaningful times when midnight omission is enabled', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    collection.setMetadata({
+      extent: {
+        spatial: collection.getMetadata().extent.spatial,
+        temporal: { interval: [['2020-01-01T12:34:56Z', null]] }
+      }
+    });
+    await configureBrowser(page, { omitTimeForMidnight: true });
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator('.catalog-card .datetime')).toContainText(/12:34:56/);
   });
 
   test('API - should load and display collection metadata', async ({ page, worker }) => {

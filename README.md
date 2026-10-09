@@ -221,6 +221,7 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `defaultThumbnailSize`
 - `displayGeoTiffByDefault`
 - `maxDisplayPixels`
+- `omitTimeForMidnight`
 - `preferredAssets`
 - `showThumbnailsAsAssets`
 
