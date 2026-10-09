@@ -113,6 +113,8 @@ export default defineConfig(async ({ mode }) => {
         fileName: () => "stac-browser.js",
       },
       sourcemap: true,
+      // public/ only contains files for the standalone app and the tests.
+      copyPublicDir: false,
       // In e2e, the element bundle is built into the same dir as the standalone
       // app (built first) so `vite preview` can serve both; don't wipe it.
       emptyOutDir: process.env.STAC_BROWSER_E2E !== "true",
