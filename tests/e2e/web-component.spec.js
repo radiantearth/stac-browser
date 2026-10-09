@@ -630,4 +630,26 @@ test.describe('<stac-browser> web component', () => {
     await expect(page.locator('stac-browser').getByText('shown-value')).toBeVisible();
     await expect(page.locator('stac-browser').getByText('hidden-value')).toHaveCount(0);
   });
+  test('renders fields registered through the exported Registry', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // Import from the same module URL as the demo page, like a host would.
+    await page.evaluate(async () => {
+      const { src } = document.querySelector('script[src$="/web-component.js"], script[src$="/stac-browser.js"]');
+      const { Registry } = await import(src);
+      Registry.addMetadataField('custom:access', {
+        label: 'Data Access',
+        formatter: (value) => (value ? 'Public' : 'Private')
+      });
+      return document.querySelector('stac-browser').setData({
+        type: 'Collection', stac_version: '1.0.0', id: 'registry', description: 'Registry', license: 'CC0-1.0', links: [],
+        extent: { spatial: { bbox: [[-10, -10, 10, 10]] }, temporal: { interval: [[null, null]] } },
+        'custom:access': true
+      }, 'https://stac.example/wc/registry/collection.json');
+    });
+
+    await expect(page.locator('stac-browser').getByText('Data Access')).toBeVisible();
+    await expect(page.locator('stac-browser').getByText('Public', { exact: true })).toBeVisible();
+  });
 });

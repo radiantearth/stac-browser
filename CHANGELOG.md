@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     background/text color/typography) or `isolated` (iframe-like — owns its scroll viewport, contains overlays within
     its box, and styles itself; requires a fixed height)
   - Widget hooks are available as native slots, so the host page can show its own content in them
+  - Exports the `Registry` of stac-fields, so the host page can register its own metadata fields
 - New `memory` value for the `historyMode` option that keeps navigation entirely in memory without touching the
   browser URL (the default in the web component; not recommended for standalone deployments)
 - New config option `basemaps` to customize the basemaps via JSON without code changes,

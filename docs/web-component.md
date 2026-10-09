@@ -20,6 +20,10 @@ It works with plain HTML and with any framework.
   - [setData(data, url)](#setdatadata-url)
 - [Properties](#properties)
 - [Widgets](#widgets)
+- [Metadata and maps](#metadata-and-maps)
+  - [Custom fields](#custom-fields)
+  - [Hiding fields](#hiding-fields)
+  - [Basemaps](#basemaps)
 - [Differences to the standalone version](#differences-to-the-standalone-version)
   - [Authentication](#authentication)
 - [Layout](#layout)
@@ -281,6 +285,46 @@ Please note:
   A Vue component with a `slot` attribute needs a single root element, which then receives the attribute.
 
 Widgets configured in [`widgets.config.js`](widgets.md) are shown before your content.
+
+## Metadata and maps
+
+### Custom fields
+
+STAC Browser uses [stac-fields](https://github.com/stac-utils/stac-fields) to show the metadata.
+To show your own fields, register them in the `Registry` of stac-fields, which you can import from the module of the web component.
+Use the same URL as for the `<script>` tag, so that you get the instance that STAC Browser uses:
+
+```js
+import { Registry } from '/path/to/stac-browser.js';
+
+Registry.addExtension('radiant', 'Radiant Earth');
+Registry.addMetadataField('radiant:public_access', {
+  label: 'Data Access',
+  formatter: (value) => (value ? 'Public' : 'Private')
+});
+```
+
+Register the fields before you add the element to the page.
+The registry is shared by all elements on the page.
+See [Adding custom fields](metadata.md#adding-custom-fields) for details.
+
+### Hiding fields
+
+To hide fields in the metadata, set the [`ignoreMetadata`](options.md#ignoremetadata) option through the `config` property:
+
+```js
+el.config = {
+  ignoreMetadata: (object, fields, type) => type === 'Item' ? [...fields, 'created', 'updated'] : fields
+};
+```
+
+See [Hiding fields](metadata.md#hiding-fields) for details.
+
+### Basemaps
+
+To show your own basemaps, set the [`basemaps`](options.md#basemaps) option through the `config` property.
+To change the map sources further, e.g. to add an API key, use [`getMapSourceOptions`](options.md#getmapsourceoptions).
+See the [basemap documentation](basemaps.md) for details.
 
 ## Differences to the standalone version
 

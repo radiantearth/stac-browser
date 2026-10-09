@@ -483,3 +483,6 @@ if (typeof customElements !== 'undefined' && !customElements.get('stac-browser')
 }
 
 export default StacBrowserElement;
+
+// The instance STAC Browser uses, so that hosts can register their own fields.
+export { default as Registry } from '@radiantearth/stac-fields/registry';
