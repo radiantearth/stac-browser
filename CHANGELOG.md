@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The fallback description in the structured data (JSON-LD) shows the catalog title instead of "undefined"
 - Scientific publications without a DOI show "n/a" instead of escaped HTML, and DOI links use HTTPS
 - Typo in the label for processing instructions/code links
+- Catalogs, collections and items of a configured catalog in folders that share their name with a page of STAC Browser
+  (e.g. `validation/` or `external/`) open correctly, their paths start with `/browse/`
 
 ## [5.1.0] - 2026-09-07
 
