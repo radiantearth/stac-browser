@@ -2,15 +2,23 @@
   <div class="widget" v-for="widget of visibleWidgets" :key="widget.key">
     <component :is="widget.id" v-bind="widget.props" />
   </div>
+  <NativeSlot v-if="embedded" :name="id" />
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, h } from 'vue';
 import widgetConfig from '../../widgets.config';
+
+// A native shadow DOM slot for the web component; <slot> in a template is Vue's own slot outlet.
+const NativeSlot = props => h('slot', { name: props.name });
+NativeSlot.props = ['name'];
 
 export default {
   name: 'WidgetHook',
-  components: {},
+  components: { NativeSlot },
+  inject: {
+    embedded: { default: false }
+  },
   props: {
     id: {
       type: String,

@@ -1,7 +1,7 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
-      <b-col class="meta">
+      <b-col class="meta" part="details">
         <WidgetHook id="view-catalog-meta-start" />
         <section class="intro">
           <h2>{{ $t('description') }}</h2>
@@ -43,7 +43,7 @@
         <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-catalog-meta-end" />
       </b-col>
-      <b-col class="catalogs-container" v-if="hasCatalogs">
+      <b-col class="catalogs-container" part="catalogs" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
           :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
@@ -53,7 +53,7 @@
         />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
-      <b-col class="items-container" v-if="hasItems || hasItemAssets">
+      <b-col class="items-container" part="items" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
           :stac="data" :items="items" :api="hasApiItems" allowFilter
@@ -82,7 +82,6 @@ import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
-import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
@@ -125,9 +124,9 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading']),
     ignoredMetadataFields() {
-      return getIgnoredFields(this.data, 'CatalogLike');
+      return getIgnoredFields(this.data, 'CatalogLike', this.$store.state.ignoreMetadata);
     },
     cssStacType() {
       if (hasText(this.data?.type)) {
@@ -236,13 +235,6 @@ export default defineComponent({
     data: {
       immediate: true,
       async handler(newData, oldData) {
-        try {
-          let schema = createCatalogSchema(newData, [this.parentLink, this.rootLink], this.$store);
-          addSchemaToDocument(document, schema);
-        } catch (error) {
-          console.error(error);
-        }
-
         if (!newData?.isCollection) {
           return;
         }

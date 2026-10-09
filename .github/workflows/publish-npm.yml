@@ -1,0 +1,40 @@
+name: Publish npm package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      TAG_NAME:
+        description: "Tag name"
+        required: true
+
+permissions:
+  contents: read
+  id-token: write # Trusted publishing and provenance
+
+jobs:
+  publish:
+    # Enable by setting the repository variable NPM_PUBLISH to true once the package is set up on npm
+    if: vars.NPM_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing requires npm 11.5.1 or later
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run build:npm
+      - name: Publish
+        run: |
+          VERSION=$(node -p "require('./dist/package.json').version")
+          case "$VERSION" in
+            *-*) DIST_TAG=next ;;
+            *) DIST_TAG=latest ;;
+          esac
+          npm publish ./dist --access public --tag "$DIST_TAG"

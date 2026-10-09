@@ -11,17 +11,4 @@ import { Registry } from '@radiantearth/stac-fields';
 //     formatter: value => value ? "Public" : "Private"
 // });
 
-// DEFINE FIELDS TO IGNORE IN METADATA RENDERING
-
-/**
- * Function that can be used to change the ignored fields in the metadata rendering.
- * 
- * @type {function|null}
- * @param {STACObject|Object} object The entity for which the metadata is rendered.
- * @param {string[]} fields The fields ignored by default.
- * @param {string} type The type of the entity (e.g. `CatalogLike`, `Item`, `Asset`, `Link`, `Provider`).
- * @returns {string[]} The fields to ignore in the metadata rendering.
- */
-const ignoreMetadata = null;
-
-export { ignoreMetadata };
+// To hide fields in the metadata, use the `ignoreMetadata` option in config.js.

@@ -22,7 +22,10 @@
           @click="updateOperator(op)"
           button-class="queryable-item"
         >
-          <span class="long-label">{{ op.longLabel }}</span>
+          <span class="long-label">
+            <template v-if="op.longLabel">{{ $t(op.longLabel) }}</template>
+            <template v-else>{{ op.label }}</template>
+          </span>
           <b-badge variant="dark" class="ms-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
         <b-dropdown-divider />
@@ -32,7 +35,7 @@
           @click="updateNegate(!negate)"
         >
           <b-icon-check :class="{hide: !negate}" class="mt-1 me-2" />
-          <span class="long-label">{{ cqlNot.longLabel }}</span>
+          <span class="long-label">{{ $t(cqlNot.longLabel) }}</span>
           <b-badge variant="dark" class="ms-2">{{ cqlNot.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
@@ -130,8 +133,8 @@
     </div>
 
     <div v-if="queryable.description || operator.description" class="queryable-help text-body-secondary small">
-      <Description v-if="operator.description" :description="operator.description" inline />
-      <Description v-if="queryable.description" :description="queryable.description" inline />
+      <Description v-if="operator.description" :description="$t(operator.description)" inline />
+      <Description v-if="queryable.description" :description="$t(queryable.description)" inline />
     </div>
   </div>
 </template>
@@ -471,6 +474,10 @@ export default {
   display: block;
   margin: 0.5em 0 1em 0;
   line-height: 1.1em;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .queryable-group {

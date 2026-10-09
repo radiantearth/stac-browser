@@ -1,4 +1,3 @@
-import i18n from '../i18n.js';
 import Utils from '../utils.js';
 
 /**
@@ -16,11 +15,11 @@ export default class CodeGenerator {
   }
 
   /**
-   * The display name of the language (for tabs).
+   * The locale key for the display name of the language (for tabs).
    * @returns {string}
    */
   get label() {
-    return i18n.global.t(`programming.${this.language}`);
+    return `programming.${this.language}`;
   }
 
   /**

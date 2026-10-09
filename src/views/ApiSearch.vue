@@ -3,7 +3,7 @@
     <Loading v-if="!parent" stretch />
     <ErrorAlert v-else-if="!supportsSearch" :description="$t('search.notSupported')" />
     <b-row v-else>
-      <b-col class="left">
+      <b-col class="left" part="filters">
         <WidgetHook id="view-search-filters-start" />
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" :id="tabIds.collections">
@@ -26,7 +26,7 @@
         </b-tabs>
         <WidgetHook id="view-search-filters-end" />
       </b-col>
-      <b-col class="right">
+      <b-col class="right" part="results">
         <Loading v-if="loading" fill top />
         <ErrorAlert v-else-if="error" :description="error" :id="errorId" />
         <b-alert v-else-if="data === null" variant="secondary" show>{{ $t('search.modifyCriteria') }}</b-alert>
@@ -100,6 +100,9 @@ export default defineComponent({
     MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
     StacActions: defineAsyncComponent(() => import('../components/StacActions.vue')),
     StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
+  },
+  inject: {
+    embedded: { default: false }
   },
   props: {
     loadParent: {
@@ -320,7 +323,7 @@ export default defineComponent({
         }
       } catch (error) {
         this.data = null;
-        this.error = getErrorMessage(error);
+        this.error = getErrorMessage(this.$i18n, error);
         this.errorId = getErrorCode(error);
       } finally {
         this.loading = false;
@@ -349,7 +352,11 @@ export default defineComponent({
         this.data = null;
       }
       else if (this.searchLink) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Embedded, never scroll the host window (see the router scrollBehavior).
+        const target = Utils.resolveScrollTarget(this.$el);
+        if (target !== window || !this.embedded) {
+          target.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         await this.loadResults(this.searchLink);
       }
     },

@@ -1,6 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
 import { URI } from 'stac-js/src/utils.js';
-import i18n from "../../i18n";
 
 const mediaType = [
   'application/vnd.apache.parquet', // Official
@@ -20,7 +19,7 @@ export default class GeoParquetInfo extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', { service: 'geoparquet.info' });
+    return this.i18n.t('actions.openIn', { service: 'geoparquet.info' });
   }
 
 }

@@ -1,10 +1,12 @@
 <template>
   <div class="ol-layercontrol ol-unselectable ol-control">
-    <button v-if="id" :id="id"><b-icon-layers-fill /></button>
     <b-popover
       v-if="id" click placement="top" @show="update"
-      :target="id" teleport-to="#stac-browser" :boundary-padding="10"
+      :boundary-padding="10"
     >
+      <template #target>
+        <button :id="id"><b-icon-layers-fill /></button>
+      </template>
       <div class="layercontrol">
         <section>
           <h5>{{ $t('mapping.layers.base') }}</h5>
