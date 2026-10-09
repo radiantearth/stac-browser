@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     its box, and styles itself; requires a fixed height)
   - Widget hooks are available as native slots, so the host page can show its own content in them
   - Exports the `Registry` of stac-fields, so the host page can register its own metadata fields
+  - Exposes the main elements as CSS parts and the current page as a custom state, e.g. `stac-browser:state(item)::part(header)`
 - New `memory` value for the `historyMode` option that keeps navigation entirely in memory without touching the
   browser URL (the default in the web component; not recommended for standalone deployments)
 - New config option `basemaps` to customize the basemaps via JSON without code changes,

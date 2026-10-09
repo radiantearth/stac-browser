@@ -32,6 +32,8 @@ It works with plain HTML and with any framework.
 - [Styling](#styling)
   - [Colors](#colors)
   - [Light and dark mode](#light-and-dark-mode)
+  - [Parts](#parts)
+  - [Page states](#page-states)
 - [Limitations](#limitations)
 
 ## Build and deploy
@@ -418,6 +420,53 @@ See the [styling documentation](styling.md#available-css-variables) for more CSS
 
 Use the [`enforcedColorMode`](options.md#enforcedcolormode) option to choose between light and dark mode.
 It only applies to STAC Browser, not to your page.
+
+### Parts
+
+The main elements of STAC Browser are exposed as [parts](https://developer.mozilla.org/en-US/docs/Web/CSS/::part).
+You can style them with the `::part()` selector in the CSS of your page:
+
+```css
+stac-browser::part(site-header) {
+  display: none;
+}
+```
+
+| Part          | Contents |
+| ------------- | -------- |
+| `header`      | The whole header, i.e. `site-header` and `page-header` |
+| `site-header` | The top row: buttons to browse, search and favorites, the catalog title, login, language and color mode |
+| `page-header` | The title of the page, the buttons to go back or to the parent, source and sharing |
+| `sidebar`     | The sidebar to browse the catalog |
+| `content`     | The current page, e.g. a catalog, an item or the search |
+| `footer`      | The footer |
+| `details`     | Catalogs and collections: the column with description, map, assets, providers, metadata and links. Items: the column with description, providers and metadata |
+| `resources`   | Items: the column with map, assets and links |
+| `catalogs`    | Catalogs and collections: the list of child catalogs and collections |
+| `items`       | Catalogs and collections: the list of items |
+| `filters`     | Search: the search filters |
+| `results`     | Search: the map and the list of results |
+
+Please note:
+
+- `::part()` only styles the element itself, not the elements in it.
+  For example, `::part(details) h2` doesn't work.
+- The rules of your page take precedence over the styles of STAC Browser, except for rules with `!important`.
+
+### Page states
+
+The element exposes the page that is shown as a [custom state](https://developer.mozilla.org/en-US/docs/Web/CSS/:state).
+Use it with the `:state()` selector to style parts only on certain pages, e.g. to hide the header for Items:
+
+```css
+stac-browser:state(item)::part(header) {
+  display: none;
+}
+```
+
+The states are `catalog`, `collection`, `item`, `search`, `favorites`, `select` (to select a catalog), `validation` and `edit`.
+There's no state while a catalog, collection or item is loading.
+You can also check the state in JavaScript, e.g. `el.matches(':state(item)')`.
 
 ## Limitations
 

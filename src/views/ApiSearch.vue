@@ -3,7 +3,7 @@
     <Loading v-if="!parent" stretch />
     <ErrorAlert v-else-if="!supportsSearch" :description="$t('search.notSupported')" />
     <b-row v-else>
-      <b-col class="left">
+      <b-col class="left" part="filters">
         <WidgetHook id="view-search-filters-start" />
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" :id="tabIds.collections">
@@ -26,7 +26,7 @@
         </b-tabs>
         <WidgetHook id="view-search-filters-end" />
       </b-col>
-      <b-col class="right">
+      <b-col class="right" part="results">
         <Loading v-if="loading" fill top />
         <ErrorAlert v-else-if="error" :description="error" :id="errorId" />
         <b-alert v-else-if="data === null" variant="secondary" show>{{ $t('search.modifyCriteria') }}</b-alert>

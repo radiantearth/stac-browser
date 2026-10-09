@@ -1,7 +1,7 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
-      <b-col class="meta">
+      <b-col class="meta" part="details">
         <WidgetHook id="view-catalog-meta-start" />
         <section class="intro">
           <h2>{{ $t('description') }}</h2>
@@ -43,7 +43,7 @@
         <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-catalog-meta-end" />
       </b-col>
-      <b-col class="catalogs-container" v-if="hasCatalogs">
+      <b-col class="catalogs-container" part="catalogs" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
           :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
@@ -53,7 +53,7 @@
         />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
-      <b-col class="items-container" v-if="hasItems || hasItemAssets">
+      <b-col class="items-container" part="items" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
           :stac="data" :items="items" :api="hasApiItems" allowFilter

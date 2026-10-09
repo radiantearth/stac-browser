@@ -4,10 +4,10 @@
     <WidgetHook id="root-start" />
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar !== null" v-model="sidebar" />
+    <Sidebar v-if="sidebar !== null" v-model="sidebar" part="sidebar" />
     <!-- Header -->
-    <header ref="header" :class="{ scrolled, 'hide-site-header': hideSite }">
-      <b-row class="site">
+    <header ref="header" part="header" :class="{ scrolled, 'hide-site-header': hideSite }">
+      <b-row class="site" part="site-header">
         <b-col md="12">
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || !isServerSelector || showFavorites">
@@ -53,7 +53,7 @@
           </nav>
         </b-col>
       </b-row>
-      <b-row class="page" v-if="!loading">
+      <b-row class="page" part="page-header" v-if="!loading">
         <b-col md="12">
           <div class="title">
             <AuthImage v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon" />
@@ -78,9 +78,9 @@
     </header>
     <!-- Content -->
     <WidgetHook id="root-before-content" />
-    <router-view />
+    <router-view part="content" />
     <!-- Footer -->
-    <footer>
+    <footer part="footer">
       <WidgetHook id="footer-start" />
       <ul v-if="Array.isArray(footerLinks) && footerLinks.length > 0" class="footer-links text-body-secondary">
         <li v-for="link in footerLinks" :key="link.url">

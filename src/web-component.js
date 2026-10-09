@@ -83,6 +83,25 @@ function abortError() {
 
 const browserVersion = typeof STAC_BROWSER_VERSION !== 'undefined' ? STAC_BROWSER_VERSION : null;
 
+const ROUTE_STATES = ['select', 'search', 'favorites', 'validation'];
+
+// The page shown, exposed as a custom state (e.g. :state(item)); null while loading.
+function pageState(route, getters) {
+  if (route.name === 'browse') {
+    if (getters.isItem) {
+      return 'item';
+    }
+    if (getters.isCollection) {
+      return 'collection';
+    }
+    return getters.isCatalog ? 'catalog' : null;
+  }
+  if (route.name?.startsWith('management')) {
+    return 'edit';
+  }
+  return ROUTE_STATES.includes(route.name) ? route.name : null;
+}
+
 export class StacBrowserElement extends HTMLElement {
 
   static get observedAttributes() {
@@ -105,6 +124,7 @@ export class StacBrowserElement extends HTMLElement {
     this._generation = 0;
     this._forwardedProps = new Set();
     this._ready = null;
+    this._internals = this.attachInternals();
     // A `config` set before the element was defined lands as an own property
     // that would shadow the setter after upgrade; re-run it through the setter.
     this._upgradeProperty('config');
@@ -121,6 +141,18 @@ export class StacBrowserElement extends HTMLElement {
       this._ready = { promise, resolve, reject };
     }
     return this._ready;
+  }
+
+  _setPageState(page) {
+    // Custom states aren't supported in older browsers.
+    const states = this._internals.states;
+    if (!states) {
+      return;
+    }
+    states.clear();
+    if (page) {
+      states.add(page);
+    }
   }
 
   _upgradeProperty(prop) {
@@ -299,6 +331,11 @@ export class StacBrowserElement extends HTMLElement {
     watchEmit(() => pageTitle(store, i18n), 'title');
     watchEmit(() => pageDescription(store), 'description');
     watchEmit(() => pageLocale(store), 'locale');
+    this._unwatchers.push(store.watch(
+      () => pageState(router.currentRoute.value, store.getters),
+      (page) => this._setPageState(page),
+      { immediate: true }
+    ));
     this._unwatchers.push(store.watch(() => store.state.data, (data) => {
       this._emit('data', { url: store.state.url || null, data: cloneStacData(data) });
     }, { immediate: true }));
@@ -393,6 +430,7 @@ export class StacBrowserElement extends HTMLElement {
     }
     this._unwatchers.forEach((unwatch) => unwatch());
     this._unwatchers = [];
+    this._setPageState(null);
     if (this._instance) {
       this._instance.app.unmount();
       this._instance = null;

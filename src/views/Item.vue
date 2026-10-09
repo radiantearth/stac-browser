@@ -1,7 +1,7 @@
 <template>
   <div class="item" :key="data.id">
     <b-row>
-      <b-col class="left">
+      <b-col class="left" part="resources">
         <WidgetHook id="view-item-primary-start" />
         <section class="mb-4">
           <b-card no-body class="maps-preview">
@@ -19,7 +19,7 @@
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>
-      <b-col class="right">
+      <b-col class="right" part="details">
         <WidgetHook id="view-item-secondary-start" />
         <section class="intro">
           <h2 v-if="data.properties.description">{{ $t('description') }}</h2>

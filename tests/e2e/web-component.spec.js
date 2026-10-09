@@ -652,4 +652,49 @@ test.describe('<stac-browser> web component', () => {
     await expect(page.locator('stac-browser').getByText('Data Access')).toBeVisible();
     await expect(page.locator('stac-browser').getByText('Public', { exact: true })).toBeVisible();
   });
+  test('exposes structural parts that the host page can style', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    await page.addStyleTag({ content: `
+      stac-browser::part(site-header) { display: none; }
+      stac-browser:state(catalog)::part(details) { outline: 3px solid rgb(255, 0, 0); }
+    ` });
+    const styles = await page.locator('stac-browser').evaluate((el) => {
+      const part = (name) => el.shadowRoot.querySelector(`[part~="${name}"]`);
+      return {
+        siteHeader: getComputedStyle(part('site-header')).display,
+        pageHeader: getComputedStyle(part('page-header')).display,
+        details: getComputedStyle(part('details')).outlineColor,
+        parts: ['header', 'content', 'footer', 'details'].filter((name) => part(name) !== null)
+      };
+    });
+    expect(styles.siteHeader).toBe('none');
+    expect(styles.pageHeader).not.toBe('none');
+    expect(styles.details).toBe('rgb(255, 0, 0)');
+    expect(styles.parts).toEqual(['header', 'content', 'footer', 'details']);
+
+    // The sidebar part is passed on to the offcanvas element.
+    await page.addStyleTag({ content: 'stac-browser::part(site-header) { display: block; }' });
+    await page.locator('stac-browser header').getByTitle('Browse').click();
+    await expect(page.locator('stac-browser [part~="sidebar"].offcanvas')).toBeVisible();
+  });
+
+  test('exposes the current page as a custom state', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    const el = page.locator('stac-browser');
+    const state = () => el.evaluate((el) => ['catalog', 'collection', 'item', 'search'].filter((s) => el.matches(`:state(${s})`)));
+
+    await expect.poll(state).toEqual(['catalog']);
+
+    await el.evaluate((el) => el.navigate('/search'));
+    await expect.poll(state).toEqual(['search']);
+
+    await el.evaluate((el) => el.setData({
+      type: 'Feature', stac_version: '1.0.0', id: 'state-item', links: [], assets: {},
+      geometry: null, properties: { datetime: '2020-01-01T00:00:00Z' }
+    }, 'https://stac.example/wc/state/item.json'));
+    await expect.poll(state).toEqual(['item']);
+  });
 });
