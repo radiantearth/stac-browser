@@ -292,6 +292,31 @@ test.describe('Catalog - Children', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Root Catalog');
   });
 
+  test('Catalog - a slow page that is opened again while it is loading is shown', async ({ page, worker }) => {
+    const root = 'https://stac.example/reopen/catalog.json';
+    const child = 'https://stac.example/reopen/slow/collection.json';
+    await mockStacResource(worker, root, {
+      type: 'Catalog', stac_version: '1.0.0', id: 'reopen', title: 'Root Catalog', description: 'Root',
+      links: [{ rel: 'self', href: root }, { rel: 'root', href: root }, { rel: 'child', href: child, title: 'Slow Child' }]
+    });
+    await mockStacResource(worker, child, {
+      type: 'Collection', stac_version: '1.0.0', id: 'slow', title: 'Slow Collection', description: 'Slow', license: 'CC0-1.0',
+      extent: { spatial: { bbox: [[-1, -1, 1, 1]] }, temporal: { interval: [[null, null]] } },
+      links: [{ rel: 'self', href: child }, { rel: 'root', href: root }, { rel: 'parent', href: root }]
+    }, { delay: 2000 });
+
+    await page.goto('/external/stac.example/reopen/catalog.json');
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: 'Root Catalog', level: 1 })).toBeVisible();
+
+    // Open the slow collection, go back and open it again while the first request is pending
+    await page.getByRole('link', { name: /Slow Child/ }).first().click();
+    await page.goBack();
+    await page.getByRole('link', { name: /Slow Child/ }).first().click();
+
+    await expect(page.getByRole('heading', { name: 'Slow Collection', level: 1 })).toBeVisible();
+  });
+
   // API tests
   test('API - renders child collection as link', async ({ page, worker }) => {
     const { api } = createAPI();

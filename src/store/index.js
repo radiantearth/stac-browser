@@ -988,6 +988,13 @@ function getStore(config, router) {
 
         url = toAbsolute(url, cx.state.url);
 
+        // Register before the first await, so that a navigation in the meantime cancels showing the page.
+        // Afterwards, check loading.show instead of show.
+        let loading = new Loading(show);
+        if (show) {
+          pendingShows.add(loading);
+        }
+
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
 
@@ -995,14 +1002,11 @@ function getStore(config, router) {
           cx.commit('clear', url);
         }
 
-        let loading = new Loading(show);
         let data = cx.state.database[url];
         if (data instanceof Loading) {
-          cx.commit('updateLoading', { url, show });
+          pendingShows.delete(loading);
+          cx.commit('updateLoading', { url, show: loading.show });
           return;
-        }
-        if (show) {
-          pendingShows.add(loading);
         }
 
         const hasData = data instanceof STAC && !data._incomplete;
@@ -1022,7 +1026,7 @@ function getStore(config, router) {
             }
             cx.commit('loaded', { url, data });
 
-            if (show) {
+            if (loading.show) {
               // If we prefer another language abort redirect to the new language
               let localeLink = data.getLocaleLink(cx.state.dataLanguage);
               if (localeLink) {
@@ -1033,7 +1037,7 @@ function getStore(config, router) {
 
             // Users may enter a different URL than reported in the STAC document
             // (e.g. missing trailing slash) - correct the URL and redirect.
-            if (await normalizeCatalogUrl(cx, data, url, show)) {
+            if (await normalizeCatalogUrl(cx, data, url, loading.show)) {
               return;
             }
 
