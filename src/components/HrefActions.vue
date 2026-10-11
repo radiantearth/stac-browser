@@ -70,6 +70,9 @@ export default {
     Description,
   },
   mixins: [TriggerRefMixin],
+  inject: {
+    embedded: { default: false }
+  },
   props: {
     data: {
       type: Object,
@@ -198,7 +201,9 @@ export default {
       return {};
     },
     useAltDownloadMethod() {
-      if (!this.isBrowserProtocol || !window.isSecureContext) {
+      // StreamSaver needs mitm.html and sw.js from the page's origin or a third-party host,
+      // which the web component can't rely on.
+      if (this.embedded || !this.isBrowserProtocol || !window.isSecureContext) {
         return false;
       }
       else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {

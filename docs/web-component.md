@@ -341,6 +341,10 @@ The web component behaves slightly different than the standalone STAC Browser, s
 - STAC Browser never prevents users from leaving your page.
   There's no warning about running downloads,
   and the editor doesn't ask about unsaved changes (they are still kept as drafts).
+- Files are always downloaded through a normal link.
+  Downloads that need request headers (e.g. [`requestHeaders`](options.md#requestheaders) or an API key in a header) or another HTTP method than GET don't work.
+  The standalone STAC Browser supports them through a service worker from your server, which the web component can't rely on.
+  Query parameters, e.g. from [`requestQueryParameters`](options.md#requestqueryparameters), are part of the link and work.
 
 These differences are always active in the web component and can't be configured.
 

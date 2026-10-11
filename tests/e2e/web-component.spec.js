@@ -725,4 +725,25 @@ test.describe('<stac-browser> web component', () => {
     await expect(browse).toHaveCount(0);
     await expect(page.locator('stac-browser .offcanvas')).toHaveCount(0);
   });
+  test('downloads files through a normal link, also with request headers', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const assetUrl = 'https://stac.example/wc/download/data.tif';
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      // Would require the StreamSaver download in the standalone STAC Browser
+      el.config = { requestHeaders: { 'X-Api-Key': 'abc' } };
+      document.querySelector('main').replaceChildren(el);
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    await page.locator('stac-browser').evaluate((el, assetUrl) => el.setData({
+        type: 'Feature', stac_version: '1.0.0', id: 'download', links: [], geometry: null,
+        properties: { datetime: '2020-01-01T00:00:00Z' },
+        assets: { data: { href: assetUrl, type: 'image/tiff; application=geotiff', title: 'Data' } }
+      }, 'https://stac.example/wc/download/item.json'), assetUrl);
+
+    await expect(page.locator(`stac-browser a.btn[href="${assetUrl}"]`)).toBeVisible();
+  });
 });
