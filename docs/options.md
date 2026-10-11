@@ -184,7 +184,7 @@ This option only applies to catalogs and collections, it never hides items.
 
 ### faviconImage
 
-URL to an icon image to use as a favicon in the broswer tab.
+URL to an icon image to use as a favicon in the browser tab.
 Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
 
 
