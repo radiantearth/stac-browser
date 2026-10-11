@@ -98,6 +98,16 @@ function getOrCreateStac(cx, data, url) {
 }
 
 function getStore(config, router) {
+  // Loads that show their page once finished. A navigation cancels them, so that
+  // a slow load can't replace the page that was navigated to in the meantime.
+  const pendingShows = new Set();
+  const cancelPendingShows = () => {
+    for (const loading of pendingShows) {
+      loading.show = false;
+    }
+    pendingShows.clear();
+  };
+
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -662,6 +672,9 @@ function getStore(config, router) {
         let data = state.database[url];
         if (data instanceof Loading) {
           data.show = show || data.show;
+          if (show) {
+            pendingShows.add(data);
+          }
         }
       },
       loading(state, { url, loading }) {
@@ -679,6 +692,7 @@ function getStore(config, router) {
         delete state.apiChildren[url];
       },
       resetCatalog(state, clearAll) {
+        cancelPendingShows();
         Object.assign(state, catalogDefaults());
         Object.assign(state, localDefaults());
         if (!state.supportedLocales.includes(state.locale)) {
@@ -698,6 +712,7 @@ function getStore(config, router) {
         }
       },
       resetPage(state) {
+        cancelPendingShows();
         Object.assign(state, localDefaults());
       },
       showPage(state, { url, stac, page }) {
@@ -973,6 +988,13 @@ function getStore(config, router) {
 
         url = toAbsolute(url, cx.state.url);
 
+        // Register before the first await, so that a navigation in the meantime cancels showing the page.
+        // Afterwards, check loading.show instead of show.
+        let loading = new Loading(show);
+        if (show) {
+          pendingShows.add(loading);
+        }
+
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
 
@@ -980,10 +1002,10 @@ function getStore(config, router) {
           cx.commit('clear', url);
         }
 
-        let loading = new Loading(show);
         let data = cx.state.database[url];
         if (data instanceof Loading) {
-          cx.commit('updateLoading', { url, show });
+          pendingShows.delete(loading);
+          cx.commit('updateLoading', { url, show: loading.show });
           return;
         }
 
@@ -1004,7 +1026,7 @@ function getStore(config, router) {
             }
             cx.commit('loaded', { url, data });
 
-            if (show) {
+            if (loading.show) {
               // If we prefer another language abort redirect to the new language
               let localeLink = data.getLocaleLink(cx.state.dataLanguage);
               if (localeLink) {
@@ -1015,7 +1037,7 @@ function getStore(config, router) {
 
             // Users may enter a different URL than reported in the STAC document
             // (e.g. missing trailing slash) - correct the URL and redirect.
-            if (await normalizeCatalogUrl(cx, data, url, show)) {
+            if (await normalizeCatalogUrl(cx, data, url, loading.show)) {
               return;
             }
 
@@ -1097,6 +1119,7 @@ function getStore(config, router) {
         }
 
         // All tasks finished, show the page if requested
+        pendingShows.delete(loading);
         if (loading.show) {
           cx.commit('showPage', { url });
           // If we don't have a catalogUrl but have a page to show,
