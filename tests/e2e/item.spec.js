@@ -282,6 +282,38 @@ test.describe('Item view - Alternate thumbnails', () => {
   });
 });
 
+test.describe('Item view - Asset actions', () => {
+  test('SVG assets are offered for download instead of being opened', async ({ page, worker }) => {
+    const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
+    const item = catalog.addItem({ url: 'https://stac.example/item.json' });
+    item.data.assets = {
+      legend: { href: 'https://stac.example/legend.svg', type: 'image/svg+xml', roles: ['metadata'], title: 'Legend' },
+      chart: { href: 'https://stac.example/chart.png', type: 'image/png', roles: ['metadata'], title: 'Chart' }
+    };
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const expandAsset = async (title) => {
+      const asset = page.locator('.asset', { hasText: title });
+      await asset.getByRole('button', { name: title }).click();
+      return asset;
+    };
+
+    // SVG files opened in the browser can run scripts
+    const legend = await expandAsset('Legend');
+    const download = legend.getByRole('button', { name: /download/i });
+    await expect(download).toBeVisible();
+    await expect(download).toHaveAttribute('download');
+    await expect(legend.getByRole('button', { name: /^open$/i })).toHaveCount(0);
+
+    // Other images that browsers can show are still opened
+    const chart = await expandAsset('Chart');
+    await expect(chart.getByRole('button', { name: /^open$/i })).toBeVisible();
+  });
+});
+
 test.describe('Item view - Geometry', () => {
   function createCatalog() {
     const catalog = new StaticCatalog({url: 'https://stac.example/catalog.json'});

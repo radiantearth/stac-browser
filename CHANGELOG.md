@@ -14,10 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Icons, logos and thumbnails that fail to load are hidden, cards fall back to the next thumbnail
-
-### Fixed
-
+- Icons, logos and card thumbnails that fail to load are hidden
 - A page that is still loading no longer replaces the page that was navigated to in the meantime
 - Maps showing multiple Items now send the configured authentication (headers and query parameters) and apply the source/layer customizations and `maxDisplayPixels` for each Item
 - The `crossOriginMedia` option now applies to images on maps

@@ -301,21 +301,21 @@ test.describe('Authenticated media', () => {
     await expect(img).toHaveAttribute('src', THUMB_URL);
   });
 
-  test('card thumbnails fall back to the next thumbnail if one fails', async ({ page, worker }) => {
+  test('failed thumbnails are hidden on cards, but kept in the thumbnails tab', async ({ page, worker }) => {
     const { catalog, item } = createCatalogWithItem();
-    const fallbackUrl = 'https://stac.example/fallback.png';
-    item.data.assets.fallback = { href: fallbackUrl, type: 'image/png', roles: ['thumbnail'] };
     await catalog.createServer(worker);
-    await mockImage(worker, THUMB_URL, () => false);
-    await mockImage(worker, fallbackUrl);
+    const requests = await mockImage(worker, THUMB_URL, () => false);
 
     await page.goto(catalog.root.getBrowserPath());
     await waitForBrowserReady(page);
+    await expect.poll(() => requests.length).toBeGreaterThan(0);
+    await expect(page.locator('.card img.thumbnail')).toHaveCount(0);
 
-    const img = page.locator('.card img.thumbnail').first();
-    await img.scrollIntoViewIfNeeded();
-    await expect(img).toHaveAttribute('src', fallbackUrl);
-    await expect.poll(() => img.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    const img = await openThumbnailsTab(page);
+    // Keeps the link to open or download the file
+    await expect(img).toHaveAttribute('src', THUMB_URL);
   });
 
   test('card thumbnails on the catalog page load with the auth header', async ({ page, worker }) => {

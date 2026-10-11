@@ -17,12 +17,6 @@ export default {
       validator: value => value === null || ['list', 'cards'].includes(value)
     }
   },
-  data() {
-    return {
-      // The index of the thumbnail to show, increased if a thumbnail fails to load
-      thumbnailIndex: 0
-    };
-  },
   computed: {
     ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
     isList() {
@@ -34,8 +28,8 @@ export default {
     thumbnail() {
       if (this.data) {
         let thumbnails = this.data.getThumbnails(true, 'thumbnail', true);
-        if (thumbnails.length > this.thumbnailIndex) {
-          let t = thumbnails[this.thumbnailIndex];
+        if (thumbnails.length > 0) {
+          let t = thumbnails[0];
           let width, height;
           const shape = t.getMetadata('proj:shape');
           if (Array.isArray(shape) && shape.length === 2) {
@@ -70,17 +64,6 @@ export default {
     },
     summarizeDescription() {
       return this.hasDescription ? Utils.summarizeMd(this.data.getMetadata('description'), 300) : '';
-    }
-  },
-  watch: {
-    data() {
-      this.thumbnailIndex = 0;
-    }
-  },
-  methods: {
-    // Falls back to the next thumbnail, hides the image if there's none
-    nextThumbnail() {
-      this.thumbnailIndex++;
     }
   }
 };

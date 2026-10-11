@@ -1,4 +1,5 @@
 import { size } from 'stac-js/src/utils.js';
+import { svgMediaType } from 'stac-js/src/mediatypes.js';
 
 /**
  * Loads media (e.g. images) through an authenticated request when needed.
@@ -24,16 +25,6 @@ import { size } from 'stac-js/src/utils.js';
  */
 
 const cache = new Map();
-
-/**
- * Whether the given blob is an SVG image.
- *
- * @param {Blob} blob The blob.
- * @returns {boolean} `true` if the blob is an SVG image.
- */
-function isSvg(blob) {
-  return typeof blob.type === 'string' && blob.type.toLowerCase().startsWith('image/svg+xml');
-}
 
 /**
  * Reads the given blob as a `data:` URL.
@@ -112,7 +103,8 @@ export async function acquire(store, url) {
           noRetry: true
         })
         .then(async response => {
-          if (isSvg(response.data)) {
+          // Prefix match as the content type may have parameters (e.g. charset)
+          if (response.data.type.toLowerCase().startsWith(svgMediaType)) {
             entry.objectUrl = await toDataUrl(response.data);
           }
           else {
