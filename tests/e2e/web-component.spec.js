@@ -705,11 +705,14 @@ test.describe('<stac-browser> web component', () => {
       const el = document.createElement('stac-browser');
       el.setAttribute('url', url);
       el.setAttribute('show-sidebar', 'false');
+      el.setAttribute('show-favorites', 'false');
       document.querySelector('main').replaceChildren(el);
     }, catalogUrl);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
     const browse = page.locator('stac-browser header').getByTitle('Browse');
     await expect(browse).toHaveCount(0);
+    // The button for the root catalog is independent of the sidebar.
+    await expect(page.locator('stac-browser #popover-root-btn')).toBeVisible();
 
     await page.locator('stac-browser').evaluate((el) => el.setAttribute('show-sidebar', 'true'));
     await expect(browse).toBeVisible();

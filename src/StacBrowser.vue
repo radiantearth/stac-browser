@@ -10,7 +10,7 @@
       <b-row class="site" part="site-header">
         <b-col md="12">
           <nav class="actions navigation">
-            <b-button-group v-if="canSearch || canBrowse || showFavorites">
+            <b-button-group v-if="canSearch || canBrowse || showFavorites || root">
               <b-button v-if="canBrowse" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list />
               </b-button>
