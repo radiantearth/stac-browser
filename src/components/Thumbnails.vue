@@ -9,7 +9,7 @@
         target="_blank" rel="noopener noreferrer" download
       >
         <AuthImage
-          class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia"
+          class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia" show-broken
           @resolved="url => hrefs[thumbnail.href] = url"
         />
       </a>

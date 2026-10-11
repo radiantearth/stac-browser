@@ -1,4 +1,5 @@
 import { size } from 'stac-js/src/utils.js';
+import { svgMediaType } from 'stac-js/src/mediatypes.js';
 
 /**
  * Loads media (e.g. images) through an authenticated request when needed.
@@ -7,6 +8,10 @@ import { size } from 'stac-js/src/utils.js';
  * header-based authentication methods (API key in header, HTTP Basic, OIDC)
  * require. For those, the media is requested through the regular
  * (authenticated) request pipeline and exposed as an object URL instead.
+ * SVG images are exposed as `data:` URLs instead of object URLs: an object URL
+ * has the origin of STAC Browser, so an SVG opened from it (e.g. through a
+ * download link) could run scripts with access to the storage and cookies of
+ * STAC Browser. A `data:` URL has an opaque origin.
  *
  * Object URLs are cached per source URL and reference-counted so that
  * repeated usage (e.g. the same icon in a list of cards) only requests
@@ -20,6 +25,21 @@ import { size } from 'stac-js/src/utils.js';
  */
 
 const cache = new Map();
+
+/**
+ * Reads the given blob as a `data:` URL.
+ *
+ * @param {Blob} blob The blob.
+ * @returns {Promise<string>} The `data:` URL.
+ */
+function toDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
 
 /**
  * Whether the given URL must be loaded through an authenticated request
@@ -52,7 +72,7 @@ export function release(store, url) {
   entry.refs--;
   if (entry.refs <= 0) {
     cache.delete(url);
-    if (entry.objectUrl) {
+    if (entry.objectUrl && entry.objectUrl.startsWith('blob:')) {
       URL.revokeObjectURL(entry.objectUrl);
     }
   }
@@ -60,7 +80,7 @@ export function release(store, url) {
 
 /**
  * Requests the given URL with the configured credentials and returns an
- * object URL for the response.
+ * object URL for the response (a `data:` URL for SVG images).
  *
  * Every successful call must be paired with a `release` call for the same
  * URL. Failed requests are not cached, but do NOT trigger the login dialog
@@ -68,7 +88,7 @@ export function release(store, url) {
  *
  * @param {Object} store The Vuex store.
  * @param {string} url The absolute URL of the media.
- * @returns {Promise<string>} The object URL for the media.
+ * @returns {Promise<string>} The object URL (or `data:` URL) for the media.
  */
 export async function acquire(store, url) {
   let entry = cache.get(url);
@@ -82,8 +102,14 @@ export async function acquire(store, url) {
           axiosOptions: { responseType: 'blob' },
           noRetry: true
         })
-        .then(response => {
-          entry.objectUrl = URL.createObjectURL(response.data);
+        .then(async response => {
+          // Prefix match as the content type may have parameters (e.g. charset)
+          if (response.data.type.toLowerCase().startsWith(svgMediaType)) {
+            entry.objectUrl = await toDataUrl(response.data);
+          }
+          else {
+            entry.objectUrl = URL.createObjectURL(response.data);
+          }
           return entry.objectUrl;
         })
     };

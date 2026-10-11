@@ -210,6 +210,29 @@ test.describe('Authenticated media', () => {
     await expect(img).toHaveAttribute('src', /^blob:/);
   });
 
+  test('SVG thumbnails load with the auth header via data URLs', async ({ page, worker }) => {
+    await configureBrowser(page, {
+      authConfig: { type: 'apiKey', in: 'header', name: 'X-API-Key' },
+    });
+    const { catalog, item } = createCatalogWithItem();
+    await catalog.createServer(worker);
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>';
+    await worker.use(
+      http.get(THUMB_URL, ({ request }) => {
+        if (!hasHeader('x-api-key', 'secret')(request)) {
+          return new HttpResponse(null, { status: 401 });
+        }
+        return new HttpResponse(svg, { headers: { 'Content-Type': 'image/svg+xml' } });
+      }),
+    );
+    await loginOnItemPage(page, worker, catalog, item);
+
+    const img = await openThumbnailsTab(page);
+    await expect.poll(() => img.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
+    // A data URL has an opaque origin, unlike an object URL
+    await expect(img).toHaveAttribute('src', /^data:image\/svg\+xml/);
+  });
+
   test('thumbnails carry the private query parameter without object URLs', async ({ page, worker }) => {
     await configureBrowser(page, {
       authConfig: { type: 'apiKey', in: 'query', name: 'API_KEY' },
@@ -275,6 +298,23 @@ test.describe('Authenticated media', () => {
 
     const img = await openThumbnailsTab(page);
     await expect.poll(() => img.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
+    await expect(img).toHaveAttribute('src', THUMB_URL);
+  });
+
+  test('failed thumbnails are hidden on cards, but kept in the thumbnails tab', async ({ page, worker }) => {
+    const { catalog, item } = createCatalogWithItem();
+    await catalog.createServer(worker);
+    const requests = await mockImage(worker, THUMB_URL, () => false);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect.poll(() => requests.length).toBeGreaterThan(0);
+    await expect(page.locator('.card img.thumbnail')).toHaveCount(0);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    const img = await openThumbnailsTab(page);
+    // Keeps the link to open or download the file
     await expect(img).toHaveAttribute('src', THUMB_URL);
   });
 
