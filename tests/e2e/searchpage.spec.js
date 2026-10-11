@@ -916,3 +916,66 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 });
+
+test.describe('STAC Browser Search page with required collections', () => {
+  let SEARCH_PATH;
+
+  test.beforeEach(async ({ worker }) => {
+    const api = API.minimalApi();
+    const collection1 = api.addCollection('collection1')
+      .setMetadata({ title: 'Test Collection 1' });
+    api.addManyItems(collection1, 5);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/item-search#require-collections');
+
+    await api.createServer(worker);
+    SEARCH_PATH = api.root.getSearchPath();
+  });
+
+  test('Item search is only submitted once a collection is selected', async ({ page }) => {
+    const searchRequests = [];
+    page.on('request', req => {
+      if (req.method() === 'POST' && req.url().includes('/search')) {
+        searchRequests.push(req);
+      }
+    });
+
+    await page.goto(SEARCH_PATH);
+    await waitForBrowserReady(page);
+
+    const collectionGroup = page.locator('.filter-collection');
+    const feedback = collectionGroup.locator('.invalid-feedback');
+
+    await test.step('Hint that a collection is required', async () => {
+      await expect(collectionGroup.locator('.form-text')).toHaveText(/select at least one collection/i);
+      await expect(page.locator('.right .alert')).toHaveText(/select at least one collection/i);
+    });
+
+    await test.step('Submitting without a collection shows an error instead of searching', async () => {
+      await page.getByRole('button', { name: /submit/i }).click();
+      await expect(feedback).toBeVisible();
+      await expect(feedback).toHaveText(/select at least one collection/i);
+      await expect(collectionGroup.locator('.multiselect')).toHaveClass(/is-invalid/);
+      expect(searchRequests).toHaveLength(0);
+    });
+
+    await test.step('Selecting a collection clears the error', async () => {
+      const collectionSelect = collectionGroup.locator('.multiselect');
+      await collectionSelect.click();
+      const option = collectionSelect.locator('.multiselect__option', { hasText: 'Test Collection 1' });
+      await option.waitFor({ state: 'visible', timeout: 10000 });
+      await option.click();
+      await expect(feedback).toBeHidden();
+      await expect(collectionSelect).not.toHaveClass(/is-invalid/);
+    });
+
+    await test.step('Submitting with a collection searches', async () => {
+      const requestPromise = waitForSearchPost(page);
+      await page.getByRole('button', { name: /submit/i }).click();
+      const { body } = await requestPromise;
+      expect(body.collections).toEqual(['collection1']);
+    });
+  });
+});

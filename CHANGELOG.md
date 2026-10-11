@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
 
 ### Fixed
 
