@@ -339,6 +339,7 @@
     "arrayOverlapsDescription": "Le tableau contient au moins une des valeurs spécifiées",
     "between": "entre",
     "betweenOperatorDescription": "Teste si une valeur de champ numérique se situe dans la plage donnée. La plage donnée est inclusive.",
+    "collectionsRequired": "",
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
     "disabledDueToSingleDate": "Ce filtre est désactivé parce que la collection a une date et heure unique comme étendue temporelle.",
     "droppedFilters": "Les filtres suivants ne sont pas pris en charge ici et ont été supprimés : {filters}.",
