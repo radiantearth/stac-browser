@@ -745,6 +745,10 @@ svg {
     box-shadow: var(--bs-box-shadow-inset), 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
   }
 
+  .multiselect.is-invalid .multiselect__tags {
+    border-color: var(--bs-form-invalid-border-color);
+  }
+
   .multiselect__select:before {
     color: var(--bs-body-color);
     border-color: var(--bs-body-color) transparent transparent;

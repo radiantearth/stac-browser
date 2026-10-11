@@ -29,6 +29,7 @@
       <b-col class="right">
         <Loading v-if="loading" fill top />
         <ErrorAlert v-else-if="error" :description="error" :id="errorId" />
+        <b-alert v-else-if="data === null && isMissingCollections" variant="secondary" show>{{ $t('search.collectionsRequired') }}</b-alert>
         <b-alert v-else-if="data === null" variant="secondary" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="secondary" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
@@ -78,6 +79,7 @@
 import Utils from '../utils';
 import { isObject, size } from 'stac-js/src/utils.js';
 import SearchFilter from '../components/SearchFilter.vue';
+import { TYPES } from '../components/ApiCapabilitiesMixin';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
@@ -127,7 +129,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -160,6 +162,11 @@ export default defineComponent({
     },
     isCollectionSearch() {
       return this.collectionSearch && this.activeSearch === 'search-collections-tab';
+    },
+    isMissingCollections() {
+      return !this.isCollectionSearch
+        && this.supportsConformance(TYPES.Global.RequireCollections)
+        && size(this.$store.state.search.itemFilters.collections) === 0;
     },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
@@ -345,7 +352,7 @@ export default defineComponent({
       else {
         this.itemFilters = filters;
       }
-      if (reset) {
+      if (reset || this.isMissingCollections) {
         this.data = null;
       }
       else if (this.searchLink) {

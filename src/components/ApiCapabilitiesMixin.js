@@ -22,6 +22,7 @@ export const TYPES = {
       'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
     ],
     CollectionIdFilter: false,
+    RequireCollections: false,
     ItemIdFilter: false,
     // It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
     CqlFilters: ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'],
@@ -35,6 +36,7 @@ export const TYPES = {
   Global: {
     BasicFilters: ['https://api.stacspec.org/v1.*/item-search'],
     CollectionIdFilter: true,
+    RequireCollections: ['https://api.stacspec.org/v1.*/item-search#require-collections'],
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
@@ -44,6 +46,7 @@ export const TYPES = {
   Collections: {
     BasicFilters: ['https://api.stacspec.org/v1.*/collection-search'],
     CollectionIdFilter: false,
+    RequireCollections: false,
     ItemIdFilter: false,
     CqlFilters: ['https://api.stacspec.org/v1.*/collection-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/collection-search#sort'],
@@ -77,6 +80,9 @@ export default {
     },
     canFilterFreeText() {
       return this.supportsConformance(this.conformances.FreeText, this.conformanceContext);
+    },
+    requiresCollections() {
+      return this.supportsConformance(this.conformances.RequireCollections, this.conformanceContext);
     },
     cql() {
       if (!this.supportsConformance(this.conformances.CqlFilters, this.conformanceContext)) {
