@@ -76,6 +76,8 @@ test.describe('<stac-browser> web component', () => {
     // The most recent navigate event resolves back to the catalog URL.
     const last = await page.evaluate(() => window.__events.navigate.at(-1));
     expect(last.url).toContain('stac.example/wc/catalog.json');
+    // The title of the new page isn't known yet when navigating, see the title event.
+    expect(last).not.toHaveProperty('title');
   });
 
   test('renders inside a shadow root with its styles applied there', async ({ page, worker }) => {

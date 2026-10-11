@@ -157,7 +157,7 @@
           browser.addEventListener(type, (e) => console.log(`stac-browser ${type}:`, e.detail));
         }
         browser.addEventListener('navigate', (e) => {
-          status.textContent = e.detail.url || e.detail.title || '';
+          status.textContent = e.detail.url || e.detail.path;
         });
         browser.addEventListener('title', (e) => {
           document.title = e.detail;

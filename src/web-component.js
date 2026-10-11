@@ -301,8 +301,7 @@ export class StacBrowserElement extends HTMLElement {
         path: to.fullPath,
         // Only browse paths encode a STAC URL; mapping app pages (/search,
         // /favorites, …) would fabricate one under the catalog URL.
-        url: to.name === 'browse' ? store.getters.fromBrowserPath(to.path) : null,
-        title: store.getters.title || null
+        url: to.name === 'browse' ? store.getters.fromBrowserPath(to.path) : null
       });
     };
     router.afterEach((to, from, failure) => {

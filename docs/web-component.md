@@ -179,7 +179,7 @@ The event data is available in `event.detail`.
 
 | Event            | `detail`                      | Emitted when...                                         |
 | ---------------- | ----------------------------- | ------------------------------------------------------- |
-| `navigate`       | `{ path, url, title }`        | the user navigates to another page.                     |
+| `navigate`       | `{ path, url }`               | the user navigates to another page.                     |
 | `data`           | `{ url, data }`               | the shown STAC entity changes. `data` is the STAC JSON. |
 | `title`          | The page title (string)       | the page title changes.                                 |
 | `description`    | A summary (string) or `null`  | the page description changes.                           |
@@ -198,7 +198,7 @@ el.addEventListener('navigate', (event) => {
 Please note:
 
 - `navigate` is emitted when the page changes, but the data may still be loading.
-  Use the `data` event if you need the data.
+  Use the `data` event if you need the data, and the `title` event for the title of the page.
 - The `url` is `null` for pages that don't show a STAC entity, e.g. the search page (`/search`).
 
 The standalone STAC Browser updates the head of the page (title, `<meta>` tags, JSON-LD) itself.
