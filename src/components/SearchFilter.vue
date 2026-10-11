@@ -274,7 +274,7 @@ export default defineComponent({
   computed: {
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapState('search', ['droppedFilters']), 
-    ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
+    ...mapGetters(['getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     droppedFilterNames() {
       const labels = {
@@ -369,7 +369,8 @@ export default defineComponent({
       return this.activeFilterSet?.filterLogic || null;
     },
     canSearchCollectionsFreeText() {
-      return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
+      return this.supportsConformance(TYPES.Collections.BasicFilters, this.conformanceContext)
+        && this.supportsConformance(TYPES.Collections.FreeText, this.conformanceContext);
     },
     ids() {
       let obj = {};

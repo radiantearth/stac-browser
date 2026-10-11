@@ -372,7 +372,7 @@ function getStore(config, router) {
           return null;
         }
         let searchLink;
-        if (state.data?.isCatalogLike && !state.data.is(getters.root)) {
+        if (state.data?.isCatalogLike && !state.data.is(getters.root) && !getters.isExternalContext) {
           searchLink = state.data.getSearchLink();
         }
         if (searchLink) {

@@ -261,4 +261,22 @@ test.describe('External content indicators and conformance scoping', () => {
     await expect(page.locator('#itemFilter .sort')).toBeHidden();
     await expect(page.locator('#itemFilter .filter-datetime')).toBeHidden();
   });
+
+  test('the search button on external content leads to the search of the configured catalog', async ({ page, worker }) => {
+    // The catalog and the external API both support item search
+    const main = API.defaultApi({ url: 'https://main.example/api/' });
+    main.addCollection('main-collection');
+    const apiA = API.defaultApi({ url: 'https://external-a.example/api/' });
+    apiA.root.setMetadata({ id: 'external-a', title: 'External API A' });
+    apiA.addCollection('collection-a');
+
+    await main.createServer(worker);
+    await apiA.createServer(worker, { reset: false });
+    await configureBrowser(page, { catalogUrl: 'https://main.example/api/' });
+
+    await page.goto('/external/external-a.example/api/');
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /External API A/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^search$/i })).toHaveAttribute('href', '/search');
+  });
 });
