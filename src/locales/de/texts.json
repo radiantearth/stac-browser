@@ -339,6 +339,7 @@
     "arrayOverlapsDescription": "Liste enthält mindestens einen der angegebenen Werte",
     "between": "zwischen",
     "betweenOperatorDescription": "Prüft, ob ein numerischer Wert innerhalb des angegebenen Bereichs liegt. Die angegebenen Grenzen werden eingeschlossen.",
+    "collectionsRequired": "Wähle mindestens ein Produkt, um nach Datensätzen zu suchen.",
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
     "disabledDueToSingleDate": "Dieser Filter ist deaktiviert, da die Sammlung einen einzelnen Zeitpunkt als zeitliche Ausdehnung hat.",
     "droppedFilters": "Die folgenden Filter werden hier nicht unterstützt und wurden entfernt: {filters}.",

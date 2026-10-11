@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
 - SVG icons, thumbnails and previews (`image/svg+xml`) are shown, SVG files are offered for download instead of being opened
+- Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
 
 ### Fixed
 
