@@ -35,6 +35,7 @@ import { STAC } from 'stac-js';
 import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardFooter, BCardText, BCardTitle } from 'bootstrap-vue-next';
 import AuthImage from './AuthImage.vue';
+import { getTemporalExtentFormatOptions } from '../utils';
 
 export default {
   name: 'Catalog',
@@ -68,7 +69,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['showKeywordsInCatalogCards']),
+    ...mapState(['omitTimeForMidnight', 'showKeywordsInCatalogCards']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -88,9 +89,9 @@ export default {
     },
     temporalExtent() {
       if (this.data?.isCollection && this.data.extent?.temporal?.interval.length > 0) {
-        let extent = this.data.extent.temporal.interval[0];
+        const extent = this.data.extent.temporal.interval[0];
         if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
-          return this.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
+          return this.formatTemporalExtent(extent, true, getTemporalExtentFormatOptions(extent, this.omitTimeForMidnight));
         }
       }
       return null;

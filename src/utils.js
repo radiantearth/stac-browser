@@ -9,6 +9,19 @@ export const commonFileNames = ['catalog', 'collection', 'item'];
 // If you add new routes that may include .../external/... in the path, update this regexp.
 export const externalBrowserPathRE = /^\/((search|validation|management\/[\w-]+)\/)?external\//;
 
+export function getTemporalExtentFormatOptions(extents, omitTimeForMidnight) {
+  const boundaries = Array.isArray(extents) ? extents.flat().filter(value => value !== null) : [];
+  const allBoundariesAreMidnight = boundaries.length > 0 && boundaries.every(value => {
+    const date = new Date(value);
+    return !Number.isNaN(date.getTime()) &&
+      date.getUTCHours() === 0 &&
+      date.getUTCMinutes() === 0 &&
+      date.getUTCSeconds() === 0 &&
+      date.getUTCMilliseconds() === 0;
+  });
+  return { shorten: omitTimeForMidnight && allBoundariesAreMidnight };
+}
+
 export class BrowserError extends Error {
   constructor(message) {
     super(message);
