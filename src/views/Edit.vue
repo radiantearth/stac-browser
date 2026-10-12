@@ -60,6 +60,9 @@ export default defineComponent({
   mixins: [
     BrowseMixin,
   ],
+  inject: {
+    embedded: { default: false }
+  },
   // Ask for confirmation when leaving the page with unsaved changes.
   // Mode switches between management routes of the same entity also pass
   // through here as the routes are separate route records.
@@ -268,7 +271,9 @@ export default defineComponent({
       this.flushDraft();
       // Don't block the page unload for an ongoing login (e.g. OIDC redirects
       // to the identity provider) - the draft preserves the changes instead.
-      if (this.isDirty && !this.saving && !this.$store.state.auth.inProgress) {
+      // Embedded, never block: the component must not interfere with the host
+      // page's navigation (the draft covers unsaved edits there too).
+      if (!this.embedded && this.isDirty && !this.saving && !this.$store.state.auth.inProgress) {
         event.preventDefault();
       }
     },
@@ -441,7 +446,7 @@ export default defineComponent({
           await this.$router.push({ name: 'browse', params: { pathMatch } });
         }
       } catch (error) {
-        this.editorError = getErrorMessage(error, true);
+        this.editorError = getErrorMessage(this.$i18n, error, true);
       } finally {
         this.saving = false;
       }

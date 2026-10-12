@@ -1,5 +1,3 @@
-import { ignoreMetadata } from '../fields.config.js';
-
 const ignoredFields = {
   CatalogLike: [
     // Catalog and Collection fields that are handled directly
@@ -91,7 +89,8 @@ const ignoredFields = {
   ]
 };
 
-export function getIgnoredFields(object, type = null) {
+// ignoreMetadata: the function from the config option of the same name
+export function getIgnoredFields(object, type = null, ignoreMetadata = null) {
   if (type === null && typeof object.getObjectType === 'function') {
     type = object.getObjectType();
   }

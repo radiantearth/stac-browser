@@ -1,7 +1,7 @@
 <template>
   <div class="item" :key="data.id">
     <b-row>
-      <b-col class="left">
+      <b-col class="left" part="resources">
         <WidgetHook id="view-item-primary-start" />
         <section class="mb-4">
           <b-card no-body class="maps-preview">
@@ -19,7 +19,7 @@
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>
-      <b-col class="right">
+      <b-col class="right" part="details">
         <WidgetHook id="view-item-secondary-start" />
         <section class="intro">
           <h2 v-if="data.properties.description">{{ $t('description') }}</h2>
@@ -47,7 +47,6 @@ import Description from '../components/Description.vue';
 import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
-import { addSchemaToDocument, createItemSchema } from '../schema-org';
 import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
@@ -75,22 +74,9 @@ export default defineComponent({
   ],
   computed: {
     ...mapState(['data']),
-    ...mapGetters(['collectionLink', 'parentLink']),
+    ...mapGetters(['collectionLink']),
     ignoredMetadataFields() {
-      return getIgnoredFields(this.data);
-    }
-  },
-  watch: {
-    data: {
-      immediate: true,
-      handler(data) {
-        try {
-          let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
-          addSchemaToDocument(document, schema);
-        } catch (error) {
-          console.error(error);
-        }
-      }
+      return getIgnoredFields(this.data, null, this.$store.state.ignoreMetadata);
     }
   }
 });

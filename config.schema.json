@@ -93,7 +93,7 @@
     },
     "historyMode": {
       "type": "string",
-      "enum": ["history", "hash"],
+      "enum": ["history", "hash", "memory"],
       "buildOnly": true
     },
     "RUNTIME": {
@@ -108,11 +108,20 @@
     "showFavorites": {
       "type": "boolean"
     },
+    "showSidebar": {
+      "type": "boolean"
+    },
     "defaultItemSort": {
       "type": ["string", "null"]
     },
     "defaultCollectionSort": {
       "type": ["string", "null"]
+    },
+    "showKeywordsInItemCards": {
+      "type": "boolean"
+    },
+    "showKeywordsInCatalogCards": {
+      "type": "boolean"
     },
     "showThumbnailsAsAssets": {
       "type": "boolean"
@@ -162,6 +171,12 @@
       "description": "Preferred asset selection strategy: false (show main asset), true (prefer HTTP/S), or asset key name (string)"
     },
     "preprocessSTAC": {
+      "type": "null",
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
+    "ignoreMetadata": {
       "type": "null",
       "format": "function",
       "noCLI": true,

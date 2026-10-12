@@ -110,6 +110,7 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
   - [enforcedColorMode](#enforcedcolormode)
   - [cardViewMode](#cardviewmode)
   - [showFavorites](#showfavorites)
+  - [showSidebar](#showsidebar)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
   - [defaultThumbnailSize](#defaultthumbnailsize)
@@ -130,6 +131,7 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
 - [Service Integration](#service-integration)
   - [socialSharing](#socialsharing)
 - [Advanced](#advanced)
+  - [ignoreMetadata](#ignoremetadata)
   - [preprocessSTAC](#preprocessstac)
   - [requestHeaders](#requestheaders)
   - [requestQueryParameters](#requestqueryparameters)
@@ -210,7 +212,7 @@ This option only applies to catalogs and collections, it never hides items.
 ***build-only option***
 
 This options handles how navigation between two pages is handled in this single-page application.
-There are two options available:
+There are three options available:
 
 #### `history`
 
@@ -232,6 +234,17 @@ This also excludes hosting your STAC catalog in the STAC Browser (sub-)folders.
 If your host/server doesn't support URL rewriting or you experience other related problems, you can enable *hash mode*.
 Either set this option to `hash` in the config file or as environment variable (`SB_historyMode`) when running or building.
 Known hosts that require hash mode are Amazon S3 and GitHub Pages.
+
+#### `memory`
+
+*Memory mode* keeps the navigation history entirely in memory and never reads or writes the browser's URL. This is the
+default when STAC Browser runs as a [web component](./web-component.md), so it does not hijack the address bar of the
+host page it is embedded in.
+
+It is **not recommended for standalone deployments**: because the URL never changes, individual pages can't be
+bookmarked, shared or reloaded, the browser's back/forward buttons don't move between STAC Browser pages, and search
+engines can't crawl beyond the entry page. Use `history` or `hash` for standalone deployments; use `memory` only when
+STAC Browser must not control the page URL.
 
 ### pathPrefix
 
@@ -676,6 +689,12 @@ they are not synchronized across devices or browsers.
 Users can export the favorites to a file and import them elsewhere.
 Set this option to `false` to disable the functionality.
 
+### showSidebar
+
+Enables the sidebar to browse the catalog if set to `true` (default).
+Users can open and close it through the "Browse" button in the header.
+Set this option to `false` to disable the sidebar, which also removes the "Browse" button.
+
 ### showKeywordsInItemCards
 
 Enables keywords in the lists of items if set to `true`. Defaults to `false`.
@@ -841,6 +860,14 @@ The following services are supported:
 - `x` (X, formerly Twitter)
 
 ## Advanced
+
+### ignoreMetadata
+
+A function that changes which fields are hidden in the metadata.
+It receives the entity, the fields hidden by default and the type of the entity, and returns the fields to hide.
+See [Hiding fields](./metadata.md#hiding-fields) for details and an example.
+
+Please note that this option can only be provided through a config file (or the `config` property of the [web component](./web-component.md)) and is not available via CLI/ENV.
 
 ### preprocessSTAC
 

@@ -67,13 +67,13 @@ Below you can find an example of an updated `custom.json` for the German languag
 ## Hiding fields
 
 If you have fields in your STAC metadata that you don't want to show in STAC Browser,
-you can customize this in the file [`fields.config.js`](../fields.config.js) as well.
+you can customize this with the [`ignoreMetadata`](./options.md#ignoremetadata) option in the config.
 
 Some fields are hidden by default, you can check the source code for details:
 [ignored-metadata.js](../src/ignored-metadata.js).
 
 If you want to add or remove fields from the list of ignored fields,
-you can implement a function that updates the list.
+you can implement a function that updates the list and set it as the `ignoreMetadata` option.
 
 The function receives three parameters:
 
@@ -83,10 +83,13 @@ The function receives three parameters:
 
 The function has to return the (updated) fields to ignore in the metadata rendering as a `Array.<string>`.
 
+Up to STAC Browser 5, this function was defined in `fields.config.js`.
+If you did that, move it to the `ignoreMetadata` option in your config.
+
 ### Example
 
 ```js
-const ignoreMetadata = (object, fields, type) => {
+ignoreMetadata: (object, fields, type) => {
   if (object.isCollection) {
     // Show the proj:bbox and proj:geometry fields for Collections (these are ignored by default)
     fields = fields.filter(field => !['proj:bbox', 'proj:geometry'].includes(field));

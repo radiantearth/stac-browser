@@ -101,10 +101,13 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: process.env.CI
     ? {
-        // In CI: Build and serve the production build.
+        // In CI: build and serve the production build. The element bundle is
+        // built alongside the app (coexists via emptyOutDir:false under e2e) and
+        // a host page loading it is emitted so the web-component spec runs
+        // against the built component too.
         // STAC_BROWSER_E2E enables __VUE_PROD_DEVTOOLS__ so tests can introspect
         // the map (see vite.config.js); it does not affect real production builds.
-        command: 'npm run build && npx vite preview --port 4173 --strictPort',
+        command: 'npm run build && npm run build:web-component && node tests/e2e/build-wc-host.mjs && npx vite preview --port 4173 --strictPort',
         env: { ...getEnvWithoutSB(), STAC_BROWSER_E2E: 'true' },
         url: 'http://localhost:4173',
         reuseExistingServer: false,

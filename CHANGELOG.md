@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- STAC Browser can be embedded into any web page, regardless of framework, as a `<stac-browser>` web component
+  (custom element) rendered into an isolated shadow root. See [docs/web-component.md](docs/web-component.md).
+  - Built with `npm run build:web-component` into `stac-browser.js`, `stac-browser.css` and additional code-split chunks in `dist/`; deploy the whole directory
+  - Configurable via a `config` DOM property and via attributes: all config options with a scalar value in kebab-case
+    (e.g. `card-view-mode`, typed per `config.schema.json`), `url` for `catalogUrl`, and `isolation`
+  - Emits `navigate`, `title`, `description`, `locale`, `structuredData` and `error` events so the host page can react
+    and manage its own document head
+  - Exposes `navigate(to)` and `navigateToStac(url)` methods for programmatic navigation by route or STAC URL
+  - Exposes the displayed resource through the `url` and `data` getters and a `data` event
+  - `setData(data, url)` renders custom STAC data without fetching it, e.g. for an editor live preview
+  - Themeable from the host by forwarding Bootstrap CSS custom properties (e.g. `--bs-primary`) into the shadow root;
+    the site header follows the primary color and can be styled independently via `--sb-header` and `--sb-header-color`
+  - `isolation` option: `inline` (default — grows with the host page, overlays span it, and it inherits the host's
+    background/text color/typography) or `isolated` (iframe-like — owns its scroll viewport, contains overlays within
+    its box, and styles itself; requires a fixed height)
+  - Widget hooks are available as native slots, so the host page can show its own content in them
+  - Exports the `Registry` of stac-fields, so the host page can register its own metadata fields
+  - Exposes the main elements as CSS parts and the current page as a custom state, e.g. `stac-browser:state(item)::part(header)`
+- New `memory` value for the `historyMode` option that keeps navigation entirely in memory without touching the
+  browser URL (the default in the web component; not recommended for standalone deployments)
+- New config option `showSidebar` to disable the sidebar and its "Browse" button
 - New config option `basemaps` to customize the basemaps via JSON without code changes,
   e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
 - Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:
@@ -16,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML
+
+### Changed
+
+- The function to hide metadata fields moved from `fields.config.js` to the new config option `ignoreMetadata`
 
 ### Removed
 
@@ -25,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Options set at runtime (via `runtime-config.js`) are no longer overwritten with build-time defaults
   for options with non-null primitive defaults (e.g. `detectLocaleFromBrowser`, `cardViewMode`)
+- The options `showKeywordsInItemCards` and `showKeywordsInCatalogCards` were missing in the config schema,
+  so they were not parsed as booleans when set via `SB_*` environment variables
 - Dark-mode basemap variants (e.g. `earth-dark`) are now found when `ssys:targets` uses different casing (e.g. `Earth`)
 - Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
   both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed
