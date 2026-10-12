@@ -339,7 +339,6 @@
     "arrayOverlapsDescription": "El arreglo contiene al menos uno de los valores especificados",
     "between": "entre",
     "betweenOperatorDescription": "Prueba si el valor de un campo numérico está dentro del rango indicado. El rango es inclusivo.",
-    "collectionsRequired": "",
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "El filtro está desactivado porque la colección tiene una única fecha y hora como extensión temporal.",
     "droppedFilters": "Los siguientes filtros no están soportados aquí y fueron eliminados: {filters}.",
