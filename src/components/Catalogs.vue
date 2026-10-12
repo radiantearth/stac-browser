@@ -141,8 +141,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['defaultCollectionSort', 'uiLanguage']),
-    ...mapGetters(['isExternalContext', 'searchBrowserLink', 'supportsConformance']),
+    ...mapState(['data', 'defaultCollectionSort', 'uiLanguage']),
+    ...mapGetters(['searchBrowserLink', 'supportsConformance']),
     ...mapGetters(['getStac']),
     advancedSearchLink() {
       if (!this.canSearchFreeText || !this.searchBrowserLink) {
@@ -155,7 +155,7 @@ export default defineComponent({
       return URI(this.searchBrowserLink).query(query).toString();
     },
     canSearchFreeText() {
-      return this.apiSearch && !this.isExternalContext && this.supportsConformance(TYPES.Collections.FreeText);
+      return this.apiSearch && this.supportsConformance(TYPES.Collections.FreeText, this.data);
     },
     catalogCount() {
       if (this.catalogs.length !== this.catalogView.length) {

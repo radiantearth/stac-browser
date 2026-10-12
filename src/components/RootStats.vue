@@ -35,7 +35,7 @@
 
 <script>
 import { formatKey } from "@radiantearth/stac-fields/helper";
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import Url from './Url.vue';
 import { isObject, size } from 'stac-js/src/utils.js';
 import { defineAsyncComponent } from 'vue';
@@ -47,8 +47,7 @@ export default {
     Url
   },
   computed: {
-    ...mapState(['conformsTo']),
-    ...mapGetters(['root']),
+    ...mapGetters(['conformsTo', 'root']),
     rootUrl() {
       return this.root ? this.root.getAbsoluteUrl() : null;
     },

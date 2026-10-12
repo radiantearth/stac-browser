@@ -142,7 +142,6 @@ function getStore(config, router) {
   const catalogDefaults = () => ({
     queue: [],
     privateQueryParameters: {},
-    conformsTo: [],
     dataLanguage: null,
 
     apiCollections: [],
@@ -204,6 +203,7 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
+      conformance: {}, // Conformance classes by URL of the API landing page
       // Loading object (when loading the first page) or an object with the props
       // type, list, prev, next and optionally loading (a Loading object when loading another page)
       apiChildren: {},
@@ -339,8 +339,38 @@ function getStore(config, router) {
 
         return null;
       },
-      // The conformance classes only apply to the configured (or selected) catalog itself.
-      // If a context (a STAC entity or a URL) is given, reports false for external content.
+      // The conformance classes of the configured (or selected) catalog
+      conformsTo: (state, getters) => getters.getConformanceClasses(),
+      // The conformance classes of the API landing page that a context (a STAC entity or a URL) belongs to.
+      // Falls back to the conformance classes of the configured (or selected) catalog.
+      getConformanceClasses: (state, getters) => (context = null) => {
+        const urls = Object.keys(state.conformance);
+        const find = url => {
+          const key = urls.find(k => Utils.equalUrl(k, url));
+          return key ? state.conformance[key] : null;
+        };
+        const rootClasses = (state.catalogUrl && find(state.catalogUrl)) || [];
+        if (!context?.isSTAC && !hasText(context) && !(context instanceof urijs)) {
+          return rootClasses;
+        }
+        const stac = getters.getStac(context.isSTAC ? context : String(context));
+        const url = stac ? stac.getAbsoluteUrl() : toAbsolute(String(context), state.url);
+        const rootLink = stac?.getStacLinkWithRel('root');
+        const candidates = [url, rootLink?.getAbsoluteUrl()];
+        for (const candidate of candidates) {
+          const classes = hasText(candidate) && find(candidate);
+          if (classes) {
+            return classes;
+          }
+        }
+        // Context not loaded (yet), e.g. an API endpoint: use the closest landing page above it
+        const parentUrl = urls
+          .filter(k => url.startsWith(Utils.removeTrailingSlash(k) + '/'))
+          .sort((a, b) => b.length - a.length)[0];
+        return parentUrl ? state.conformance[parentUrl] : rootClasses;
+      },
+      // If a context (a STAC entity or a URL) is given, uses the conformance classes of its API.
+      // External content reports false, see https://github.com/radiantearth/stac-browser/pull/988
       supportsConformance: (state, getters) => (classes, context = null) => {
         if (!Array.isArray(classes)) {
           return classes;
@@ -355,7 +385,7 @@ function getStore(config, router) {
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
         let regexp = new RegExp(`^(${classRegexp})$`);
-        return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
+        return Boolean(getters.getConformanceClasses(context).find(uri => uri.match(regexp)));
       },
 
       canSearch: (state, getters) => {
@@ -697,6 +727,7 @@ function getStore(config, router) {
       clear(state, url) {
         delete state.database[url];
         delete state.apiChildren[url];
+        delete state.conformance[url];
       },
       resetCatalog(state, clearAll) {
         cancelPendingShows();
@@ -709,6 +740,7 @@ function getStore(config, router) {
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
           state.database = {};
+          state.conformance = {};
           state.apiChildren = {};
           state.manager.permissions = {};
           // Don't leak search filters (incl. CQL built against the previous
@@ -756,9 +788,9 @@ function getStore(config, router) {
       removeFromQueue(state, num) {
         state.queue.splice(0, num);
       },
-      setConformanceClasses(state, classes) {
+      setConformanceClasses(state, { url, classes }) {
         if (Array.isArray(classes)) {
-          state.conformsTo = classes;
+          state.conformance[url] = classes;
         }
       },
       setApiItemsLink(state, link) {
@@ -1051,10 +1083,10 @@ function getStore(config, router) {
             // Handle conformance classes
             let conformanceLink = data.getStacLinkWithRel('conformance');
             if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
-              cx.commit('setConformanceClasses', data.conformsTo);
+              cx.commit('setConformanceClasses', { url, classes: data.conformsTo });
             }
             else if (conformanceLink) {
-              await cx.dispatch('loadOgcApiConformance', conformanceLink);
+              await cx.dispatch('loadOgcApiConformance', { url, link: conformanceLink });
             }
           } catch (error) {
             console.error(error);
@@ -1342,10 +1374,10 @@ function getStore(config, router) {
           }
         }
       },
-      async loadOgcApiConformance(cx, link) {
+      async loadOgcApiConformance(cx, { url, link }) {
         let response = await cx.dispatch('request', { link });
         if (isObject(response.data) && Array.isArray(response.data.conformsTo)) {
-          cx.commit('setConformanceClasses', response.data.conformsTo);
+          cx.commit('setConformanceClasses', { url, classes: response.data.conformsTo });
         }
       },
       async altDownload(cx, args) {

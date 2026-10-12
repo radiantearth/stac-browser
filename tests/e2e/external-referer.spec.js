@@ -279,4 +279,70 @@ test.describe('External content indicators and conformance scoping', () => {
     await expect(page.getByRole('heading', { name: /External API A/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /^search$/i })).toHaveAttribute('href', '/search');
   });
+
+  test('does not apply the search capabilities of the selected catalog to external APIs', async ({ page, worker }) => {
+    // The selected catalog is an API that requires collections in the item search,
+    // one of its collections links to another API that supports item search
+    const main = API.defaultApi({ url: 'https://main.example/api/' });
+    main.root.addConformsTo('https://api.stacspec.org/v1.0.0/item-search#require-collections');
+    const mainCollection = main.addCollection('main-collection').setMetadata({ title: 'Main Collection' });
+    const apiA = API.defaultApi({ url: 'https://external-a.example/api/' });
+    apiA.root.setMetadata({ id: 'external-a', title: 'External API A' });
+    apiA.addCollection('collection-a');
+    mainCollection.addLink({ rel: 'child', href: apiA.root.getAbsoluteUrl(), type: 'application/json', title: 'External API A' });
+
+    await main.createServer(worker);
+    await apiA.createServer(worker, { reset: false });
+    await configureBrowser(page, { catalogUrl: null });
+
+    await test.step('Navigate from the selected catalog to the external API', async () => {
+      await page.goto(main.root.getBrowserPath());
+      await waitForBrowserReady(page);
+      await page.getByRole('link', { name: /Main Collection/ }).first().click();
+      await waitForBrowserReady(page);
+      await page.getByRole('link', { name: /External API A/ }).first().click();
+      await waitForBrowserReady(page);
+      await expect(page.getByRole('heading', { name: /External API A/ })).toBeVisible();
+    });
+
+    await test.step('The search button leads to the search of the selected catalog', async () => {
+      await expect(page.getByRole('button', { name: /^search$/i })).toHaveAttribute('href', main.root.getSearchPath());
+    });
+
+    await test.step('The search page does not offer a search for the external API', async () => {
+      // Navigate within the app so that the selected catalog is kept
+      await page.evaluate((path) => {
+        document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+      }, apiA.root.getSearchPath());
+      await expect(page.getByText('Item Search is not supported by the API.')).toBeVisible();
+    });
+  });
+
+  test('keeps the conformance classes of the catalog after visiting an external API', async ({ page, worker }) => {
+    // Only the catalog supports sorting for item lists
+    const main = API.defaultApi({ url: 'https://main.example/api/' });
+    main.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features#sort');
+    const mainCollection = main.addCollection('main-collection').setMetadata({ title: 'Main Collection' });
+    main.addItem(mainCollection, 'item-1');
+    const apiA = API.defaultApi({ url: 'https://external-a.example/api/' });
+    apiA.root.setMetadata({ id: 'external-a', title: 'External API A' });
+    apiA.addCollection('collection-a');
+    mainCollection.addLink({ rel: 'child', href: apiA.root.getAbsoluteUrl(), type: 'application/json', title: 'External API A' });
+
+    await main.createServer(worker);
+    await apiA.createServer(worker, { reset: false });
+    await configureBrowser(page, { catalogUrl: 'https://main.example/api/' });
+
+    await page.goto('/collections/main-collection');
+    await waitForBrowserReady(page);
+    await page.getByRole('link', { name: /External API A/ }).first().click();
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /External API A/ })).toBeVisible();
+
+    await backButton(page).click();
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /Main Collection/ })).toBeVisible();
+    await page.locator('[aria-controls="itemFilter"]').click();
+    await expect(page.locator('#itemFilter .sort')).toBeVisible();
+  });
 });

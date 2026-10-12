@@ -181,7 +181,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
     ...mapState({
       allowExternalAccessFromVueX: 'allowExternalAccess',
       showFavoritesFromVueX: 'showFavorites',
@@ -194,7 +194,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'conformsTo', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
