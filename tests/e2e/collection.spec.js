@@ -9,6 +9,7 @@ import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js
 import { commitToStore } from '../helpers/store.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
+import Queryables from '../fixtures/builders/queryables.js';
 
 test.describe('Collection Metadata', () => {
   function createStaticCatalog() {
@@ -380,6 +381,47 @@ test.describe('STAC Collection item search', () => {
     // Changing the sort direction is an unapplied change
     await page.locator('.sort').getByTitle(/ascending order/i).click();
     await expect(page.getByTitle(/changes have not been applied/i)).toBeVisible();
+  });
+
+  test('sortables without title get translated labels that follow language switches', async ({ page, worker }) => {
+    const { api, collection } = createAPIWithSearch();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features#sort');
+    // Serve the sortables through the generic JSON Schema endpoint builder
+    const sortables = new Queryables(api);
+    sortables.url = `collections/${collection.id}/sortables`;
+    sortables.data.properties = {
+      'properties.datetime': { type: 'string' },
+      'properties.eo:cloud_cover': { type: 'number' }
+    };
+    api.endpoints.push(sortables);
+    collection.addLink({
+      rel: 'http://www.opengis.net/def/rel/ogc/1.0/sortables',
+      href: sortables.getAbsoluteUrl(),
+      type: 'application/schema+json'
+    });
+    await api.createServer(worker);
+    await page.goto(api.root.getBrowserPath());
+    await commitToStore(page, 'config', { defaultItemSort: '-properties.datetime' });
+    await page.evaluate((path) => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+    }, collection.getBrowserPath());
+    await expect(page.getByRole('heading', { name: collection.getMetadata().title })).toBeVisible();
+
+    await page.getByRole('button', { name: /show filters/i }).click();
+    const sortSelect = page.locator('.sort .multiselect');
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Time of Data');
+    await sortSelect.locator('.multiselect__select').click();
+    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Default', 'Cloud Cover', 'Time of Data']);
+    await sortSelect.locator('input.multiselect__input').press('Escape');
+
+    await page.evaluate(() => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$store.dispatch('switchLocale', { locale: 'de' });
+    });
+    // Both the selected option and the list of options are translated
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Zeitstempel der Daten');
+    await sortSelect.locator('.multiselect__select').click();
+    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Standardeinstellung', 'Wolkenbedeckung', 'Zeitstempel der Daten']);
+    await expect(page.getByTitle(/nicht angewendet/i)).toHaveCount(0);
   });
 
   test('changing limit should result in the according number of items rendered', async ({ page, worker }) => {

@@ -395,9 +395,13 @@ export default defineComponent({
     sortOptions() {
       // Use sortables from API if available
       if (Array.isArray(this.sortables) && this.sortables.length > 0) {
+        const collator = new Intl.Collator(this.uiLanguage);
+        const sortables = this.sortables
+          .map(({ value, title }) => ({ value, text: title || formatPropertyKey(value) }))
+          .sort((a, b) => collator.compare(a.text, b.text));
         return [
           { text: this.$t('default'), value: null },
-          ...this.sortables
+          ...sortables
         ];
       }
       // Fallback: provide reasonable defaults when sortables are not available
@@ -606,6 +610,13 @@ export default defineComponent({
         this.commitToVuex('bbox', this.bbox);
       }
     },
+    sortOptions(options) {
+      // Keep the label of the selected option up to date, e.g. after a language switch
+      const option = this.sortTerm && options.find(o => o.value === this.sortTerm.value);
+      if (option) {
+        this.sortTerm = option;
+      }
+    },
     sortTerm() {
       this.commitToVuex('sortby', this.formatSort());
     },
@@ -765,13 +776,7 @@ export default defineComponent({
       }
       this.sortables = [];
       const sortables = await fetchSchemaProperties(this.$store, link);
-      const collator = new Intl.Collator(this.uiLanguage);
-      this.sortables = sortables
-        .map(([key, schema]) => ({
-          value: key,
-          text: schema.title || formatPropertyKey(key)
-        }))
-        .sort((a, b) => collator.compare(a.text, b.text));
+      this.sortables = sortables.map(([key, schema]) => ({ value: key, title: schema.title }));
     },
     buildFilter() {
       if (this.filters.length === 0) {
