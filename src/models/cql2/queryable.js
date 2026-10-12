@@ -1,8 +1,19 @@
+import { Fields } from "@radiantearth/stac-fields";
 import { formatKey } from "@radiantearth/stac-fields/helper";
-import i18n from '../../i18n.js';
+import i18n, { translateFields } from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual, CqlBetween, CqlLike } from "./operators/comparison";
 import { CqlIn, CqlArrayOverlaps, CqlArrayContains, CqlArrayEquals, CqlArrayContainedBy } from "./operators/array";
 import { isObject } from "stac-js/src/utils.js";
+
+// Uses the translated stac-fields labels for well-known fields, e.g. properties.datetime
+export function formatPropertyKey(key) {
+  const field = key.replace(/^properties\./, '');
+  const label = Fields.metadata[field]?.label;
+  if (typeof label === 'string') {
+    return translateFields(label);
+  }
+  return formatKey(field);
+}
 
 export default class Queryable {
   constructor(id, schema) {
@@ -14,7 +25,7 @@ export default class Queryable {
     if (typeof this.schema.title === 'string') {
       return this.schema.title;
     }
-    return formatKey(this.id);
+    return formatPropertyKey(this.id);
   }
 
   get description() {

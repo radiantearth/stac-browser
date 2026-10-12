@@ -6,6 +6,7 @@
  */
 import { test, expect } from './fixtures.js';
 import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
+import { commitToStore } from '../helpers/store.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -359,6 +360,28 @@ test.describe('STAC Collection item search', () => {
     await expect(await page.getByPlaceholder(/select date range/i)).toBeVisible();
   });
     
+  test('configured default sort is not reported as unapplied filter change', async ({ page, worker }) => {
+    const { api, collection } = createAPIWithSearch();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features#sort');
+    await api.createServer(worker);
+    await page.goto(api.root.getBrowserPath());
+    await commitToStore(page, 'config', { defaultItemSort: '-properties.datetime' });
+    // Navigate within the app so that the configured default sort is kept
+    await page.evaluate((path) => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+    }, collection.getBrowserPath());
+    await expect(page.getByRole('heading', { name: collection.getMetadata().title })).toBeVisible();
+
+    await page.getByRole('button', { name: /show filters/i }).click();
+    // The default sort is pre-selected in the form
+    await expect(page.locator('.sort .multiselect')).toContainText('Time of Data');
+    await expect(page.getByTitle(/changes have not been applied/i)).toHaveCount(0);
+
+    // Changing the sort direction is an unapplied change
+    await page.locator('.sort').getByTitle(/ascending order/i).click();
+    await expect(page.getByTitle(/changes have not been applied/i)).toBeVisible();
+  });
+
   test('changing limit should result in the according number of items rendered', async ({ page, worker }) => {
     const { api, collection } = createAPIWithSearch();
     await api.createServer(worker);

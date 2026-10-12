@@ -195,10 +195,10 @@ import Loading from './Loading.vue';
 import { CollectionCollection, STAC } from 'stac-js'; 
 import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
+import { formatPropertyKey } from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { fetchQueryablesForLink, fetchSchemaProperties } from '../store/utils';
 import { FILTER_FIELDS } from '../store/modules/search';
-import { formatKey } from '@radiantearth/stac-fields/helper';
 
 function getDefaults() {
   return {
@@ -769,7 +769,7 @@ export default defineComponent({
       this.sortables = sortables
         .map(([key, schema]) => ({
           value: key,
-          text: schema.title || formatKey(key)
+          text: schema.title || formatPropertyKey(key)
         }))
         .sort((a, b) => collator.compare(a.text, b.text));
     },

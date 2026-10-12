@@ -143,13 +143,14 @@ export default defineComponent({
       if ((draft.filters || null) !== (applied.filters || null)) {
         return true;
       }
-      const normalize = (value) => {
+      const normalize = (key, value) => {
         if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
-          return null;
+          // Requests without sortby are sorted by the configured default sort
+          return key === 'sortby' ? (this.defaultItemSort || null) : null;
         }
         return value;
       };
-      return FILTER_FIELDS.some(key => JSON.stringify(normalize(draft[key])) !== JSON.stringify(normalize(applied[key])));
+      return FILTER_FIELDS.some(key => JSON.stringify(normalize(key, draft[key])) !== JSON.stringify(normalize(key, applied[key])));
     },
     canFilter() {
       // Filtering requires the parent STAC entity, e.g. for the queryables
