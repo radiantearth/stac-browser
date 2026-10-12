@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Links with the relation type `source_for` open in STAC Browser
 - Filters: Sortables and queryables without a title show translated labels for common fields (e.g. `properties.datetime`)
 
+### Changed
+
+- Filters: The "Default" sort option shows the configured default sort (e.g. "Default (Time of Data, Descending)") instead of pre-selecting it
+
 ### Fixed
 
 - Item filters from the global search that a collection doesn't support (e.g. item IDs or free text) are no longer sent with its item filter or reported as unapplied changes
