@@ -133,23 +133,25 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultItemSort', 'uiLanguage']),
-    ...mapGetters('search', ['itemSearchParams']),
+    ...mapGetters('search', ['requestParams']),
     hasUnappliedChanges() {
       // The badge reflects the filters applied to the shown items (apiFilters);
       // the form state in the store may have been changed without submitting.
-      const draft = this.itemSearchParams || {};
+      // Filters that the items endpoint doesn't support are neither shown nor applied.
+      const draft = this.requestParams('Items', this.stac);
       const applied = this.apiFilters || {};
       // CQL filters are only rebuilt on submit, compare them by reference
       if ((draft.filters || null) !== (applied.filters || null)) {
         return true;
       }
-      const normalize = (value) => {
+      const normalize = (key, value) => {
         if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
-          return null;
+          // Requests without sortby are sorted by the configured default sort
+          return key === 'sortby' ? (this.defaultItemSort || null) : null;
         }
         return value;
       };
-      return FILTER_FIELDS.some(key => JSON.stringify(normalize(draft[key])) !== JSON.stringify(normalize(applied[key])));
+      return FILTER_FIELDS.some(key => JSON.stringify(normalize(key, draft[key])) !== JSON.stringify(normalize(key, applied[key])));
     },
     canFilter() {
       // Filtering requires the parent STAC entity, e.g. for the queryables

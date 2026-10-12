@@ -129,7 +129,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'defaultSort', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -212,7 +212,7 @@ export default defineComponent({
           fetchSortables: (stac) => fetchSortablesForLink(this.$store, stac?.getSortablesLink?.()),
           targetType: 'Global',
         });
-        this.itemFilters = this.$store.getters['search/itemSearchParams'];
+        this.itemFilters = this.$store.getters['search/requestParams']('Global', this.parent);
       }
       // Restore the previous results for this tab, e.g. when the user returns
       // to the Search page after visiting a result
@@ -231,11 +231,6 @@ export default defineComponent({
     }
   },
   async created() {
-    // Continue with the persisted search filters, e.g. when the user returns
-    // to the Search page after visiting a result
-    this.collectionFilters = this.$store.getters['search/collectionSearchParams'];
-    this.itemFilters = this.$store.getters['search/itemSearchParams'];
-
     let url = this.catalogUrl;
     if (this.loadParent) {
       url = this.fromBrowserPath(this.loadParent);
@@ -252,6 +247,11 @@ export default defineComponent({
       this.parent = this.getStac(url);
       this.showPage();
     }
+
+    // Continue with the persisted search filters, e.g. when the user returns
+    // to the Search page after visiting a result
+    this.collectionFilters = this.$store.getters['search/requestParams']('Collections', this.parent);
+    this.itemFilters = this.$store.getters['search/requestParams']('Global', this.parent);
 
     // We had this initially in a watcher with immediate: true, but this was executed too early.
     // Thus we only apply it once when creating the component and then on any subsequent change.
@@ -302,7 +302,8 @@ export default defineComponent({
       this.loading = true;
 
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
+        const sort = this.defaultSort(this.isCollectionSearch ? 'Collections' : 'Global', this.parent);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage, sort);
       
         const response = await this.$store.dispatch('request', { link: this.link });
         if (response) {
