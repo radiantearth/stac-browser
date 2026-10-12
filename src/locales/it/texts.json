@@ -339,6 +339,7 @@
     "arrayOverlapsDescription": "L'array contiene almeno uno dei valori specificati",
     "between": "tra",
     "betweenOperatorDescription": "Verifica se un valore di campo numerico si trova all'interno dell'intervallo specificato. L'intervallo dato è inclusivo.",
+    "collectionsRequired": "Seleziona almeno una collezione per cercare elementi.",
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "disabledDueToSingleDate": "Questo filtro è disabilitato perché la collezione ha una singola data e ora come estensione temporale.",
     "droppedFilters": "I seguenti filtri non sono supportati e sono stati rimossi: {filters}.",
