@@ -47,12 +47,12 @@ export default {
     Url
   },
   computed: {
-    ...mapGetters(['conformsTo', 'root']),
+    ...mapGetters(['getConformanceClasses', 'root']),
     rootUrl() {
       return this.root ? this.root.getAbsoluteUrl() : null;
     },
     hasConformances() {
-      return Array.isArray(this.conformsTo) && this.conformsTo.length > 0;
+      return this.getConformanceClasses().length > 0;
     },
     conformances() {
       if (!this.hasConformances) {
@@ -63,7 +63,7 @@ export default {
         STAC: {},
         Other: {} 
       };
-      for(let uri of this.conformsTo) {
+      for(let uri of this.getConformanceClasses()) {
         let confClass =  this.parseConformance(uri);
         obj[confClass.type][uri] = confClass;
       }

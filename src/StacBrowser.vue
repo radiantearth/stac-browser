@@ -194,7 +194,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'conformsTo', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'getConformanceClasses', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -225,7 +225,7 @@ export default defineComponent({
     },
     isApi() {
       // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
-      return Array.isArray(this.conformsTo) && this.conformsTo.length > 0;
+      return this.getConformanceClasses().length > 0;
     },
     serviceType() {
       return this.isApi ? this.$t('index.api') : this.$t('index.catalog');

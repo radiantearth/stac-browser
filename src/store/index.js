@@ -339,8 +339,6 @@ function getStore(config, router) {
 
         return null;
       },
-      // The conformance classes of the configured (or selected) catalog
-      conformsTo: (state, getters) => getters.getConformanceClasses(),
       // The conformance classes of the API landing page that a context (a STAC entity or a URL) belongs to.
       // Falls back to the conformance classes of the configured (or selected) catalog.
       getConformanceClasses: (state, getters) => (context = null) => {
