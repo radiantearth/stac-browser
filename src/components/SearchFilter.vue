@@ -369,7 +369,8 @@ export default defineComponent({
       return this.activeFilterSet?.filterLogic || null;
     },
     canSearchCollectionsFreeText() {
-      return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
+      return this.canSearchCollections(this.conformanceContext)
+        && this.supportsConformance(TYPES.Collections.FreeText, this.conformanceContext);
     },
     ids() {
       let obj = {};
