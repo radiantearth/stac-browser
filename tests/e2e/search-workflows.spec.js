@@ -292,6 +292,50 @@ test.describe('Search filter carry-over workflows', () => {
     });
   });
 
+  test('Item filters that a collection does not support are kept, but neither applied nor reported there', async ({ page }) => {
+    await goToSearch(page, BROWSER_PATH);
+
+    await test.step('Execute an item search with filters the collections do not support', async () => {
+      await page.getByRole('tab', { name: /search for items/i }).click();
+      await waitForBrowserReady(page);
+      await addItemIdTerm(page, 'example-item-1');
+      // The collection search form in the other tab is hidden
+      const freeText = page.locator('.filter-freetext:visible .multiselect');
+      await freeText.locator('.multiselect__tags').click();
+      await freeText.locator('input.multiselect__input').fill('sentinel');
+      await freeText.locator('input.multiselect__input').press('Enter');
+      await page.getByRole('button', { name: /submit/i }).click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Browse into a collection — no unapplied changes are indicated', async () => {
+      await page.getByRole('button', { name: /^browse$/i }).click();
+      await waitForBrowserReady(page);
+      await navigateIntoCollection(page, 'Alpha Collection');
+      const toggle = page.getByRole('button', { name: /show filters/i });
+      await expect(toggle).toBeVisible();
+      await expect(toggle.locator('.badge', { hasText: '!' })).toHaveCount(0);
+    });
+
+    await test.step('Submit the item filter — the unsupported filters are not sent', async () => {
+      await page.getByRole('button', { name: /show filters/i }).click();
+      const request = page.waitForRequest(r => r.url().includes('/collections/alpha/items'));
+      await page.getByRole('button', { name: /submit/i }).click();
+      const url = new URL((await request).url());
+      expect(url.searchParams.has('ids')).toBe(false);
+      expect(url.searchParams.has('q')).toBe(false);
+    });
+
+    await test.step('Return to the item search — the filters are still there', async () => {
+      await page.getByRole('button', { name: /^search$/i }).click();
+      await waitForBrowserReady(page);
+      await page.getByRole('tab', { name: /search for items/i }).click();
+      await waitForBrowserReady(page);
+      await expect(page.locator('.filter-item-id .multiselect__tag').filter({ hasText: 'example-item-1' })).toBeVisible();
+      await expect(page.locator('.filter-freetext:visible .multiselect__tag').filter({ hasText: 'sentinel' })).toBeVisible();
+    });
+  });
+
   test('Executing an own item search stops the carry-over on further navigation', async ({ page }) => {
     await goToCollectionSearchTab(page, BROWSER_PATH);
 

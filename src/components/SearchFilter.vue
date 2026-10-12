@@ -275,7 +275,7 @@ export default defineComponent({
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapState('search', ['droppedFilters']), 
     ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
-    ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
+    ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams', 'requestParams']),
     droppedFilterNames() {
       const labels = {
         freeText: () => this.$t('search.freeText'),
@@ -349,10 +349,15 @@ export default defineComponent({
     },
     codeExampleQuery() {
       return {
-        ...this.activeParams,
+        ...this.supportedParams,
         sortby: this.formatSort(),
-        filters: this.buildFilter()
+        filters: this.cql ? this.buildFilter() : null
       };
+    },
+    // The filters of the form that the API supports for this search, which may
+    // be fewer than in the store, as the item searches share their filters
+    supportedParams() {
+      return this.requestParams(this.type, this.conformanceContext);
     },
     activeParams() {
       const params = this.type === 'Collections' 
@@ -816,7 +821,9 @@ export default defineComponent({
         return;
       }
       this.commitToVuex('sortby', this.formatSort());
-      this.commitToVuex('filters', this.buildFilter());
+      if (this.cql) {
+        this.commitToVuex('filters', this.buildFilter());
+      }
       // Copy the rows so that later form edits don't mutate the store state
       this.commitToVuex('rawFilters', this.filters.map(f => ({ ...f })));
       this.commitToVuex('filterLogic', {
@@ -826,7 +833,7 @@ export default defineComponent({
       // Executing a search retires the notice about the previous carry-over
       this.$store.commit('search/clearDroppedFilters', this.type);
 
-      this.$emit('input', this.activeParams);
+      this.$emit('input', this.supportedParams);
     },
     onReset() {
       Object.assign(this, getDefaults());
@@ -838,7 +845,7 @@ export default defineComponent({
       }
       // The notice about the carry-over refers to a state that was just discarded
       this.$store.commit('search/clearDroppedFilters', this.type);
-      this.$emit('input', this.activeParams, true);
+      this.$emit('input', this.supportedParams, true);
     },
     addSearchTerm(term) {
       if (!hasText(term)) {

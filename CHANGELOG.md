@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Item filters from the global search that a collection doesn't support (e.g. item IDs or free text) are no longer sent with its item filter or reported as unapplied changes
 - Icons, logos and card thumbnails that fail to load are hidden
 - A page that is still loading no longer replaces the page that was navigated to in the meantime
 - "Search" on external content opens the search of the catalog instead of an error page
