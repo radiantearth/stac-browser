@@ -129,7 +129,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
-    ...mapGetters(['getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -146,10 +146,10 @@ export default defineComponent({
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
     collectionSearch() {
-      return this.parent && this.supportsConformance(TYPES.Collections.BasicFilters, this.parent) && this.parent.getApiCollectionsLink();
+      return this.parent && this.canSearchCollections(this.parent) && this.parent.getApiCollectionsLink();
     },
     itemSearch() {
-      return this.parent && this.supportsConformance(TYPES.Global.BasicFilters, this.parent) && this.parent.getSearchLink();
+      return this.parent && this.canSearchItems(this.parent) && this.parent.getSearchLink();
     },
     results() {
       return this.data?.getAll() || [];

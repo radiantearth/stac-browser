@@ -359,13 +359,13 @@ function getStore(config, router) {
       },
 
       canSearch: (state, getters) => {
-        return getters.canSearchCollections || getters.canSearchItems;
+        return getters.canSearchCollections() || getters.canSearchItems();
       },
-      canSearchItems: (state, getters) => {
-        return getters.supportsConformance(TYPES.Global.BasicFilters);
+      canSearchItems: (state, getters) => (context = null) => {
+        return getters.supportsConformance(TYPES.Global.BasicFilters, context);
       },
-      canSearchCollections: (state, getters) => {
-        return getters.supportsConformance(TYPES.Collections.BasicFilters);
+      canSearchCollections: (state, getters) => (context = null) => {
+        return getters.supportsConformance(TYPES.Collections.BasicFilters, context);
       },
       searchBrowserLink: (state, getters) => {
         if (!getters.canSearch) {
