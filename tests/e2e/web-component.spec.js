@@ -746,4 +746,23 @@ test.describe('<stac-browser> web component', () => {
 
     await expect(page.locator(`stac-browser a.btn[href="${assetUrl}"]`)).toBeVisible();
   });
+  test('shows data set via setData() also with request query parameters', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      el.config = { requestQueryParameters: { apikey: 'abc' } };
+      document.querySelector('main').replaceChildren(el);
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // A URL in the catalog that doesn't exist on the server, e.g. for a live preview
+    await page.locator('stac-browser').evaluate((el) => el.setData({
+      type: 'Collection', stac_version: '1.0.0', id: 'draft', title: 'Draft Collection', description: 'Draft', license: 'CC0-1.0', links: [],
+      extent: { spatial: { bbox: [[-10, -10, 10, 10]] }, temporal: { interval: [[null, null]] } }
+    }, 'https://stac.example/wc/draft/collection.json'));
+    await expect(page.getByRole('heading', { name: 'Draft Collection', level: 1 })).toBeVisible();
+  });
 });

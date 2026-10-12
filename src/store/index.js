@@ -967,7 +967,8 @@ function getStore(config, router, i18n) {
       // web component's setData; re-injecting an already shown URL refreshes it.
       // eslint-disable-next-line require-await
       async injectData(cx, { data, url }) {
-        url = toAbsolute(url, cx.state.url);
+        // Same URL (incl. query parameters) as for the route, so that load() finds it in the cache
+        url = cx.getters.getRequestUrl(url, null, true);
         // Convert before clearing: if migration/preprocessing throws, the URL's
         // existing cache entry stays intact.
         const stac = createSTAC(data, url, cx);
