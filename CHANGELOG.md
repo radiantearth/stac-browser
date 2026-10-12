@@ -15,8 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A page that is still loading no longer replaces the page that was navigated to in the meantime
-- The search no longer applies the search capabilities of the catalog to external APIs, which led to an error page when clicking "Search" on external content
-- After visiting another API, the catalog keeps its own capabilities (e.g. search, sorting and filters) instead of taking over those of the other API
+- "Search" on external content opens the search of the catalog instead of an error page
+- The catalog keeps its capabilities (e.g. search, sorting, filters) after visiting external content
 - Maps showing multiple Items now send the configured authentication (headers and query parameters) and apply the source/layer customizations and `maxDisplayPixels` for each Item
 - The `crossOriginMedia` option now applies to images on maps
 - The fallback description in the structured data (JSON-LD) shows the catalog title instead of "undefined"
