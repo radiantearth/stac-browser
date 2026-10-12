@@ -273,7 +273,7 @@ export default defineComponent({
     ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapState('search', ['droppedFilters']), 
     ...mapGetters(['canSearchCollections', 'defaultSort', 'getApiChildren', 'supportsConformance']),
-    ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
+    ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams', 'requestParams']),
     droppedFilterNames() {
       const labels = {
         freeText: () => this.$t('search.freeText'),
@@ -347,10 +347,15 @@ export default defineComponent({
     },
     codeExampleQuery() {
       return {
-        ...this.activeParams,
-        sortby: this.activeParams.sortby || this.defaultSortby,
+        ...this.supportedParams,
+        sortby: this.supportedParams.sortby || this.defaultSortby,
         filters: this.buildFilter()
       };
+    },
+    // The filters of the form that the API supports for this search, which may
+    // be fewer than in the store, as the item searches share their filters
+    supportedParams() {
+      return this.requestParams(this.type, this.conformanceContext);
     },
     activeParams() {
       const params = this.type === 'Collections' 
@@ -835,7 +840,7 @@ export default defineComponent({
       // Executing a search retires the notice about the previous carry-over
       this.$store.commit('search/clearDroppedFilters', this.type);
 
-      this.$emit('input', this.activeParams);
+      this.$emit('input', this.supportedParams);
     },
     onReset() {
       Object.assign(this, getDefaults());
@@ -846,7 +851,7 @@ export default defineComponent({
       }
       // The notice about the carry-over refers to a state that was just discarded
       this.$store.commit('search/clearDroppedFilters', this.type);
-      this.$emit('input', this.activeParams, true);
+      this.$emit('input', this.supportedParams, true);
     },
     addSearchTerm(term) {
       if (!hasText(term)) {

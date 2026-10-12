@@ -268,7 +268,7 @@ export default defineComponent({
             targetType: 'Items',
           });
 
-          this.filters = this.$store.getters['search/itemSearchParams'];
+          this.filters = this.$store.getters['search/requestParams']('Items', newData);
           // Open the filter panel so that the user can see which filters are
           // applied to the item list instead of filtering it silently
           this.$store.commit('updateState', {type: 'itemFilterOpen', value: 1});

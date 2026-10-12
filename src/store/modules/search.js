@@ -88,6 +88,11 @@ export const freshSearchState = () => ({
   },
 });
 
+// The capability in TYPES that each search filter requires
+const FILTER_CAPABILITIES = {
+  sortby: 'Sort',
+};
+
 const buildSearchParams = (filters) => {
   const rest = { ...filters };
   delete rest.rawFilters;
@@ -111,9 +116,23 @@ export default {
   state: freshSearchState,
 
   getters: {
-    // Full filter objects ready to hand to Utils.addFiltersToLink
+    // All filters of the filter sets, as shown in the search forms
     collectionSearchParams: (state) => buildSearchParams(state.collectionFilters),
     itemSearchParams: (state) => buildSearchParams(state.itemFilters),
+    // The filters ready to hand to Utils.addFiltersToLink, without the ones that
+    // the given type of search (key of TYPES) doesn't support. The filter sets
+    // keep them, as e.g. the global and the in-collection item search share one.
+    requestParams: (state, getters, rootState, rootGetters) => (type, context = null) => {
+      const params = buildSearchParams(type === 'Collections' ? state.collectionFilters : state.itemFilters);
+      const defaults = defaultFilterSet();
+      const supports = (classes) => rootGetters.supportsConformance(classes, context);
+      for (const [field, capability] of Object.entries(FILTER_CAPABILITIES)) {
+        if (!supports(TYPES[type][capability])) {
+          params[field] = defaults[field];
+        }
+      }
+      return params;
+    },
     hasActiveFilters: (state) => isActive(state.itemFilters) || isActive(state.collectionFilters),
     hasCollectionSearchCriteria: (state) => hasSearchCriteria(state.collectionFilters),
     hasDroppedFilters: (state) => Object.values(state.droppedFilters).some(arr => arr.length > 0),

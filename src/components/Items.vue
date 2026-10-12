@@ -133,11 +133,12 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultItemSort', 'uiLanguage']),
-    ...mapGetters('search', ['itemSearchParams']),
+    ...mapGetters('search', ['requestParams']),
     hasUnappliedChanges() {
       // The badge reflects the filters applied to the shown items (apiFilters);
       // the form state in the store may have been changed without submitting.
-      const draft = this.itemSearchParams || {};
+      // Filters that the items endpoint doesn't support are neither shown nor applied.
+      const draft = this.requestParams('Items', this.stac);
       const applied = this.apiFilters || {};
       // CQL filters are only rebuilt on submit, compare them by reference
       if ((draft.filters || null) !== (applied.filters || null)) {

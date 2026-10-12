@@ -155,7 +155,6 @@ test.describe('Search filter carry-over workflows', () => {
 
     await test.step('Add a free-text term and select a sort field', async () => {
       await addFreeTextTerm(page, 'sentinel');
-      // 'created' is not the configured default sort, so it counts as a user choice
       const sortSelect = page.locator('.sort .multiselect').first();
       await sortSelect.locator('.multiselect__select').click();
       const sortInput = sortSelect.locator('input.multiselect__input');
@@ -289,6 +288,47 @@ test.describe('Search filter carry-over workflows', () => {
       const state = await getSearchState(page);
       // The user's item search is untouched
       expect(state.itemFilters.ids).toEqual(['example-item-1']);
+    });
+  });
+
+  test('A sort that a collection does not support is kept, but neither applied nor reported there', async ({ page }) => {
+    await goToSearch(page, BROWSER_PATH);
+
+    await test.step('Execute an item search with a sort the collections do not support', async () => {
+      await page.getByRole('tab', { name: /search for items/i }).click();
+      await waitForBrowserReady(page);
+      // The collection search form in the other tab is hidden
+      const sortSelect = page.locator('.sort:visible .multiselect');
+      await sortSelect.locator('.multiselect__select').click();
+      await sortSelect.locator('input.multiselect__input').fill('Title');
+      await sortSelect.locator('input.multiselect__input').press('Enter');
+      await page.getByRole('button', { name: /submit/i }).click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Browse into a collection — no unapplied changes are indicated', async () => {
+      await page.getByRole('button', { name: /^browse$/i }).click();
+      await waitForBrowserReady(page);
+      await navigateIntoCollection(page, 'Alpha Collection');
+      const toggle = page.getByRole('button', { name: /show filters/i });
+      await expect(toggle).toBeVisible();
+      await expect(toggle.locator('.badge', { hasText: '!' })).toHaveCount(0);
+    });
+
+    await test.step('Submit the item filter — the sort is not sent', async () => {
+      await page.getByRole('button', { name: /show filters/i }).click();
+      const request = page.waitForRequest(r => r.url().includes('/collections/alpha/items'));
+      await page.getByRole('button', { name: /submit/i }).click();
+      const url = new URL((await request).url());
+      expect(url.searchParams.has('sortby')).toBe(false);
+    });
+
+    await test.step('Return to the item search — the sort is still there', async () => {
+      await page.getByRole('button', { name: /^search$/i }).click();
+      await waitForBrowserReady(page);
+      await page.getByRole('tab', { name: /search for items/i }).click();
+      await waitForBrowserReady(page);
+      await expect(page.locator('.sort:visible .multiselect__single')).toHaveText('Title');
     });
   });
 
