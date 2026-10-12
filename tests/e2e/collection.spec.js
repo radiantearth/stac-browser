@@ -326,6 +326,14 @@ test.describe('Collection - Items', () => {
 });
 
 test.describe('STAC Collection item search', () => {
+  const selectSortField = async (page, text) => {
+    const sortSelect = page.locator('.sort .multiselect');
+    await sortSelect.locator('.multiselect__select').click();
+    const sortInput = sortSelect.locator('input.multiselect__input');
+    await sortInput.fill(text);
+    await sortInput.press('Enter');
+  };
+
   function createAPIWithSearch() {
     const api = API.minimalApi(
       { url: "https://stac.example/api/" },
@@ -374,13 +382,20 @@ test.describe('STAC Collection item search', () => {
     await expect(page.getByRole('heading', { name: collection.getMetadata().title })).toBeVisible();
 
     await page.getByRole('button', { name: /show filters/i }).click();
-    // The default sort is pre-selected in the form
-    await expect(page.locator('.sort .multiselect')).toContainText('Time of Data');
-    await expect(page.getByTitle(/changes have not been applied/i)).toHaveCount(0);
+    const sortSelect = page.locator('.sort .multiselect');
+    const unapplied = page.getByTitle(/changes have not been applied/i);
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Default (Time of Data, Descending)');
+    await expect(unapplied).toHaveCount(0);
+
+    // Selecting the field of the default sort keeps its direction and doesn't change the results
+    await selectSortField(page, 'Time of Data');
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Time of Data');
+    await expect(page.locator('.sort').getByTitle(/descending order/i)).toHaveAttribute('aria-pressed', 'true');
+    await expect(unapplied).toHaveCount(0);
 
     // Changing the sort direction is an unapplied change
     await page.locator('.sort').getByTitle(/ascending order/i).click();
-    await expect(page.getByTitle(/changes have not been applied/i)).toBeVisible();
+    await expect(unapplied).toBeVisible();
   });
 
   test('sortables without title get translated labels that follow language switches', async ({ page, worker }) => {
@@ -409,19 +424,19 @@ test.describe('STAC Collection item search', () => {
 
     await page.getByRole('button', { name: /show filters/i }).click();
     const sortSelect = page.locator('.sort .multiselect');
-    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Time of Data');
     await sortSelect.locator('.multiselect__select').click();
-    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Default', 'Cloud Cover', 'Time of Data']);
+    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Default (Time of Data, Descending)', 'Cloud Cover', 'Time of Data']);
     await sortSelect.locator('input.multiselect__input').press('Escape');
+    await selectSortField(page, 'Cloud Cover');
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Cloud Cover');
 
     await page.evaluate(() => {
       document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$store.dispatch('switchLocale', { locale: 'de' });
     });
     // Both the selected option and the list of options are translated
-    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Zeitstempel der Daten');
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Wolkenbedeckung');
     await sortSelect.locator('.multiselect__select').click();
-    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Standardeinstellung', 'Wolkenbedeckung', 'Zeitstempel der Daten']);
-    await expect(page.getByTitle(/nicht angewendet/i)).toHaveCount(0);
+    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Standardeinstellung (Zeitstempel der Daten, Absteigend)', 'Wolkenbedeckung', 'Zeitstempel der Daten']);
   });
 
   test('changing limit should result in the according number of items rendered', async ({ page, worker }) => {

@@ -129,7 +129,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'defaultSort', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -302,7 +302,8 @@ export default defineComponent({
       this.loading = true;
 
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
+        const sort = this.defaultSort(this.isCollectionSearch ? 'Collections' : 'Global', this.parent);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage, sort);
       
         const response = await this.$store.dispatch('request', { link: this.link });
         if (response) {

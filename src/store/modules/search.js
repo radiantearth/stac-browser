@@ -97,7 +97,7 @@ const buildSearchParams = (filters) => {
 
 // Fields to validate a carried sortby against when the target doesn't
 // advertise sortables. Keep in sync with the fallback in
-// SearchFilter.sortOptions.
+// SearchFilter.sortFields.
 const FALLBACK_ITEM_SORT_FIELDS = [
   'id',
   'properties.title',
@@ -183,7 +183,7 @@ export default {
      * @param {Function} fetchSortables - Async fn fetching the collection's sortable field names
      * @param {String} targetType - 'Items' (OGC API Features) or 'Global' (STAC item search)
      */
-    async carryToItemSearch({ commit, state, rootGetters, rootState }, { collection, fetchQueryables, fetchSortables, targetType = 'Items' }) {
+    async carryToItemSearch({ commit, state, rootGetters }, { collection, fetchQueryables, fetchSortables, targetType = 'Items' }) {
       const source = state.collectionFilters;
       const capabilities = TYPES[targetType] || {};
       const supports = (capability) => {
@@ -221,9 +221,7 @@ export default {
       // user's field is sortable there, so validate against the target's
       // sortables. Item properties are usually `properties.`-prefixed while
       // collection fields are not, so also try the prefixed field name.
-      // The configured default sort is applied without user interaction and is
-      // neither worth carrying over nor warning about.
-      if (isSet(source.sortby) && source.sortby !== (rootState.defaultCollectionSort || null)) {
+      if (isSet(source.sortby)) {
         if (supports('Sort')) {
           const direction = source.sortby.startsWith('-') ? '-' : '';
           const field = direction ? source.sortby.substring(1) : source.sortby;

@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
 - Filters: Sortables and queryables without a title show translated labels for common fields (e.g. `properties.datetime`)
 
+### Changed
+
+- Filters: The "Default" sort option shows the configured default sort (e.g. "Default (Time of Data, Descending)") instead of pre-selecting it
+
 ### Fixed
 
 - The filter button no longer reports unapplied changes for the configured default sort order

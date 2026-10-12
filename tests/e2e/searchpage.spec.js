@@ -8,6 +8,7 @@
 import { test, expect } from './fixtures.js';
 import API from '../fixtures/instances/api.js';
 import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from './helpers.js';
+import { commitToStore } from '../helpers/store.js';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
@@ -378,6 +379,21 @@ test.describe('STAC Browser Search page', () => {
     });
   });
     
+  test('search without selected sort uses the configured default sort', async ({ page }) => {
+    await page.goto(api.root.getBrowserPath());
+    await commitToStore(page, 'config', { defaultItemSort: '-properties.datetime' });
+    // Navigate within the app so that the configured default sort is kept
+    await page.evaluate((path) => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+    }, SEARCH_PATH);
+
+    await expect(page.locator('.sort .multiselect__single')).toHaveText('Default (Time of Data, Descending)');
+    const requestPromise = waitForSearchPost(page);
+    await page.getByRole('button', { name: /submit/i }).click();
+    const { body } = await requestPromise;
+    expect(body.sortby).toEqual([{ field: 'properties.datetime', direction: 'desc' }]);
+  });
+
   test('search with item limit should have valid POST body', async ({ page }) => {
       
     await page.goto(SEARCH_PATH);
