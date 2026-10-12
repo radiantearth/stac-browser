@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Catalogs, collections and items of a configured catalog in folders that share their name with a page of STAC Browser
   (e.g. `validation/` or `external/`) open correctly, their paths start with `/browse/`
 
+### Fixed
+
+- Relative links are resolved against the URL after redirects (RFC 3986, section 5.1.3) instead of the requested URL
+- Relative `self` links of Items and Collections in API lists are resolved against the URL of the list response instead of the URL of the parent
+- URLs of Items and Collections without `self` link are constructed the same way whether or not the parent URL has a trailing slash, and their IDs are percent-encoded [#486](https://github.com/radiantearth/stac-browser/issues/486)
+
 ## [5.1.0] - 2026-09-07
 
 ### Added
