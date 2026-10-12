@@ -155,7 +155,6 @@ test.describe('Search filter carry-over workflows', () => {
 
     await test.step('Add a free-text term and select a sort field', async () => {
       await addFreeTextTerm(page, 'sentinel');
-      // 'created' is not the configured default sort, so it counts as a user choice
       const sortSelect = page.locator('.sort .multiselect').first();
       await sortSelect.locator('.multiselect__select').click();
       const sortInput = sortSelect.locator('input.multiselect__input');
@@ -304,6 +303,10 @@ test.describe('Search filter carry-over workflows', () => {
       await freeText.locator('.multiselect__tags').click();
       await freeText.locator('input.multiselect__input').fill('sentinel');
       await freeText.locator('input.multiselect__input').press('Enter');
+      const sortSelect = page.locator('.sort:visible .multiselect');
+      await sortSelect.locator('.multiselect__select').click();
+      await sortSelect.locator('input.multiselect__input').fill('Title');
+      await sortSelect.locator('input.multiselect__input').press('Enter');
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
     });
@@ -324,6 +327,7 @@ test.describe('Search filter carry-over workflows', () => {
       const url = new URL((await request).url());
       expect(url.searchParams.has('ids')).toBe(false);
       expect(url.searchParams.has('q')).toBe(false);
+      expect(url.searchParams.has('sortby')).toBe(false);
     });
 
     await test.step('Return to the item search — the filters are still there', async () => {
@@ -333,6 +337,7 @@ test.describe('Search filter carry-over workflows', () => {
       await waitForBrowserReady(page);
       await expect(page.locator('.filter-item-id .multiselect__tag').filter({ hasText: 'example-item-1' })).toBeVisible();
       await expect(page.locator('.filter-freetext:visible .multiselect__tag').filter({ hasText: 'sentinel' })).toBeVisible();
+      await expect(page.locator('.sort:visible .multiselect__single')).toHaveText('Title');
     });
   });
 
