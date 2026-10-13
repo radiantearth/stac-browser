@@ -3,19 +3,19 @@
     <li>
       <b-button v-if="canLoadMore" size="sm" variant="light" v-visible.300="loadNextPage" @click="loadNextPage()">
         <b-spinner v-if="loadingMore" small :label="$t('loading')" />
-        <b-icon-three-dots v-else />
+        <mdi-dots-horizontal v-else />
       </b-button>
       <b-button v-else-if="pagination" size="sm" variant="light" disabled>
-        <b-icon-three-dots />
+        <mdi-dots-horizontal />
       </b-button>
       <template v-else-if="mayHaveChildren">
         <b-button size="sm" variant="light" @click="toggle">
-          <b-icon-folder-minus v-if="expanded" />
-          <b-icon-folder-plus v-else />
+          <mdi-folder-open-outline v-if="expanded" />
+          <mdi-folder-outline v-else />
         </b-button>
       </template>
       <b-button v-else size="sm" variant="light" :to="to">
-        <b-icon-file-earmark-richtext />
+        <mdi-file-document-outline />
       </b-button><!--
       
       --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">

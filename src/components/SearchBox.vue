@@ -1,6 +1,6 @@
 <template>
   <div class="vue-component search-box">
-    <b-icon-search class="icon" />
+    <mdi-magnify class="icon" />
     <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder || $t('search.placeholder')" />
   </div>
 </template>

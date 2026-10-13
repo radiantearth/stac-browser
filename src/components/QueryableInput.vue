@@ -2,7 +2,7 @@
   <div class="queryable-group">
     <div class="queryable-row">
       <b-button class="delete" size="md" variant="outline-danger" @click="$emit('remove-queryable')">
-        <b-icon-trash aria-hidden="true" />
+        <mdi-delete-outline aria-hidden="true" />
       </b-button>
 
       <span class="title">
@@ -31,7 +31,7 @@
           :active="negate"
           @click="updateNegate(!negate)"
         >
-          <b-icon-check :class="{hide: !negate}" class="mt-1 me-2" />
+          <mdi-check :class="{hide: !negate}" class="mt-1 me-2" />
           <span class="long-label">{{ cqlNot.longLabel }}</span>
           <b-badge variant="dark" class="ms-2">{{ cqlNot.label }}</b-badge>
         </b-dropdown-item-button>
@@ -70,14 +70,14 @@
             :aria-label="$t('search.removeDate')"
             @click="removeTemporalValue(index)"
           >
-            <b-icon-trash aria-hidden="true" />
+            <mdi-delete-outline aria-hidden="true" />
           </b-button>
         </div>
         <b-button
           size="sm" variant="outline-primary" class="add-date"
           @click="addTemporalValue"
         >
-          <b-icon-plus aria-hidden="true" /> {{ $t('search.addDate') }}
+          <mdi-plus aria-hidden="true" /> {{ $t('search.addDate') }}
         </b-button>
       </div>
       <multiselect

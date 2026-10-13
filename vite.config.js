@@ -184,9 +184,9 @@ export default defineConfig(async ({ mode }) => {
           }), // Auto-register Bootstrap components
           IconsResolver({
             prefix: false,
-            enabledCollections: ["bi"],
+            enabledCollections: ["mdi"],
             alias: {
-              "b-icon": "bi",
+              "mdi-icon": "mdi",
             },
             customCollections: ["share"],
           }),

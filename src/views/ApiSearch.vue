@@ -47,8 +47,8 @@
             <template #footer="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
-                  <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
-                  <b-icon-square v-else />
+                  <mdi-checkbox-marked-outline v-if="selectedCollections[slot.data.id]" />
+                  <mdi-checkbox-blank-outline v-else />
                   <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />

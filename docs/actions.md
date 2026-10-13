@@ -143,7 +143,7 @@ All interfaces look as follows:
 - `get text() : string`
   - Returns the text that is displayed for the button, defaults to "Open". Should be using the [i18n methods](https://vue-i18n.intlify.dev/api/general.html) to localize the text.
 - `get icon() : Vue`
-  - Returns a Vue component that should be the icon for the button. Defaults to the `box-arrow-up-right` icon, see the [Bootstrap Icons list](https://icones.js.org/collection/bi) for other icons that can be imported through `~icons/bi/<name>` (via [unplugin-icons](https://github.com/unplugin/unplugin-icons)).
+  - Returns a Vue component that should be the icon for the button. Defaults to the `open-in-new` icon, see the [Material Design Icons list](https://icones.js.org/collection/mdi) for other icons that can be imported through `~icons/mdi/<name>` (via [unplugin-icons](https://github.com/unplugin/unplugin-icons)).
 
 Each action should at least implement custom behaviour for `uri`, `show` and `text`.
 

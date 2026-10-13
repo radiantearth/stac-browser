@@ -3,8 +3,8 @@
     <template #title>
       <span class="start">
         <span class="chevron" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+          <mdi-chevron-up v-if="expanded" />
+          <mdi-chevron-down v-else />
         </span>
         <span class="title" :title="provider.name">{{ provider.name }}</span>
       </span>

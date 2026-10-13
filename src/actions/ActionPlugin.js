@@ -1,6 +1,6 @@
 import urijs from 'urijs';
 import i18n from "../i18n";
-import BIconBoxArrowUpRight from '~icons/bi/box-arrow-up-right';
+import MdiOpenInNew from '~icons/mdi/open-in-new';
 
 export default class ActionPlugin {
 
@@ -40,7 +40,7 @@ export default class ActionPlugin {
   }
 
   get icon() {
-    return BIconBoxArrowUpRight;
+    return MdiOpenInNew;
   }
 
   get text() {

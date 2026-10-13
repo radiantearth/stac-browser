@@ -1,15 +1,15 @@
 <template>
   <b-dropdown variant="header" right :title="$t('source.language.switch')">
     <template #button-content>
-      <b-icon-flag /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
+      <mdi-translate /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
     </template>
     <b-dropdown-item v-for="l of languages" :key="l.code" class="lang-item" @click="setLocale(l.code)">
-      <b-icon-check :class="{hide: currentLocale !== l.code}" />
+      <mdi-check :class="{hide: currentLocale !== l.code}" />
       <span class="title">
         <span :lang="l.code">{{ l.native }}</span>
         <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
       </span>
-      <b-icon-exclamation-triangle v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ms-2" />
+      <mdi-alert-outline v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ms-2" />
     </b-dropdown-item>
   </b-dropdown>
 </template>
