@@ -765,4 +765,19 @@ test.describe('<stac-browser> web component', () => {
     }, 'https://stac.example/wc/draft/collection.json'));
     await expect(page.getByRole('heading', { name: 'Draft Collection', level: 1 })).toBeVisible();
   });
+  test('uses the font of the host page for headings, unless a headings font is set', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    await page.addStyleTag({ content: 'stac-browser { font-family: "Courier New", monospace; }' });
+
+    const fonts = () => page.locator('stac-browser').evaluate((el) => {
+      const font = (selector) => getComputedStyle(el.shadowRoot.querySelector(selector)).fontFamily;
+      return { h1: font('h1'), h2: font('h2'), banner: font('.header-title span[role="banner"]') };
+    });
+    const host = '"Courier New", monospace';
+    expect(await fonts()).toEqual({ h1: host, h2: host, banner: host });
+
+    await page.locator('stac-browser').evaluate((el) => el.style.setProperty('--sb-headings-font-family', 'Georgia, serif'));
+    expect(await fonts()).toEqual({ h1: 'Georgia, serif', h2: 'Georgia, serif', banner: 'Georgia, serif' });
+  });
 });

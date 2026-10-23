@@ -230,3 +230,15 @@ a {
   --sb-h1-color: #{$h1-color-dark};
   --sb-subheadings-color: #{$subheadings-color-dark};
 }
+
+// Font for headings, can be changed at runtime via --sb-headings-font-family
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.header-title span[role="banner"] {
+  @if $headings-font-family {
+    font-family: var(--sb-headings-font-family, $headings-font-family);
+  }
+  @else {
+    font-family: var(--sb-headings-font-family, inherit);
+  }
+}

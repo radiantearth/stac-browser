@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New config option `basemaps` to customize the basemaps via JSON without code changes,
   e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
 - Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:
-  the primary and secondary colors, body background/text colors, link colors, heading colors, and fonts
+  the primary and secondary colors, body background/text colors, link colors, heading colors, and fonts (incl. a separate font for headings)
   can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML

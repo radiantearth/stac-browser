@@ -31,6 +31,7 @@ It works with plain HTML and with any framework.
   - [isolated](#isolated)
 - [Styling](#styling)
   - [Colors](#colors)
+  - [Fonts](#fonts)
   - [Light and dark mode](#light-and-dark-mode)
   - [Parts](#parts)
   - [Page states](#page-states)
@@ -420,6 +421,15 @@ The header uses the primary color by default.
 To set the colors of the header separately, use `--sb-header` for the background and `--sb-header-color` for the text and links.
 
 See the [styling documentation](styling.md#available-css-variables) for more CSS variables.
+
+### Fonts
+
+In the [`inline` mode](#inline), STAC Browser uses the fonts of your page, in the [`isolated` mode](#isolated) its own fonts.
+To use a different font for the headings and the catalog title in the header, set `--sb-headings-font-family` on the element:
+
+```js
+el.style.setProperty('--sb-headings-font-family', 'Georgia, serif');
+```
 
 ### Light and dark mode
 
