@@ -1,7 +1,11 @@
 <template>
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-      <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
+      <b-button
+        variant="danger" v-if="requiresAuth" tag="a" tabindex="0"
+        :id="`popover-href-${id}-btn`" :ref="el => setTriggerRef('authTriggerEl', el)"
+        @click="handleAuthButton"
+      >
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="canDownload && !requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
@@ -26,8 +30,8 @@
 
     <b-popover
       v-if="auth.length > 1" click focus
-      :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser" :boundary-padding="10"
+      :id="`popover-href-${id}`" class="href-auth-methods" :target="triggerRefs.authTriggerEl"
+      :title="$t('authentication.chooseMethod')" :boundary-padding="10"
     >
       <b-list-group>
         <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
@@ -41,6 +45,7 @@
 import { defineAsyncComponent } from 'vue';
 
 import Description from './Description.vue';
+import TriggerRefMixin from './TriggerRefMixin';
 import Utils from '../utils';
 import { size, URI } from 'stac-js/src/utils.js';
 import { mapGetters, mapState } from 'vuex';
@@ -63,6 +68,10 @@ export default {
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
+  },
+  mixins: [TriggerRefMixin],
+  inject: {
+    embedded: { default: false }
   },
   props: {
     data: {
@@ -192,7 +201,9 @@ export default {
       return {};
     },
     useAltDownloadMethod() {
-      if (!this.isBrowserProtocol || !window.isSecureContext) {
+      // StreamSaver needs mitm.html and sw.js from the page's origin or a third-party host,
+      // which the web component can't rely on.
+      if (this.embedded || !this.isBrowserProtocol || !window.isSecureContext) {
         return false;
       }
       else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {

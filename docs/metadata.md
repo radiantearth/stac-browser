@@ -67,13 +67,13 @@ Below you can find an example of an updated `custom.json` for the German languag
 ## Hiding fields
 
 If you have fields in your STAC metadata that you don't want to show in STAC Browser,
-you can customize this in the file [`fields.config.js`](../fields.config.js) as well.
+you can customize this with the [`ignoreMetadata`](./options.md#ignoremetadata) option in the config.
 
 Some fields are hidden by default, you can check the source code for details:
 [ignored-metadata.js](../src/ignored-metadata.js).
 
 If you want to add or remove fields from the list of ignored fields,
-you can implement a function that updates the list.
+you can implement a function that updates the list and set it as the `ignoreMetadata` option.
 
 The function receives three parameters:
 
@@ -83,10 +83,13 @@ The function receives three parameters:
 
 The function has to return the (updated) fields to ignore in the metadata rendering as a `Array.<string>`.
 
+Up to STAC Browser 5, this function was defined in `fields.config.js`.
+If you did that, move it to the `ignoreMetadata` option in your config.
+
 ### Example
 
 ```js
-const ignoreMetadata = (object, fields, type) => {
+ignoreMetadata: (object, fields, type) => {
   if (object.isCollection) {
     // Show the proj:bbox and proj:geometry fields for Collections (these are ignored by default)
     fields = fields.filter(field => !['proj:bbox', 'proj:geometry'].includes(field));
@@ -108,23 +111,25 @@ const ignoreMetadata = (object, fields, type) => {
 STAC Browser shows the links of a STAC entity in a link list.
 Links that point to other STAC entities open within STAC Browser,
 while all other links open in a new browser tab.
-You can customize this behavior in the file [`relationTypes.config.js`](../relationTypes.config.js)
-based on the relation type (`rel`) of the links.
+You can customize this behavior with two config options based on the relation type (`rel`) of the links:
 
-Two customizations are available:
-
-- `stacNavigation`: A list of relation types that point to STAC entities.
+- [`browsableRelationTypes`](./options.md#browsablerelationtypes): A list of relation types that point to STAC entities.
   Links with these relation types open within STAC Browser instead of opening the raw file in a new tab.
   Use this if your catalogs use custom relation types to link to other STAC catalogs, collections, or items.
-- `hidden`: A list of relation types that should not appear in the link list at all.
+- [`hiddenRelationTypes`](./options.md#hiddenrelationtypes): A list of relation types that should not appear in the link list at all.
   Use this to hide links that are not useful for the people browsing your catalog.
+
+Up to STAC Browser 5, these lists were defined as `stacNavigation` and `hidden` in the file `relationTypes.config.js`.
+If you did that, move them to the options `browsableRelationTypes` and `hiddenRelationTypes` in your config.
 
 ### Example
 
 ```js
-// Links with the relation type `via` open within STAC Browser
-export const stacNavigation = ['via'];
-// Links with the relation type `service-desc` and `service-doc` are hidden,
-// effectively hiding the OpenAPI document links from the link list on the landing page.
-export const hidden = ['service-desc', 'service-doc'];
+{
+  // Links with the relation type `via` open within STAC Browser
+  browsableRelationTypes: ['via'],
+  // Links with the relation type `service-desc` and `service-doc` are hidden,
+  // effectively hiding the OpenAPI document links from the link list on the landing page.
+  hiddenRelationTypes: ['service-desc', 'service-doc']
+}
 ```

@@ -1,4 +1,3 @@
-import i18n from '../../../i18n.js';
 import CqlOperator from './operator.js';
 
 export default class CqlLogicalOperator extends CqlOperator {
@@ -34,7 +33,7 @@ export class CqlAnd extends CqlLogicalOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.logical.and');
+    return 'search.logical.and';
   }
 
 }
@@ -52,7 +51,7 @@ export class CqlOr extends CqlLogicalOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.logical.or');
+    return 'search.logical.or';
   }
 
 }
@@ -70,7 +69,7 @@ export class CqlNot extends CqlLogicalOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.logical.not');
+    return 'search.logical.not';
   }
 
 }

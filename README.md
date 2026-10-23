@@ -24,6 +24,7 @@ certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 - [Docker](#docker)
 - [Customize](#customize)
   - [Options](#options)
+  - [Embedding as a Web Component](#embedding-as-a-web-component)
   - [Languages](#languages)
   - [Themes](#themes)
   - [Basemaps](#basemaps)
@@ -169,6 +170,12 @@ What needs which deployment:
 STAC Browser supports customization through a long list of options that can be set in various ways.
 
 Please read the **[documentation for the options](docs/options.md)**.
+
+### Embedding as a Web Component
+
+STAC Browser can be embedded into any web page as a `<stac-browser>` custom element, configured through attributes/properties and observable through events.
+
+Please read the **[embedding documentation](docs/web-component.md)** for more details.
 
 ### Languages
 

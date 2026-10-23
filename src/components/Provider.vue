@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     ignoredMetadataFields() {
-      return getIgnoredFields(this.provider, 'Provider');
+      return getIgnoredFields(this.provider, 'Provider', this.$store.state.ignoreMetadata);
     }
   }
 };

@@ -15,7 +15,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['showThumbnailsAsAssets']),
+    ...mapState(['hiddenRelationTypes', 'showThumbnailsAsAssets']),
     ...mapGetters(['data']),
     hasAssets() {
       return this.assets.length > 0;
@@ -43,7 +43,7 @@ export default {
       if (!this.data) {
         return [];
       }
-      return this.data.getLinksWithOtherRels(stacBrowserSpecialHandling)
+      return this.data.getLinksWithOtherRels(stacBrowserSpecialHandling.concat(this.hiddenRelationTypes))
         .filter(link => link.rel !== 'preview' || !link.canBrowserDisplayImage());
     },
     selectedReferences() {

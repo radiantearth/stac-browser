@@ -43,7 +43,7 @@ export default {
   emits: ['show'],
   computed: {
     ignoredMetadataFields() {
-      return getIgnoredFields(this.asset);
+      return getIgnoredFields(this.asset, null, this.$store.state.ignoreMetadata);
     },
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {

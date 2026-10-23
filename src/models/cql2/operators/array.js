@@ -1,4 +1,3 @@
-import i18n from '../../../i18n.js';
 import CqlValue, { CqlArray } from '../value.js';
 import CqlOperator from './operator';
 
@@ -51,11 +50,11 @@ export class CqlIn extends CqlArrayOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.in');
+    return 'search.in';
   }
 
   static get description() {
-    return i18n.global.t('search.inOperatorDescription');
+    return 'search.inOperatorDescription';
   }
 
   toText() {
@@ -77,11 +76,11 @@ export class CqlArrayOverlaps extends CqlArrayOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.arrayOverlaps');
+    return 'search.arrayOverlaps';
   }
 
   static get description() {
-    return i18n.global.t('search.arrayOverlapsDescription');
+    return 'search.arrayOverlapsDescription';
   }
 
 }
@@ -99,11 +98,11 @@ export class CqlArrayContains extends CqlArrayOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.arrayContains');
+    return 'search.arrayContains';
   }
 
   static get description() {
-    return i18n.global.t('search.arrayContainsDescription');
+    return 'search.arrayContainsDescription';
   }
 
 }
@@ -121,11 +120,11 @@ export class CqlArrayEquals extends CqlArrayOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.arrayEquals');
+    return 'search.arrayEquals';
   }
 
   static get description() {
-    return i18n.global.t('search.arrayEqualsDescription');
+    return 'search.arrayEqualsDescription';
   }
 
 }
@@ -143,11 +142,11 @@ export class CqlArrayContainedBy extends CqlArrayOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.arrayContainedBy');
+    return 'search.arrayContainedBy';
   }
 
   static get description() {
-    return i18n.global.t('search.arrayContainedByDescription');
+    return 'search.arrayContainedByDescription';
   }
 
 }

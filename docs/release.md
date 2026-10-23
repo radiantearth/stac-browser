@@ -12,5 +12,9 @@
 8. `npm run build:report`
    1. Check whether the `dist/report.html` has significantly changed (if yes, check why)
    2. Delete the `dist/report.html`
-9. `npm publish`
-10. Create GitHub release (v3.x.x)
+9. `npm run build:npm` and `npm pack --dry-run ./dist`
+   1. Check that the package contains `stac-browser.js`, `stac-browser.css`, the chunks, `README.md` and `LICENSE`
+   2. Check that it doesn't contain any files from `public/`
+10. Create GitHub release (v6.x.x)
+    - The Docker image and the npm package (web component) are published by GitHub Actions
+    - The npm package is only published if the repository variable `NPM_PUBLISH` is set to `true`

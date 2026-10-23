@@ -209,6 +209,7 @@ These are independent of the color mode and can be set in a single `:root, [data
 | Variable | Purpose |
 | -------- | ------- |
 | `--bs-body-font-family` | Font family for normal text. |
+| `--sb-headings-font-family` | Font family for headings and the catalog title in the header. Defaults to the font for normal text. |
 | `--bs-font-monospace` | Font family for code. |
 | `--sb-logo-height` | Height of the logo (`catalogImage`); the width scales proportionally. |
 | `--sb-block-gap` | Gap between the main sections of the page (header, content, footer). |
