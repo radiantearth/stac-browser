@@ -119,6 +119,7 @@ export class StacBrowserElement extends HTMLElement {
     super();
     this._configProp = {};
     this._instance = null;
+    this._root = null;
     this._mountPoint = null;
     this._unwatchers = [];
     this._generation = 0;
@@ -349,7 +350,7 @@ export class StacBrowserElement extends HTMLElement {
       this._emit('structuredData', schema);
     }, { immediate: true }));
 
-    app.mount(this._mountPoint);
+    this._root = app.mount(this._mountPoint);
 
     // Replay options set while init was pending (the setter/attr callback bailed
     // with no instance yet).
@@ -434,6 +435,7 @@ export class StacBrowserElement extends HTMLElement {
       this._instance.app.unmount();
       this._instance = null;
     }
+    this._root = null;
     this._mountPoint = null;
     // Reject calls still waiting for a disconnected-mid-init instance instead of
     // leaving them pending; the next connect starts a fresh deferred.
@@ -494,6 +496,22 @@ export class StacBrowserElement extends HTMLElement {
   // it is migrated, cached under that url and displayed, with links resolving
   // against it and browsing continuing as usual. Calling it again with the same
   // url updates the view in place (e.g. for an editor live preview).
+  // Opens (true) or closes (false) the sidebar, or switches it without force.
+  // Resolves with whether the sidebar is open.
+  toggleSidebar(force) {
+    return this._whenReady(() => {
+      if (!this._instance.store.state.showSidebar) {
+        return false;
+      }
+      const open = typeof force === 'boolean' ? force : !this._root.sidebar;
+      // null: the sidebar was never opened and doesn't exist yet
+      if (open || this._root.sidebar !== null) {
+        this._root.sidebar = open;
+      }
+      return open;
+    });
+  }
+
   setData(data, url) {
     let copy;
     try {

@@ -18,6 +18,7 @@ It works with plain HTML and with any framework.
   - [navigate(to)](#navigateto)
   - [navigateToStac(url)](#navigatetostacurl)
   - [setData(data, url)](#setdatadata-url)
+  - [toggleSidebar(force)](#togglesidebarforce)
 - [Properties](#properties)
 - [Widgets](#widgets)
 - [Metadata and maps](#metadata-and-maps)
@@ -247,6 +248,21 @@ Relative links are resolved against `url`, so users can continue browsing from t
 
 If you call `setData` again with the same URL, the view is updated.
 This is useful for a live preview in an editor, for example.
+
+### toggleSidebar(force)
+
+Opens or closes the sidebar to browse the catalog.
+Without `force`, the sidebar is opened if it's closed and closed if it's open.
+With `force` set to `true` it is opened, with `false` it is closed.
+The Promise resolves with `true` if the sidebar is open afterwards, otherwise with `false`.
+
+```js
+el.toggleSidebar(); // Opens or closes the sidebar
+el.toggleSidebar(true); // Opens the sidebar
+```
+
+This is useful if you hide the header (see [Parts](#parts)) and provide your own button to browse.
+If the sidebar is disabled through the [`showSidebar`](options.md#showsidebar) option, nothing happens.
 
 ## Properties
 

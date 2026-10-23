@@ -812,4 +812,24 @@ test.describe('<stac-browser> web component', () => {
     await expect(page.getByRole('heading', { name: 'Relation Types', level: 1 })).toBeVisible();
     await expect.poll(links).toEqual({ viaOpensInBrowser: true, serviceDesc: false });
   });
+  test('opens and closes the sidebar through toggleSidebar()', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    // A host with its own header and browse button
+    await page.addStyleTag({ content: 'stac-browser::part(header) { display: none; }' });
+    const el = page.locator('stac-browser');
+    const sidebar = page.locator('stac-browser .offcanvas.show');
+
+    expect(await el.evaluate((el) => el.toggleSidebar())).toBe(true);
+    await expect(sidebar).toBeVisible();
+    expect(await el.evaluate((el) => el.toggleSidebar(true))).toBe(true);
+    await expect(sidebar).toBeVisible();
+    expect(await el.evaluate((el) => el.toggleSidebar())).toBe(false);
+    await expect(sidebar).toHaveCount(0);
+
+    // Nothing happens if the sidebar is disabled
+    await el.evaluate((el) => el.setAttribute('show-sidebar', 'false'));
+    expect(await el.evaluate((el) => el.toggleSidebar(true))).toBe(false);
+    await expect(page.locator('stac-browser .offcanvas')).toHaveCount(0);
+  });
 });
