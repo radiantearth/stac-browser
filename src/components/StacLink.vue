@@ -58,7 +58,7 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(['allowExternalAccess', 'privateQueryParameters']),
+    ...mapState(['allowExternalAccess', 'browsableRelationTypes', 'privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
       if (this.stac instanceof STAC) {
@@ -101,7 +101,7 @@ export default defineComponent({
       if (!this.allowExternalAccess && this.isExternalUrl(this.link.href)) {
         return false;
       }
-      return stacBrowserNavigatesTo.includes(this.link.rel);
+      return stacBrowserNavigatesTo.includes(this.link.rel) || this.browsableRelationTypes.includes(this.link.rel);
     },
     attributes() {
       if (this.isStacBrowserLink || this.button) {

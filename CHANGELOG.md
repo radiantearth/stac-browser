@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The function to hide metadata fields moved from `fields.config.js` to the new config option `ignoreMetadata`
+- The relation types for links moved from `relationTypes.config.js` to the new config options `browsableRelationTypes` (previously `stacNavigation`) and `hiddenRelationTypes` (previously `hidden`)
 
 ### Removed
 

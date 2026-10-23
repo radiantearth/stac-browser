@@ -131,6 +131,8 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
 - [Service Integration](#service-integration)
   - [socialSharing](#socialsharing)
 - [Advanced](#advanced)
+  - [browsableRelationTypes](#browsablerelationtypes)
+  - [hiddenRelationTypes](#hiddenrelationtypes)
   - [ignoreMetadata](#ignoremetadata)
   - [preprocessSTAC](#preprocessstac)
   - [requestHeaders](#requestheaders)
@@ -860,6 +862,19 @@ The following services are supported:
 - `x` (X, formerly Twitter)
 
 ## Advanced
+
+### browsableRelationTypes
+
+A list of additional relation types (`rel`) of links that point to STAC catalogs, collections or items.
+Links with these relation types open in STAC Browser instead of opening the file in a new tab, e.g. `['via']`.
+Defaults to an empty list.
+See [Customizing links](./metadata.md#customizing-links) for details.
+
+### hiddenRelationTypes
+
+A list of relation types (`rel`) of links that are not shown in the list of links, e.g. `['service-desc', 'service-doc']`.
+Defaults to an empty list.
+See [Customizing links](./metadata.md#customizing-links) for details.
 
 ### ignoreMetadata
 

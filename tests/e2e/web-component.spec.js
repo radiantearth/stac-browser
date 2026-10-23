@@ -780,4 +780,36 @@ test.describe('<stac-browser> web component', () => {
     await page.locator('stac-browser').evaluate((el) => el.style.setProperty('--sb-headings-font-family', 'Georgia, serif'));
     expect(await fonts()).toEqual({ h1: 'Georgia, serif', h2: 'Georgia, serif', banner: 'Georgia, serif' });
   });
+  test('opens and hides links based on the configured relation types', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const data = (rel) => ({
+      type: 'Collection', stac_version: '1.0.0', id: 'rels', title: 'Relation Types', description: 'Rels', license: 'CC0-1.0',
+      extent: { spatial: { bbox: [[-10, -10, 10, 10]] }, temporal: { interval: [[null, null]] } },
+      links: [
+        { rel, href: 'https://stac.example/wc/via/collection.json', type: 'application/json', title: 'Via Link' },
+        { rel: 'service-desc', href: 'https://stac.example/wc/api', type: 'application/json', title: 'Service Description' }
+      ]
+    });
+    const links = () => page.locator('stac-browser').evaluate((el) => {
+      const anchors = [...el.shadowRoot.querySelectorAll('a')];
+      const via = anchors.find((a) => a.textContent.includes('Via Link'));
+      return {
+        viaOpensInBrowser: Boolean(via) && !via.getAttribute('href').startsWith('https://'),
+        serviceDesc: anchors.some((a) => a.textContent.includes('Service Description'))
+      };
+    });
+
+    await page.evaluate((url) => {
+      const el = document.createElement('stac-browser');
+      el.setAttribute('url', url);
+      el.config = { browsableRelationTypes: ['via'], hiddenRelationTypes: ['service-desc'] };
+      document.querySelector('main').replaceChildren(el);
+    }, catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    await page.locator('stac-browser').evaluate((el, data) => el.setData(data, 'https://stac.example/wc/rels/collection.json'), data('via'));
+    await expect(page.getByRole('heading', { name: 'Relation Types', level: 1 })).toBeVisible();
+    await expect.poll(links).toEqual({ viaOpensInBrowser: true, serviceDesc: false });
+  });
 });

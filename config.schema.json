@@ -123,6 +123,18 @@
     "showKeywordsInCatalogCards": {
       "type": "boolean"
     },
+    "browsableRelationTypes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hiddenRelationTypes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "showThumbnailsAsAssets": {
       "type": "boolean"
     },

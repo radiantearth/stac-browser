@@ -111,23 +111,25 @@ ignoreMetadata: (object, fields, type) => {
 STAC Browser shows the links of a STAC entity in a link list.
 Links that point to other STAC entities open within STAC Browser,
 while all other links open in a new browser tab.
-You can customize this behavior in the file [`relationTypes.config.js`](../relationTypes.config.js)
-based on the relation type (`rel`) of the links.
+You can customize this behavior with two config options based on the relation type (`rel`) of the links:
 
-Two customizations are available:
-
-- `stacNavigation`: A list of relation types that point to STAC entities.
+- [`browsableRelationTypes`](./options.md#browsablerelationtypes): A list of relation types that point to STAC entities.
   Links with these relation types open within STAC Browser instead of opening the raw file in a new tab.
   Use this if your catalogs use custom relation types to link to other STAC catalogs, collections, or items.
-- `hidden`: A list of relation types that should not appear in the link list at all.
+- [`hiddenRelationTypes`](./options.md#hiddenrelationtypes): A list of relation types that should not appear in the link list at all.
   Use this to hide links that are not useful for the people browsing your catalog.
+
+Up to STAC Browser 5, these lists were defined as `stacNavigation` and `hidden` in the file `relationTypes.config.js`.
+If you did that, move them to the options `browsableRelationTypes` and `hiddenRelationTypes` in your config.
 
 ### Example
 
 ```js
-// Links with the relation type `via` open within STAC Browser
-export const stacNavigation = ['via'];
-// Links with the relation type `service-desc` and `service-doc` are hidden,
-// effectively hiding the OpenAPI document links from the link list on the landing page.
-export const hidden = ['service-desc', 'service-doc'];
+{
+  // Links with the relation type `via` open within STAC Browser
+  browsableRelationTypes: ['via'],
+  // Links with the relation type `service-desc` and `service-doc` are hidden,
+  // effectively hiding the OpenAPI document links from the link list on the landing page.
+  hiddenRelationTypes: ['service-desc', 'service-doc']
+}
 ```
