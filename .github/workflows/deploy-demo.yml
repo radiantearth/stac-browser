@@ -11,6 +11,7 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
       DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+    if: ${{ secrets.SSH_HOST != '' }}
     steps:
       - uses: actions/setup-node@v6
         with:
