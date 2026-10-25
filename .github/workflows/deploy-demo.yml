@@ -4,19 +4,8 @@ on:
     branches:
       - main
 jobs:
-  check-secret:
-    runs-on: ubuntu-latest
-    outputs:
-      has_secret: ${{ steps.check.outputs.defined }}
-    steps:
-      - id: check
-        env:
-          MY_SECRET: ${{ secrets.MY_SECRET_KEY }}
-        run: echo "defined=${MY_SECRET:+'true'}" >> $GITHUB_OUTPUT
-
   deploy:
-    needs: check-secret
-    if: needs.check-secret.outputs.has_secret
+    if: github.repository == 'radiantearth/stac-browser'
     runs-on: ubuntu-latest
     env:
       SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
