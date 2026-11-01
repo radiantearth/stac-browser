@@ -6,7 +6,7 @@
         v-if="canManage" size="sm" variant="outline-primary" tabindex="0"
       >
         <template #button-content>
-          <mdi-cog /><span class="button-label">{{ $t('source.manage') }}</span>
+          <mdi-cog-outline /><span class="button-label">{{ $t('source.manage') }}</span>
         </template>
         <b-dropdown-item v-if="canAddCollections" :to="browserPaths.addCollection">
           <mdi-folder-plus-outline /> {{ $t('manage.addCollection') }}

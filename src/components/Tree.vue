@@ -10,8 +10,8 @@
       </b-button>
       <template v-else-if="mayHaveChildren">
         <b-button size="sm" variant="light" @click="toggle">
-          <mdi-folder-open-outline v-if="expanded" />
-          <mdi-folder-outline v-else />
+          <mdi-folder-minus-outline v-if="expanded" />
+          <mdi-folder-plus-outline v-else />
         </b-button>
       </template>
       <b-button v-else size="sm" variant="light" :to="to">

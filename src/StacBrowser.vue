@@ -65,7 +65,7 @@
                 <mdi-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
               </b-button>
               <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
-                <mdi-folder-upload-outline /><span class="button-label">{{ $t('goToCollection.label') }}</span>
+                <mdi-folder-move-outline /><span class="button-label">{{ $t('goToCollection.label') }}</span>
               </b-button>
               <b-button v-if="parentLink" :to="toBrowserPath(parentLink)" :title="parentLinkTitle" variant="outline-primary" size="sm">
                 <mdi-arrow-up-left /><span class="button-label">{{ $t('goToParent.label') }}</span>

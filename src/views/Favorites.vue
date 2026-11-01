@@ -5,11 +5,11 @@
       <div class="mt-2">
         <b-button-group size="sm">
           <b-button variant="warning" :title="$t('favorites.importDescription')" @click="openImportDialog">
-            <mdi-tray-arrow-down /> {{ $t('favorites.import') }}
+            <mdi-import /> {{ $t('favorites.import') }}
           </b-button>
           <b-dropdown size="sm" variant="warning" :title="$t('favorites.exportDescription')" :disabled="favorites.length === 0">
             <template #button-content>
-              <mdi-tray-arrow-up /> {{ $t('favorites.export') }}
+              <mdi-export /> {{ $t('favorites.export') }}
             </template>
             <b-dropdown-item v-for="format in ['json', 'csv', 'excel', 'stac']" :key="format" @click="exportFavorites(format)">
               {{ $t(`favorites.exportFormats.${format}`) }}

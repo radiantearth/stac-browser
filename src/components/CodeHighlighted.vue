@@ -6,7 +6,7 @@
         size="sm" variant="primary"
         @click.prevent.stop="download"
       >
-        <mdi-download />
+        <mdi-tray-arrow-down />
       </b-button>
       <CopyButton
         :copyText="code" size="sm"

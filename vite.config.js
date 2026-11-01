@@ -185,15 +185,21 @@ export default defineConfig(async ({ mode }) => {
           IconsResolver({
             prefix: false,
             enabledCollections: ["mdi"],
-            alias: {
-              "mdi-icon": "mdi",
-            },
             customCollections: ["share"],
           }),
         ],
       }),
       Icons({
         compiler: "vue3",
+        // MDI glyphs are padded within their 24px grid: scale up to match the text and offset the side padding
+        scale: 1.4,
+        defaultStyle: "vertical-align: -0.3em; margin: 0 -0.1em",
+        // The custom icons have no padding, so they must not get the negative margin
+        iconCustomizer(collection, icon, props) {
+          if (collection === "share") {
+            props.style = "vertical-align: -0.3em";
+          }
+        },
         customCollections: {
           share: FileSystemIconLoader("./src/media/"),
         },

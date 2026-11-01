@@ -7,7 +7,7 @@
       <b-button v-if="canDownload && !requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
         <b-spinner v-if="loading" small />
         <mdi-open-in-new v-else-if="browserCanOpenFile" />
-        <mdi-download v-else />
+        <mdi-tray-arrow-down v-else />
         {{ buttonText }}
       </b-button>
       <CopyButton variant="primary" :copyText="href" :title="href">
