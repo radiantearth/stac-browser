@@ -143,7 +143,7 @@ export default defineComponent({
       if (this.additionalLinks.length === 0) {
         return null;
       }
-      if (this.isCollection || !this.hasThumbnails) {
+      if (this.isCollection || (!this.hasThumbnails && !this.hasWebMapLinks)) {
         return "right";
       }
       else {
