@@ -1,9 +1,8 @@
 // Cal-Adapt overrides on top of STAC Browser's page styles
 
 #stac-browser {
-  // Header: logo, title and the Map/Catalog tabs on the left, as on caladapt-stac-map,
-  // with STAC Browser's own buttons on the right. Same 52px height as the map's
-  // header, so the nav doesn't move when switching between them.
+  // Header: logo, title and the Map/Catalog tabs, as on caladapt-stac-map. Same
+  // 52px height as the map's header, so the nav doesn't move when switching.
   > header .site {
     padding-block: 0;
   }
@@ -36,7 +35,13 @@
       min-width: 0;
     }
 
+    // Browse, Search and API assume STAC knowledge; the map covers finding data.
+    // The search page still works at /#/search.
     > .navigation {
+      display: none;
+    }
+
+    > .user {
       margin-left: auto;
     }
   }

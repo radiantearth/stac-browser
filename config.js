@@ -11,33 +11,17 @@ export default {
   catalogImage: calAdaptBear,
   allowExternalAccess: true, // Must be true if catalogUrl is not given
   allowedDomains: [],
-  enforcedColorMode: "auto",
-  detectLocaleFromBrowser: true,
+  // Light only, matching caladapt-stac-map, which has no dark mode yet. Once it
+  // does, "auto" makes both follow the computer's setting.
+  enforcedColorMode: "light",
+  // English only: the map and the catalog's dataset text are English, so other
+  // languages would give a half-translated site. Upstream also ships
+  // ar, de, es, fr, it, ro, ru, ja, pt, id, pl and sv.
+  detectLocaleFromBrowser: false,
   storeLocale: true,
   locale: "en",
   fallbackLocale: "en",
-  supportedLocales: [
-    "ar",
-    "de",
-//  "de-CH",
-    "es",
-    "en",
-//  "en-GB",
-//  "en-US",
-    "fr",
-//  "fr-CA",
-//  "fr-CH",
-    "it",
-//  "it-CH",
-    "ro",
-    "ru",
-    "ja",
-    "pt",
-//  "pt-BR",
-    "id",
-    "pl",
-    "sv"
-  ],
+  supportedLocales: ["en"],
   apiCatalogPriority: null,
   useTileLayerAsFallback: false,
   displayGeoTiffByDefault: false,
@@ -51,7 +35,7 @@ export default {
   pathPrefix: "/",
   historyMode: "hash", // existing links use /#/ URLs
   cardViewMode: "cards",
-  showFavorites: true,
+  showFavorites: false,
   defaultCollectionSort: "title",
   defaultItemSort: null,
   showKeywordsInItemCards: false,
