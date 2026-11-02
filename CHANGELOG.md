@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
 - SVG icons, thumbnails and previews (`image/svg+xml`) are shown, SVG files are offered for download instead of being opened
 - Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The fallback description in the structured data (JSON-LD) shows the catalog title instead of "undefined"
 - Scientific publications without a DOI show "n/a" instead of escaped HTML, and DOI links use HTTPS
 - Zarr datacubes are visualized based on the metadata of their bands (e.g. RGB data without statistics is no longer shown in white) and apply nodata values
+- Maps show the attribution of assets (GeoTIFF, Zarr, GeoJSON, previews) and of their item or collection (attribution extension)
 - Typo in the label for processing instructions/code links
 - Catalogs, collections and items of a configured catalog in folders that share their name with a page of STAC Browser
   (e.g. `validation/` or `external/`) open correctly, their paths start with `/browse/`
@@ -33,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - A "Back" button on pages with external content returns to the page in the catalog from which the external content was reached
-- Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
 - The source popover indicates when the shown data is not part of the configured catalog
 - Widget `ExternalWarning`: Shows an information on the page of a catalog, collection or item that is not part of the configured catalog
 
