@@ -183,3 +183,43 @@ test.describe('Very small footprint item', () => {
     expect(view.lat).toBeLessThan(50.78);
   });
 });
+
+test.describe('Catalog with web map links', () => {
+  function createCatalog(links = []) {
+    const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
+    catalog.setMetadata({ title: 'Web Map Catalog', description: 'A catalog without spatial extent' });
+    links.forEach(link => catalog.root.addLink(link));
+    return catalog;
+  }
+
+  test('shows a map and lists the links next to it', async ({ page, worker }) => {
+    const catalog = createCatalog([{
+      rel: 'xyz',
+      href: 'https://tiles.example/tiles/{z}/{x}/{y}.png',
+      type: 'image/png',
+      title: 'Tiles',
+    }]);
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+
+    await expect(page.locator('.maps-preview')).toBeVisible();
+    // The links move into the intro section so that they don't wrap below the map
+    const links = page.locator('.meta > .intro > .links');
+    await expect(links.getByRole('heading', { name: 'Additional Resources' })).toBeVisible();
+    await expect(links.getByText('Tiles')).toBeVisible();
+  });
+
+  test('shows no map without web map links', async ({ page, worker }) => {
+    const catalog = createCatalog();
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('heading', { name: 'Web Map Catalog' })).toBeVisible();
+    await expect(page.locator('.maps-preview')).toHaveCount(0);
+  });
+});
