@@ -1,6 +1,71 @@
 // Cal-Adapt overrides on top of STAC Browser's page styles
 
 #stac-browser {
+  // Header: logo, title and the Map/Catalog tabs on the left, as on caladapt-stac-map,
+  // with STAC Browser's own buttons on the right. Same 52px height as the map's
+  // header, so the nav doesn't move when switching between them.
+  > header .site {
+    padding-block: 0;
+  }
+
+  > header .site > .col-md-12 {
+    padding-inline: 22px;
+
+    > .title {
+      order: -1;
+      justify-content: flex-start;
+      align-self: stretch;
+      gap: 24px;
+
+      .header-title {
+        gap: 10px;
+
+        span {
+          font-family: $headings-font-family;
+          white-space: nowrap;
+        }
+      }
+
+      > .widget {
+        flex: none;
+      }
+    }
+
+    // Upstream reserves 350px per button group to keep the title centered
+    > .actions {
+      min-width: 0;
+    }
+
+    > .navigation {
+      margin-left: auto;
+    }
+  }
+
+  .site-tabs {
+    display: flex;
+    height: 100%;
+
+    a {
+      display: flex;
+      align-items: center;
+      min-height: 52px;
+      padding: 0 16px;
+      border-bottom: 4px solid transparent;
+      font-size: 15px;
+      color: var(--sb-header-color);
+      text-decoration: none;
+
+      &:hover {
+        border-bottom-color: rgba(255, 255, 255, 0.5);
+      }
+
+      &[aria-current="page"] {
+        border-bottom-color: $ca-goldenrod;
+        font-weight: 500;
+      }
+    }
+  }
+
   // Keyword chips: light cobalt tint instead of solid grey, so long lists read less heavy.
   // !important because Bootstrap's badge variant classes set these colors with !important.
   .keywords .badge {

@@ -30,6 +30,7 @@
               <HeaderTitle ref="headerTitle" />
             </StacLink>
             <HeaderTitle v-else ref="headerTitle" />
+            <WidgetHook id="header-title-end" />
           </div>
           <nav class="actions user">
             <b-button-group>

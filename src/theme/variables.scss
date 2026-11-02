@@ -105,8 +105,8 @@ $link-hover-color: darken($link-color, 20%);
 $header: $ca-cobalt;
 $header-background: linear-gradient(59deg, $ca-cobalt 0%, $ca-ocean 100%);
 $header-position: sticky; // sticky or static
-$header-font-size: 1.5rem;
-$header-font-weight: 600;
+$header-font-size: 18px; // matches caladapt-stac-map
+$header-font-weight: 700;
 $header-text-shadow: none;
 
 $header-contrast: color-contrast($header);
