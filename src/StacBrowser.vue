@@ -58,7 +58,7 @@
         <b-col md="12">
           <div class="title">
             <AuthImage v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon" />
-            <h1 :title="title" :class="{ 'visually-hidden': isRoot }">{{ title }}</h1>
+            <h1 :title="title">{{ title }}</h1>
           </div>
           <nav class="actions navigation">
             <b-button-group>
