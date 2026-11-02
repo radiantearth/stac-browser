@@ -51,7 +51,15 @@ export default {
   requestHeaders: {},
   requestQueryParameters: {},
   socialSharing: ['email', 'bsky', 'mastodon', 'x'],
-  preprocessSTAC: null,
+  // Show the API's root catalog ("Cal-Adapt STAC API") under the site's own title,
+  // in the browser only; the API keeps its title for people using it directly
+  preprocessSTAC: (stac, state) => {
+    const withoutSlash = (url) => String(url).replace(/\/$/, "");
+    if (withoutSlash(stac.getAbsoluteUrl()) === withoutSlash(state.catalogUrl)) {
+      stac.title = state.catalogTitle;
+    }
+    return stac;
+  },
   authConfig: null,
   transactions: 'auto',
   transactionsRequireLogin: true,
