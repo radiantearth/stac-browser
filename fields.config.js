@@ -27,7 +27,8 @@ const ignoreMetadata = (object, fields) => fields.concat([
   'features',
   // Shown as tables by the Cal-Adapt Dataset Overview widget
   'caladapt:variable_labels',
-  'caladapt:station_labels'
+  'caladapt:station_labels',
+  'caladapt:boundary_labels'
 ]);
 
 export { ignoreMetadata };
