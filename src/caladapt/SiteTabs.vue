@@ -1,7 +1,7 @@
 <template>
   <nav class="site-tabs" aria-label="Views">
-    <a :href="mapHref">Map</a>
     <router-link to="/" aria-current="page">Catalog</router-link>
+    <a :href="mapHref">Map</a>
   </nav>
 </template>
 
