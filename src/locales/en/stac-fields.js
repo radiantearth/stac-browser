@@ -9,7 +9,7 @@ export default function run(/*locale*/) {
   }));
   // We want ISO formatting for the date (and time), which is available in e.g. sv-SE
   // See also: https://stackoverflow.com/questions/25050034/get-iso-8601-using-intl-datetimeformat
-  I18N.dateFormatter = new Intl.DateTimeFormat("sv-SE", defaults.dateFormatterOptions);
+  I18N.dateFormatter = new Intl.DateTimeFormat("sv-SE", Object.assign({}, defaults.dateFormatterOptions, { timeZone: "UTC" }));
   I18N.dateTimeFormatter = new Intl.DateTimeFormat("sv-SE", {
     day: 'numeric',
     month: 'numeric',
