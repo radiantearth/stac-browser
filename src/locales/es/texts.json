@@ -237,6 +237,7 @@
       "title": "Conjunto de datos grande"
     },
     "fit": "Encajar en la extensión",
+    "focusHint": "Haz clic o toca el mapa para acercar y desplazar",
     "layers": {
       "base": "Capas base",
       "footprint": "Huella",

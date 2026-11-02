@@ -1,9 +1,9 @@
 <template>
   <img
-    v-if="displaySrc" :src="displaySrc" :alt="alt" :title="title"
+    v-if="showImage" :src="displaySrc" :alt="alt" :title="title"
     :crossorigin="crossorigin" :class="placement ? `card-img-${placement}` : null"
     :loading="lazy ? 'lazy' : null" :width="width" :height="height"
-    @load="$emit('load', $event)" @error="$emit('error', $event)"
+    @load="$emit('load', $event)" @error="onError"
   >
 </template>
 
@@ -22,8 +22,10 @@ import { acquire, needsAuthenticatedFetch, release } from '../models/authMedia';
  * never receive credentials.
  *
  * Failed authenticated requests fall back to loading the image directly
- * (without the headers) and never open the login dialog; errors are
- * reported through the `error` event.
+ * (without the headers) and never open the login dialog. Images that fail
+ * to load are reported through the `error` event and hidden, unless
+ * `showBroken` is set. They are shown again once their URL changes, e.g.
+ * after login.
  */
 export default {
   name: 'AuthImage',
@@ -61,6 +63,11 @@ export default {
     height: {
       type: [Number, String],
       default: null
+    },
+    // Keeps images that fail to load visible
+    showBroken: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['load', 'error', 'resolved'],
@@ -70,6 +77,9 @@ export default {
       // The URL currently held in the authMedia cache
       acquiredUrl: null,
       failed: false,
+      // The URL that the image element failed to load. Also covers header
+      // credentials: new ones lead to a new object URL (or data URL for new content).
+      brokenSrc: null,
       disposed: false,
       // Whether a lazy image is close enough to the viewport to be loaded
       nearViewport: false,
@@ -91,6 +101,9 @@ export default {
         return this.blobUrl; // null (= not rendered) while loading
       }
       return this.requestUrl;
+    },
+    showImage() {
+      return Boolean(this.displaySrc) && (this.showBroken || this.displaySrc !== this.brokenSrc);
     }
   },
   watch: {
@@ -103,6 +116,7 @@ export default {
     },
     src() {
       this.failed = false;
+      this.brokenSrc = null;
       this.resolve();
     },
     requestHeaders: {
@@ -149,6 +163,10 @@ export default {
     this.releaseAcquired();
   },
   methods: {
+    onError(event) {
+      this.brokenSrc = this.displaySrc;
+      this.$emit('error', event);
+    },
     disconnectObserver() {
       if (this.observer) {
         this.observer.disconnect();
@@ -177,7 +195,7 @@ export default {
         this.releaseAcquired();
         this.acquiredUrl = url;
         this.blobUrl = blobUrl;
-      } catch (error) {
+      } catch {
         if (this.disposed || url !== this.src || !this.useAuthenticatedFetch) {
           return;
         }
@@ -188,7 +206,6 @@ export default {
         // reports the failure through the error event of the element.
         this.failed = true;
         this.blobUrl = null;
-        this.$emit('error', error);
       }
     },
     releaseAcquired() {

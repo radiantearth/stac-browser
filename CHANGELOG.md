@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- SVG icons, thumbnails and previews (`image/svg+xml`) are shown, SVG files are offered for download instead of being opened
+- Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
+
+### Fixed
+
+- Icons, logos and card thumbnails that fail to load are hidden
+- A page that is still loading no longer replaces the page that was navigated to in the meantime
+- "Search" on external content opens the search of the catalog instead of an error page
+- The catalog keeps its capabilities (e.g. search, sorting, filters) after visiting external content
+- Maps showing multiple Items now send the configured authentication (headers and query parameters) and apply the source/layer customizations and `maxDisplayPixels` for each Item
+- The `crossOriginMedia` option now applies to images on maps
+- The fallback description in the structured data (JSON-LD) shows the catalog title instead of "undefined"
+- Scientific publications without a DOI show "n/a" instead of escaped HTML, and DOI links use HTTPS
+- Zarr datacubes are visualized based on the metadata of their bands (e.g. RGB data without statistics is no longer shown in white) and apply nodata values
+- Typo in the label for processing instructions/code links
+- Catalogs, collections and items of a configured catalog in folders that share their name with a page of STAC Browser
+  (e.g. `validation/` or `external/`) open correctly, their paths start with `/browse/`
+
+## [5.1.0] - 2026-09-07
+
+### Added
+
 - A "Back" button on pages with external content returns to the page in the catalog from which the external content was reached
 - Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
 - The source popover indicates when the shown data is not part of the configured catalog
@@ -305,7 +328,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.1.0...HEAD
+[5.1.0]: https://github.com/radiantearth/stac-browser/compare/v5.1.0-rc.1...v5.1.0
 [5.1.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...v5.1.0-rc.1
 [5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...v5.0.0
 [5.0.0-rc.2]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0-rc.2

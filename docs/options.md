@@ -62,6 +62,7 @@ The override order for the configuration is:
   - [allowExternalAccess](#allowexternalaccess)
   - [allowedDomains](#alloweddomains)
   - [crossOriginMedia](#crossoriginmedia)
+    - [SVG images](#svg-images)
   - [authConfig](#authconfig)
     - [API Keys](#api-keys)
     - [HTTP Basic](#http-basic)
@@ -78,6 +79,7 @@ The override order for the configuration is:
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayPreview](#displaypreview)
   - [displayOverview](#displayoverview)
+  - [displayPreviewsForChildren](#displaypreviewsforchildren)
   - [displayOverviewsForChildren](#displayoverviewsforchildren)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [maxDisplayPixels](#maxdisplaypixels)
@@ -247,6 +249,15 @@ Domain and subdomain patterns ignore schema, userinfo, port, path, query and fra
 ### crossOriginMedia
 
 The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
+
+#### SVG images
+
+STAC Browser shows SVG images (`image/svg+xml`), e.g. icons and thumbnails.
+SVG files can contain scripts, which don't run when the image is shown in STAC Browser, but may run when a user opens the file directly.
+We recommend serving SVG data from a different origin (domain) than STAC Browser.
+Otherwise, serve the SVG files with a [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP) that blocks scripts, e.g. `script-src 'none'`.
+
+If STAC Browser is served with a Content Security Policy, `img-src` must allow `blob:` and `data:`, as images that require authentication headers are shown from such URLs.
 
 ### authConfig
 
@@ -490,6 +501,10 @@ If both `displayPreview` and `displayOverview` (see below) are enabled, STAC Bro
 ### displayOverview
 
 If set to `true` (default), allows to display COGs and, if `displayGeoTiffByDefault` is enabled, GeoTiffs on the map as default visualization, usually from an asset with role `overview` or `visual`.
+
+### displayPreviewsForChildren
+
+Similar to `displayPreview` (see above), but applies only to maps that show multiple STAC entities, i.e. lists of items for a Collection or Search. Defaults to `true`.
 
 ### displayOverviewsForChildren
 

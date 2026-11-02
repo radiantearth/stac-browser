@@ -48,7 +48,7 @@ import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
 import AuthUtils from './auth/utils';
 import { browserProtocols } from 'stac-js/src/http';
-import { imageMediaTypes, geojsonMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
+import { imageMediaTypes, geojsonMediaType, svgMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
 import { getGeoZarrSourceOptionsFromAsset } from 'ol-stac/util.js';
 
 const disableDownloadTypes = [...zarrMediaTypes];
@@ -236,6 +236,10 @@ export default {
     },
     browserCanOpenFile() {
       if (this.useAltDownloadMethod)  {
+        return false;
+      }
+      // SVG files opened in the browser can run scripts, so they are downloaded instead
+      if (this.data.isType(svgMediaType)) {
         return false;
       }
       if (this.data.canBrowserDisplayImage()) {

@@ -63,11 +63,16 @@
           <MapSelect class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
         </b-form-group>
 
-        <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
+        <b-form-group
+          v-if="conformances.CollectionIdFilter" class="filter-collection"
+          :label="$t('stacCollection', collections.length)" :label-for="ids.collections"
+          :description="requiresCollections && !collectionsMissing ? $t('search.collectionsRequired') : null"
+        >
           <multiselect
             :id="ids.collections"
             v-model="selectedCollections"
             v-bind="collectionSelectOptions"
+            :class="{ 'is-invalid': collectionsMissing }"
             @tag="addCollection"
             @search-change="searchCollections"
           >
@@ -80,6 +85,9 @@
               </li>
             </template>
           </multiselect>
+          <b-form-invalid-feedback :state="collectionsMissing ? false : null">
+            {{ $t('search.collectionsRequired') }}
+          </b-form-invalid-feedback>
         </b-form-group>
 
         <b-form-group v-if="conformances.ItemIdFilter" class="filter-item-id" :label="$t('search.itemIds')" :label-for="ids.ids">
@@ -202,7 +210,8 @@ function getDefaults() {
     filtersAndOr: 'and',
     filtersNegate: false,
     filters: [],
-    selectedCollections: []
+    selectedCollections: [],
+    collectionsMissing: false
   };
 }
 
@@ -360,7 +369,8 @@ export default defineComponent({
       return this.activeFilterSet?.filterLogic || null;
     },
     canSearchCollectionsFreeText() {
-      return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
+      return this.canSearchCollections(this.conformanceContext)
+        && this.supportsConformance(TYPES.Collections.FreeText, this.conformanceContext);
     },
     ids() {
       let obj = {};
@@ -579,6 +589,9 @@ export default defineComponent({
       deep: 1,
       handler(collections) {
         this.commitToVuex('collections', collections.map(c => c.value));
+        if (collections.length > 0) {
+          this.collectionsMissing = false;
+        }
       }
     },
     provideBBox(shown) {
@@ -798,6 +811,10 @@ export default defineComponent({
       });
     },
     onSubmit() {
+      if (this.requiresCollections && this.selectedCollections.length === 0) {
+        this.collectionsMissing = true;
+        return;
+      }
       this.commitToVuex('sortby', this.formatSort());
       this.commitToVuex('filters', this.buildFilter());
       // Copy the rows so that later form edits don't mutate the store state

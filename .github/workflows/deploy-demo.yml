@@ -5,6 +5,7 @@ on:
       - main
 jobs:
   deploy:
+    if: github.repository == 'radiantearth/stac-browser'
     runs-on: ubuntu-latest
     env:
       SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

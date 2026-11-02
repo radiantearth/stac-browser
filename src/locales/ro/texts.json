@@ -91,6 +91,7 @@
   },
   "description": "Descriere",
   "errors": {
+    "apiListRequested": "Cererea nu este validă. Cererile directe către /collections and .../items nu sunt suportate în acest moment",
     "authFailed": "Solicitarea a eșuat, credențialele furnizate ar putea fi incorecte.",
     "badRequest": "Solicitarea nu este validă. Acest lucru se poate datora unor parametri de căutare invalizi sau a unei erori în browserul STAC",
     "contactProvider": "Vă rugăm să contactați operatorul serviciului pentru a rezolva această problemă.",
@@ -109,6 +110,7 @@
     "loadApiItemsFailed": "Elementele API nu au putut fi încărcate.",
     "loadFilteredItems": "Ne pare rău, încărcarea unei liste de articole filtrate nu a reușit.",
     "loadItems": "Ne pare rău, nu s-a putut încărca lista de articole STAC.",
+    "missingPermissions": "Credențiale furnizate pentru această cerere nu au permisiunile necesare",
     "networkError": "Această problemă poate apărea atunci când serverele nu permit accesul extern prin browsere web (de exemplu, când anteturile CORS nu sunt prezente). @:errors.contactProvider",
     "noExternalAccess": "Accesul la cataloage externe nu este permis!",
     "notFound": "Resursa solicitată nu există. @:errors.contactProvider",
@@ -121,12 +123,26 @@
     "storeAs": "Salvează codul ca:",
     "installDependencies": "Instalează dependințele:"
   },
+  "externalInfo": "Acest {type} este oferit de un furnizor extern de date",
   "favorites": {
+    "add": "Adaugă la favorite",
+    "empty": "Nu au fost adăugate elemente preferate. Pentru adăuga la secțiunea de elemente preferate folosiți butonul „Preferate” de pe pagina unui catalog, colecții sau unui element.",
+    "export": "Export",
+    "exportDescription": "Exportați elementele preferate într-un fișier, de exemplu să le importați în alt browser.",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
-      "json": "JSON"
-    }
+      "json": "JSON",
+      "stac": "Catalog STAC"
+    },
+    "import": "Import",
+    "importDescription": "Importați elemente preferate dintr-un fișier exportat.",
+    "importInvalid": "Fișierul selectat nu conține elemente preferate.",
+    "imported": "{count} Favorite au fost importate.",
+    "label": "Favorite",
+    "localOnly": "Elementele preferate sunt stocate local doar în acest web browser. Acestea nu sunt sincronizate între dispozitive sau browsere.",
+    "remove": "Elimină dintre elementele preferate",
+    "title": "Favorite"
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
@@ -140,7 +156,8 @@
   },
   "goBack": {
     "description": "Reveniți la {type}",
-    "label": "Înapoi"
+    "label": "Înapoi",
+    "refererDescription": "Mergi înapoi la ultima pagină vizitată din catalog"
   },
   "goToCollection": {
     "description": "Accesați colecția asociată",
@@ -165,6 +182,7 @@
   },
   "items": {
     "filter": "Filtrat",
+    "filterChangesNotApplied": "Filtrele au fost schimbate dar schimbările nu au fost aplicate încă.",
     "hideFilter": "Ascunde filtrele",
     "noTime": "Niciun timp selectat",
     "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
@@ -172,8 +190,19 @@
   },
   "loading": "Încărcare...",
   "manage": {
+    "addCollection": "Adaugă colecție",
+    "addItem": "Adaugă element",
+    "confirmDeleteTitle": "Confirmă ștergerea",
+    "confirmDeleteMessage": "Sunteți sigur că doriți să ștergeți această resursă STAC?",
+    "create": "Creează",
+    "delete": "Șterge",
+    "discardDraft": "Ignoră modificările restaurate",
     "edit": "Editare",
-    "save": "Salvare"
+    "save": "Salvare",
+    "noUndo": "Această acțiune nu poate fi anulată.",
+    "unsavedChangesLeave": "Aveți modificări nesalvate. Sunteți siguri că doriți să părăsiți această pagină?",
+    "unsavedChangesTitle": "Modificări nesalvate",
+    "validate": "Validează"
   },
   "map": "Hartă",
   "mapping": {
@@ -196,7 +225,9 @@
       "westLon": "Longitudine vestică"
     },
     "close": "Închidere",
-    "displayLimit": {},
+    "displayLimit": {
+      "showAnyway": "Afișează oricum"
+    },
     "layers": {
       "base": "Straturi de bază",
       "footprint": "Amprentă la sol",
@@ -410,8 +441,11 @@
   "stacAssets": "Resursă | Resurse",
   "stacCatalog": "Catalog | Cataloage",
   "stacCollection": "Colecție | Colecții",
+  "stacEntity": "resursă | resurse",
   "stacItem": "Element | Elemente",
   "submit": "Trimitere",
+  "switchToDarkMode": "Schimbă la mod întunecat",
+  "switchToLightMode": "Schimbă la mod deschis",
   "table": {
     "emptyFilteredText": "Nu există înregistrări care să corespundă interogării dvs",
     "emptyText": "Nu există înregistrări de afișat",
