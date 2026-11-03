@@ -220,8 +220,8 @@
       "eastLon": "東経",
       "error": {
         "incomplete": "座標が欠損しています",
-        "invalidLat": "",
-        "invalidLon": "",
+        "invalidLat": "値は-90から90の間である必要があります",
+        "invalidLon": "値は-180から180の間である必要があります",
         "latOrder": "南緯は北緯より小さくなければならない",
         "lonOrder": "西経は東経より小さくなければならない"
       },
@@ -232,9 +232,9 @@
     },
     "close": "閉じる",
     "displayLimit": {
-      "message": "",
+      "message": "このデータセットは非常に大きいため、表示するとブラウザの動作が重くなったり、フリーズしたりする可能性があります。",
       "showAnyway": "",
-      "title": ""
+      "title": "大規模データセット"
     },
     "fit": "",
     "focusHint": "地図をクリック/タップして拡大・移動",
@@ -248,7 +248,7 @@
       "description": ""
     },
     "nobasemap": "利用可能なベースマップがありません。",
-    "nodata": "",
+    "nodata": "メタデータ内に位置情報がありません。",
     "zoom": {
       "in": {
         "description": "拡大",
