@@ -19,6 +19,18 @@ export class BrowserError extends Error {
  */
 export default class Utils {
 
+  static isMidnightUTC(extents) {
+    const boundaries = Array.isArray(extents) ? extents.flat().filter(value => value !== null) : [];
+    return boundaries.length > 0 && boundaries.every(value => {
+      const date = new Date(value);
+      return !Number.isNaN(date.getTime()) &&
+        date.getUTCHours() === 0 &&
+        date.getUTCMinutes() === 0 &&
+        date.getUTCSeconds() === 0 &&
+        date.getUTCMilliseconds() === 0;
+    });
+  }
+
   static shortenTitle(fullStr, strLen, separator = '…') {
     if (fullStr.length <= strLen) {
       return fullStr;

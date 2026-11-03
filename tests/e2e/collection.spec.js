@@ -5,7 +5,7 @@
  * item listing, and detail controls.
  */
 import { test, expect } from './fixtures.js';
-import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
+import { clearClipboard, configureBrowser, readClipboard, waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -71,6 +71,143 @@ test.describe('Collection Metadata', () => {
     // not just "bis jetzt" on its own.
     await expect(temporalValue).toContainText(year);
     await expect(temporalValue).toContainText('bis jetzt');
+  });
+
+  test.describe('Temporal extents', () => {
+    test.use({ timezoneId: 'America/New_York' });
+
+    test('Catalog - optionally omits midnight from temporal extents', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(collection.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+      await expect(temporalValue).toHaveText('2020-01-01 until present');
+    });
+
+    test('Catalog - keeps midnight time by default', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      await catalog.createServer(worker);
+
+      await page.goto(collection.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+      await expect(temporalValue).toHaveText('2020-01-01 0:00:00 UTC until present');
+    });
+
+    test('Catalog - keeps meaningful times when midnight omission is enabled', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      collection.setMetadata({
+        extent: {
+          spatial: collection.getMetadata().extent.spatial,
+          temporal: { interval: [['2020-01-01T12:34:56Z', null]] }
+        }
+      });
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(collection.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+      await expect(temporalValue).toHaveText('2020-01-01 12:34:56 UTC until present');
+    });
+
+    test('Catalog card - optionally omits midnight from temporal extents', async ({ page, worker }) => {
+      const { catalog } = createStaticCatalog();
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(catalog.root.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('.catalog-card .datetime');
+      await expect(temporalValue).toHaveText('2020-01-01 until present');
+    });
+
+    test('Catalog card - keeps midnight time by default', async ({ page, worker }) => {
+      const { catalog } = createStaticCatalog();
+      await catalog.createServer(worker);
+
+      await page.goto(catalog.root.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      await expect(page.locator('.catalog-card .datetime')).toHaveText('2020-01-01 0:00:00 UTC until present');
+    });
+
+    test('Catalog card - keeps meaningful times when midnight omission is enabled', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      collection.setMetadata({
+        extent: {
+          spatial: collection.getMetadata().extent.spatial,
+          temporal: { interval: [['2020-01-01T12:34:56Z', null]] }
+        }
+      });
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(catalog.root.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      await expect(page.locator('.catalog-card .datetime')).toHaveText('2020-01-01 12:34:56 UTC until present');
+    });
+
+    for (const isCard of [false, true]) {
+      const name = isCard ? 'Catalog card' : 'Catalog';
+      const selector = isCard ? '.catalog-card .datetime' : 'section.metadata .row:has-text("Temporal extent") .value';
+
+      test(`${name} - keeps both midnight dates in a closed interval`, async ({ page, worker }) => {
+        const { catalog, collection } = createStaticCatalog();
+        collection.setMetadata({
+          extent: {
+            spatial: collection.getMetadata().extent.spatial,
+            temporal: { interval: [['2020-01-01T00:00:00Z', '2020-12-31T00:00:00Z']] }
+          }
+        });
+        await configureBrowser(page, { omitTimeForMidnight: true });
+        await catalog.createServer(worker);
+
+        await page.goto((isCard ? catalog.root : collection).getBrowserPath());
+        await waitForBrowserReady(page);
+
+        await expect(page.locator(selector)).toHaveText('2020-01-01–12-31');
+      });
+
+      test(`${name} - keeps times when a later interval is not midnight`, async ({ page, worker }) => {
+        const { catalog, collection } = createStaticCatalog();
+        collection.setMetadata({
+          extent: {
+            spatial: collection.getMetadata().extent.spatial,
+            temporal: {
+              interval: [
+                ['2020-01-01T00:00:00Z', null],
+                ['2020-01-01T00:00:00Z', '2020-01-02T00:00:00Z'],
+                ['2020-06-01T12:34:56Z', null]
+              ]
+            }
+          }
+        });
+        await configureBrowser(page, { omitTimeForMidnight: true });
+        await catalog.createServer(worker);
+
+        await page.goto((isCard ? catalog.root : collection).getBrowserPath());
+        await waitForBrowserReady(page);
+
+        if (isCard) {
+          await expect(page.locator(selector)).toHaveText('2020-01-01 0:00:00 UTC until present');
+        }
+        else {
+          await expect(page.locator(selector).locator('li')).toHaveText([
+            '2020-01-01 00:00:00 UTC–2020-01-02 00:00:00 UTC',
+            '2020-06-01 12:34:56 UTC until present'
+          ]);
+        }
+      });
+    }
   });
 
   test('API - should load and display collection metadata', async ({ page, worker }) => {

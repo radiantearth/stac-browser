@@ -125,7 +125,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'omitTimeForMidnight', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
@@ -179,11 +179,12 @@ export default defineComponent({
     temporalExtents() {
       if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
         let extents = this.data.extent.temporal.interval;
+        const shorten = this.omitTimeForMidnight && Utils.isMidnightUTC(extents);
         if (extents.length > 1) {
           // Remove union temporal extent in favor of more concrete extents
           extents = extents.slice(1);
         }
-        return this.formatTemporalExtents(extents);
+        return this.formatTemporalExtents(extents, null, { shorten });
       }
       return null;
     },

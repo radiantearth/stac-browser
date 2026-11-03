@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
 - New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- New config option `omitTimeForMidnight` to show date-only Collection temporal extents when all boundaries are midnight UTC
 - SVG icons, thumbnails and previews (`image/svg+xml`) are shown, SVG files are offered for download instead of being opened
 - Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
 - Links with the relation type `source_for` open in STAC Browser
