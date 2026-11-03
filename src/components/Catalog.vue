@@ -93,7 +93,7 @@ export default {
         const extent = extents[0];
         if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
           const shorten = this.omitTimeForMidnight && Utils.isMidnightUTC(extents);
-          return this.formatTemporalExtent(extent, true, { shorten });
+          return this.formatTemporalExtent(extent, null, { shorten });
         }
       }
       return null;
