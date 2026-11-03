@@ -395,6 +395,13 @@ function getStore(config, router) {
       canSearchCollections: (state, getters) => (context = null) => {
         return getters.supportsConformance(TYPES.Collections.BasicFilters, context);
       },
+      // The sort applied to API requests without sortby, type is a key of TYPES
+      defaultSort: (state, getters) => (type, context = null) => {
+        if (!getters.supportsConformance(TYPES[type].Sort, context)) {
+          return null;
+        }
+        return (type === 'Collections' ? state.defaultCollectionSort : state.defaultItemSort) || null;
+      },
       searchBrowserLink: (state, getters) => {
         if (!getters.canSearch) {
           return null;
@@ -1180,10 +1187,7 @@ function getStore(config, router) {
             baseUrl = URI(baseUrl);
           }
 
-          let sort = null;
-          if (cx.getters.supportsConformance(TYPES.Items.Sort, baseUrl)) {
-            sort = cx.state.defaultItemSort;
-          }
+          const sort = cx.getters.defaultSort('Items', baseUrl);
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
 
           let response = await cx.dispatch('request', { link, checkPermissions: true });
@@ -1285,10 +1289,7 @@ function getStore(config, router) {
             reset = true;
           }
           link = stac.getLinkWithRel('data');
-          let sort = null;
-          if (cx.getters.supportsConformance(TYPES.Collections.Sort, stac)) {
-            sort = cx.state.defaultCollectionSort;
-          }
+          const sort = cx.getters.defaultSort('Collections', stac);
           const filters = {};
           if (cx.getters.supportsConformance(TYPES.Collections.FreeText, stac) && searching && size(q) > 0) {
             filters.q = q;
