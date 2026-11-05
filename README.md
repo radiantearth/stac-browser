@@ -1,6 +1,6 @@
 # Cal-Adapt STAC Browser
 
-A customized [STAC Browser](https://github.com/radiantearth/stac-browser) for the [Cal-Adapt STAC API](https://8dawjspn5g.execute-api.us-west-2.amazonaws.com), live at https://stac-browser.cal-adapt.org.
+A customized [STAC Browser](https://github.com/radiantearth/stac-browser) for the [Cal-Adapt STAC API](https://stac.cal-adapt.org), live at https://stac-browser.cal-adapt.org.
 
 Based on [radiantearth/stac-browser](https://github.com/radiantearth/stac-browser) v5.1.0. See upstream's [README](https://github.com/radiantearth/stac-browser/blob/v5.1.0/README.md) and [docs](https://github.com/radiantearth/stac-browser/tree/v5.1.0/docs) for everything not covered here.
 
