@@ -11,6 +11,7 @@ export default {
       mapSelection: {
         show: ref => this.showAsset(ref),
         hide: ref => this.hideAsset(ref),
+        move: (ref, offset) => this.moveAsset(ref, offset),
         isShown: ref => this.isShown(ref),
         isOnMap: ref => this.isOnMap(ref)
       }
@@ -125,6 +126,16 @@ export default {
     },
     hideAsset(asset) {
       this.selectedDataSources = this.getSelection().filter(ref => !this.isReferenceEqual(ref, asset));
+    },
+    moveAsset(asset, offset) {
+      const selection = this.getSelection();
+      const from = selection.findIndex(ref => this.isReferenceEqual(ref, asset));
+      const to = from + offset;
+      if (from < 0 || to < 0 || to >= selection.length) {
+        return;
+      }
+      selection.splice(to, 0, selection.splice(from, 1)[0]);
+      this.selectedDataSources = selection;
     },
     dataChanged(data) {
       if (Array.isArray(data)) {

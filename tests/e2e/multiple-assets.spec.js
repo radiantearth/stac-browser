@@ -74,4 +74,27 @@ test.describe('Multiple assets', () => {
     await expect(page.locator('.global-error')).toContainText('Up to 8 layers');
     await expect(page.locator('.badge.shown')).toHaveCount(8);
   });
+
+  test('assets can be reordered and removed in the layer switcher', async ({ page, worker }) => {
+    await setup(page, worker, 2);
+    await clickAssetButton(page, 'Vector 1', 'Show on map');
+    await clickAssetButton(page, 'Vector 2', 'Show on map');
+    await expect(asset(page, 'Vector 2').locator('.badge.shown')).toBeVisible();
+
+    await page.locator('.ol-layercontrol button').click();
+    const layerControl = page.locator('.layercontrol');
+    const entry = (title) => layerControl.locator('li', { hasText: title }).last();
+    const titles = layerControl.locator('.title').filter({ hasText: /^Vector/ });
+
+    // The layer on top is listed first
+    await expect(titles).toHaveText(['Vector 2', 'Vector 1']);
+    await expect(entry('Vector 2').getByRole('button', { name: 'Move up' })).toBeDisabled();
+
+    await entry('Vector 2').getByRole('button', { name: 'Move down' }).click();
+    await expect(titles).toHaveText(['Vector 1', 'Vector 2']);
+
+    await entry('Vector 1').getByRole('button', { name: 'Hide from map' }).click();
+    await expect(titles).toHaveText(['Vector 2']);
+    await expect(asset(page, 'Vector 1').locator('.badge.shown')).toBeHidden();
+  });
 });
