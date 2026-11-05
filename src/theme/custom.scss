@@ -30,8 +30,9 @@
       min-width: 0;
     }
 
-    // Browse, Search and API assume STAC knowledge; the map covers finding data.
-    // The search page still works at /#/search.
+    // Browse, Search and API assume STAC knowledge. People find datasets with the
+    // search box above the home page list and items with each dataset's filters;
+    // the full search page still works at /#/search.
     > .navigation {
       display: none;
     }
