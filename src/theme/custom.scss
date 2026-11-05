@@ -44,9 +44,14 @@
   }
 
   // The Share panel only repeats the address bar's URL (hash routes) plus social
-  // posting buttons; STAC Browser has no option to turn the button off
+  // posting buttons; STAC Browser has no option to turn the button off.
+  // The hidden button still ends the group, so round the source button's corners.
   #popover-share-btn {
     display: none;
+  }
+
+  #popover-link-btn {
+    border-radius: var(--bs-btn-border-radius);
   }
 
   // Keyword chips: light cobalt tint instead of solid grey, so long lists read less heavy.
