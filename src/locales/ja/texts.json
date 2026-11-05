@@ -216,12 +216,36 @@
       "label": "i"
     },
     "bboxSelect": {
-      "error": {}
+      "add": "地図をクリックしてバウンディングボックスを追加。",
+      "eastLon": "東経",
+      "error": {
+        "incomplete": "座標が欠損しています",
+        "invalidLat": "値は-90から90の間である必要があります",
+        "invalidLon": "値は-180から180の間である必要があります",
+        "latOrder": "南緯は北緯より小さくなければならない",
+        "lonOrder": "西経は東経より小さくなければならない"
+      },
+      "northLat": "北緯",
+      "remove": "バウンディングボックス内をクリックして削除。",
+      "southLat": "南緯",
+      "westLon": "西経"
     },
     "close": "閉じる",
-    "displayLimit": {},
-    "layers": {},
+    "displayLimit": {
+      "message": "このデータセットは非常に大きいため、表示するとブラウザの動作が重くなったり、フリーズしたりする可能性があります。",
+      "title": "大規模データセット"
+    },
+    "fit": "全体表示",
+    "focusHint": "地図をクリック/タップして拡大・移動",
+    "layers": {
+      "base": "背景地図レイヤ",
+      "footprint": "レイヤの範囲",
+      "title": "レイヤ",
+      "unnamed": "名無し#{id}"
+    },
     "location": {},
+    "nobasemap": "利用可能なベースマップがありません。",
+    "nodata": "メタデータ内に位置情報がありません。",
     "zoom": {
       "in": {
         "description": "拡大",
@@ -254,7 +278,16 @@
     "previous": "‹ 前"
   },
   "poweredBy": "提供: {link}",
-  "programming": {},
+  "programming": {
+    "csharp": "C#",
+    "curl": "cURL",
+    "go": "Go",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "ファイルシステム (ローカル)",
@@ -284,11 +317,19 @@
   "reset": "リセット",
   "search": {
     "addCollections": "Enterキーを押してコレクションを追加",
+    "addDate": "日付を追加",
     "addFilter": "フィルターを追加",
     "additionalFilters": "追加のフィルター",
     "addItemIds": "Enterキーを押してアイテムIDを追加",
     "addSearchTerm": "Enter キーを押して検索語句を追加",
-    "arrayInput": {},
+    "arrayInput": {
+      "addValue": "Enterキーを押して値を追加"
+    },
+    "arrayContainsDescription": "配列が指定されたすべての値を含んでいる",
+    "arrayContainedByDescription": "配列が指定された値の部分集合である",
+    "arrayEqualsDescription": "配列の要素が順序に関わらず一致する（同じ要素を含む）",
+    "arrayOverlapsDescription": "配列が指定された値のいずれかを含んでいる場合",
+    "collectionsRequired": "アイテムを検索するには、一つ以上のコレクションを選択してください。",
     "dateDescription": "すべての時刻はUTC (協定世界時) です",
     "enterCollections": "1つ以上のコレクションIDを入力してください...",
     "enterItemIds": "1つ以上のアイテムIDを入力してください...",
@@ -313,7 +354,9 @@
     "matches": "マッチ",
     "metaDescription": "{title} のデータを検索します。",
     "modifyCriteria": "検索条件を変更してください。",
+    "noFurtherItemsFound": "利用可能なアイテムはありません。",
     "noItemsFound": "指定されたフィルターにアイテムが見つかりませんでした。",
+    "noOperatorsError": "STAC Browserはフィルターの演算子{queryable}を一切サポートしていません。",
     "noOptions": "まだ何も入力されていません",
     "notEqualTo": "等しくない",
     "notFullySupported": "すべてのオプションがサポートされているわけではありません。",
