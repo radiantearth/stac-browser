@@ -14,7 +14,7 @@ RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!--RC//;s/RC-->//' index.h
 RUN npm run build
 
 
-FROM nginxinc/nginx-unprivileged:1-alpine
+FROM nginx/nginx-unprivileged:1-alpine-slim
 ARG pathPrefix="/"
 
 USER root
