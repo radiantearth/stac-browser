@@ -48,6 +48,39 @@ test.describe('Item view - Metadata', () => {
     await expect(itemTitle).toBeVisible();
   });
 
+  test('should escape proj:wkt2 instead of rendering it as HTML', async ({ page, worker }) => {
+    const { catalog, item } = createCatalog();
+    item.setMetadata({ 'proj:wkt2': 'PROJCRS["x</pre><img src=x onerror="window.__xss=true">"]' });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const wkt = page.locator('pre', { hasText: 'PROJCRS' });
+    await expect(wkt).toBeVisible();
+    await expect(wkt).toContainText('<img src=x onerror=');
+    await expect(page.locator('img[src="x"]')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+  });
+
+  test('should escape other formatted properties instead of rendering them as HTML', async ({ page, worker }) => {
+    const { catalog, item } = createCatalog();
+    const payload = '<img src=x onerror="window.__xss=true">';
+    item.setMetadata({
+      'grid:code': `FOO-${payload}`,
+      'processing:software': { [payload]: payload }
+    });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByText(`FOO-${payload}`)).toBeVisible();
+    await expect(page.getByText(`${payload} (${payload})`)).toBeVisible();
+    await expect(page.locator('img[src="x"]')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+  });
+
   test('should display rich item properties from EO collection', async ({ page, worker }) => {
     const { api, items } = createAPI();
     await api.createServer(worker);

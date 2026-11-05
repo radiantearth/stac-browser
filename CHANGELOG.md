@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+**A vulnerability was found, an upgrade is recommended as fast as possible.**
+
+- XSS issues fixed: Metadata values (e.g. `proj:wkt2`, `grid:code` or `processing:software`) are escaped and links with `javascript:` URLs are not clickable
+
 ### Added
 
 - Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
