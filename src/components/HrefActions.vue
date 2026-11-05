@@ -53,7 +53,7 @@ import LinkActions from '../../linkActions.config';
 import AuthUtils from './auth/utils';
 import { browserProtocols } from 'stac-js/src/http';
 import { imageMediaTypes, geojsonMediaType, svgMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
-import { getGeoZarrSourceOptionsFromAsset } from 'ol-stac/util.js';
+import { getGeoZarrSourceOptionsFromAsset, getWebMapLinks } from 'ol-stac/util.js';
 
 const disableDownloadTypes = [...zarrMediaTypes];
 const mapTypes = imageMediaTypes.concat([geojsonMediaType]).concat(wozMediaTypes);
@@ -166,11 +166,21 @@ export default {
     shown() {
       return Boolean(this.mapSelection?.isShown(this.data));
     },
+    isWebMapLink() {
+      if (this.isAsset || !this.data.getContext) {
+        return false;
+      }
+      return getWebMapLinks(this.data.getContext())
+        .some(link => link.rel === this.data.rel && link.href === this.data.href);
+    },
+    canShowOnMap() {
+      return this.isAsset ? this.canShow : this.isWebMapLink;
+    },
     hasShowButton() {
-      return this.isAsset && this.mapSelection && this.canShow && !this.shown;
+      return this.mapSelection && this.canShowOnMap && !this.shown;
     },
     hasHideButton() {
-      return this.isAsset && Boolean(this.mapSelection?.isOnMap(this.data));
+      return (this.isAsset || this.isWebMapLink) && Boolean(this.mapSelection?.isOnMap(this.data));
     },
     canDownload() {
       return this.isAsset && this.isBrowserProtocol && !disableDownloadTypes.includes(this.data?.type);

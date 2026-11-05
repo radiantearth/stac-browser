@@ -212,6 +212,43 @@ test.describe('Catalog with web map links', () => {
     await expect(links.getByText('Tiles')).toBeVisible();
   });
 
+  test('web map links can be shown on and hidden from the map', async ({ page, worker }) => {
+    const catalog = createCatalog([1, 2].map(i => ({
+      rel: 'xyz',
+      href: `https://tiles${i}.example/tiles/{z}/{x}/{y}.png`,
+      type: 'image/png',
+      title: `Tiles ${i}`,
+    })));
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+
+    const links = page.locator('.meta > .intro > .links');
+    const openPopover = async (title) => {
+      // Close other popovers first, they stay open while focused
+      await page.getByRole('heading', { name: 'Web Map Catalog' }).click();
+      await expect(page.locator('.link-more:visible')).toHaveCount(0);
+      await links.getByText(title).hover();
+      return page.locator('.link-more:visible');
+    };
+
+    // The first link is shown by default
+    let popover = await openPopover('Tiles 1');
+    await expect(popover.getByRole('button', { name: 'Hide from map' })).toBeVisible();
+
+    popover = await openPopover('Tiles 2');
+    await popover.getByRole('button', { name: 'Show on map' }).click();
+    await expect(popover.getByRole('button', { name: 'Hide from map' })).toBeVisible();
+
+    await popover.getByRole('button', { name: 'Hide from map' }).click();
+    await expect(popover.getByRole('button', { name: 'Show on map' })).toBeVisible();
+
+    popover = await openPopover('Tiles 1');
+    await expect(popover.getByRole('button', { name: 'Hide from map' })).toBeVisible();
+  });
+
   test('shows no map without web map links', async ({ page, worker }) => {
     const catalog = createCatalog();
     await catalog.createServer(worker);

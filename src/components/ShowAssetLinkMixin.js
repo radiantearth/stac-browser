@@ -69,7 +69,10 @@ export default {
     }
   },
   methods: {
-    isAssetEqual(a, b) {
+    isReferenceEqual(a, b) {
+      if (a?.isLink && b?.isLink) {
+        return a === b || (a.rel === b.rel && a.getAbsoluteUrl() === b.getAbsoluteUrl());
+      }
       if (!a?.isAsset || !b?.isAsset) {
         return false;
       }
@@ -80,24 +83,24 @@ export default {
         return true;
       }
       if (a.isAlternate) {
-        return this.isAssetEqual(a.getContext(), b);
+        return this.isReferenceEqual(a.getContext(), b);
       }
       if (b.isAlternate) {
-        return this.isAssetEqual(a, b.getContext());
+        return this.isReferenceEqual(a, b.getContext());
       }
       return false;
     },
     isShown(ref) {
-      return this.selectedReferences.some(shown => this.isAssetEqual(shown, ref));
+      return this.selectedReferences.some(shown => this.isReferenceEqual(shown, ref));
     },
     isOnMap(ref) {
-      return this.shownOnMap.some(shown => this.isAssetEqual(shown, ref));
+      return this.shownOnMap.some(shown => this.isReferenceEqual(shown, ref));
     },
     getSelection() {
       return (this.selectedDataSources || this.shownOnMap).slice();
     },
     isThumbnail(asset) {
-      return this.thumbnails.some(t => this.isAssetEqual(t, asset));
+      return this.thumbnails.some(t => this.isReferenceEqual(t, asset));
     },
     showAsset(asset) {
       if (this.isThumbnail(asset)) {
@@ -105,7 +108,7 @@ export default {
       }
       else {
         this.tab = this.tabIds.map;
-        const selection = this.getSelection().filter(ref => !this.isAssetEqual(ref, asset));
+        const selection = this.getSelection().filter(ref => !this.isReferenceEqual(ref, asset));
         if (selection.length >= MAX_SHOWN_ON_MAP) {
           this.$store.commit('showGlobalError', {
             message: this.$t('mapping.maxLayers', {max: MAX_SHOWN_ON_MAP})
@@ -121,7 +124,7 @@ export default {
       }
     },
     hideAsset(asset) {
-      this.selectedDataSources = this.getSelection().filter(ref => !this.isAssetEqual(ref, asset));
+      this.selectedDataSources = this.getSelection().filter(ref => !this.isReferenceEqual(ref, asset));
     },
     dataChanged(data) {
       if (Array.isArray(data)) {

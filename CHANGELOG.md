@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Filters: Sortables and queryables without a title show translated labels for common fields (e.g. `properties.datetime`)
 - Multiple assets can be shown on the map at once (up to 8), the most recently added asset is shown on top
 - Assets that are shown on the map can be hidden again
+- Web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) can be shown on and hidden from the map through the list of links
 
 ### Changed
 
