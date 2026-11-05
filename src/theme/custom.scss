@@ -1,8 +1,7 @@
 // Cal-Adapt overrides on top of STAC Browser's page styles
 
 #stac-browser {
-  // Header: logo, title and the Map/Catalog tabs, as on caladapt-stac-map. Same
-  // 52px height as the map's header, so the nav doesn't move when switching.
+  // Header: logo and title on the left, as on caladapt-stac-map, with the same 52px height
   > header .site {
     padding-block: 0;
   }
@@ -24,10 +23,6 @@
           white-space: nowrap;
         }
       }
-
-      > .widget {
-        flex: none;
-      }
     }
 
     // Upstream reserves 350px per button group to keep the title centered
@@ -43,31 +38,6 @@
 
     > .user {
       margin-left: auto;
-    }
-  }
-
-  .site-tabs {
-    display: flex;
-    height: 100%;
-
-    a {
-      display: flex;
-      align-items: center;
-      min-height: 52px;
-      padding: 0 16px;
-      border-bottom: 4px solid transparent;
-      font-size: 15px;
-      color: var(--sb-header-color);
-      text-decoration: none;
-
-      &:hover {
-        border-bottom-color: rgba(255, 255, 255, 0.5);
-      }
-
-      &[aria-current="page"] {
-        border-bottom-color: $ca-goldenrod;
-        font-weight: 500;
-      }
     }
   }
 
