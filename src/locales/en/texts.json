@@ -20,6 +20,7 @@
       "generic": "Download",
       "withSource": "Download from {source}"
     },
+    "hideFromMap": "Hide from map",
     "inItems": "Asset in Items | Assets in Items",
     "role": {
       "data": "Data",
@@ -247,6 +248,7 @@
     "location": {
       "description": "Go to your location"
     },
+    "maxLayers": "Up to {max} layers can be shown on the map at once, please hide a layer first.",
     "nobasemap": "No basemaps available.",
     "nodata": "No spatial information available in the metadata.",
     "zoom": {

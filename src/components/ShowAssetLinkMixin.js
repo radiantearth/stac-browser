@@ -2,12 +2,17 @@ import Utils from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import { stacBrowserSpecialHandling } from "../rels";
 
+// Each layer needs a WebGL context, of which browsers only allow a few
+export const MAX_SHOWN_ON_MAP = 8;
+
 export default {
   provide() {
     return {
       mapSelection: {
         show: ref => this.showAsset(ref),
-        isShown: ref => this.isShown(ref)
+        hide: ref => this.hideAsset(ref),
+        isShown: ref => this.isShown(ref),
+        isOnMap: ref => this.isOnMap(ref)
       }
     };
   },
@@ -19,7 +24,7 @@ export default {
       },
       tab: null,
       shownOnMap: [],
-      selectedAssets: []
+      selectedDataSources: null
     };
   },
   computed: {
@@ -85,6 +90,12 @@ export default {
     isShown(ref) {
       return this.selectedReferences.some(shown => this.isAssetEqual(shown, ref));
     },
+    isOnMap(ref) {
+      return this.shownOnMap.some(shown => this.isAssetEqual(shown, ref));
+    },
+    getSelection() {
+      return (this.selectedDataSources || this.shownOnMap).slice();
+    },
     isThumbnail(asset) {
       return this.thumbnails.some(t => this.isAssetEqual(t, asset));
     },
@@ -94,11 +105,23 @@ export default {
       }
       else {
         this.tab = this.tabIds.map;
-        this.selectedAssets = [asset];
+        const selection = this.getSelection().filter(ref => !this.isAssetEqual(ref, asset));
+        if (selection.length >= MAX_SHOWN_ON_MAP) {
+          this.$store.commit('showGlobalError', {
+            message: this.$t('mapping.maxLayers', {max: MAX_SHOWN_ON_MAP})
+          });
+          return;
+        }
+        // The last data source is rendered on top
+        selection.push(asset);
+        this.selectedDataSources = selection;
       }
       if (this.$refs.tabs) {
         Utils.scrollTo(this.$refs.tabs.$el);
       }
+    },
+    hideAsset(asset) {
+      this.selectedDataSources = this.getSelection().filter(ref => !this.isAssetEqual(ref, asset));
     },
     dataChanged(data) {
       if (Array.isArray(data)) {

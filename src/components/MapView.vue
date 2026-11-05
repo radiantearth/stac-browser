@@ -61,12 +61,15 @@ export default {
   mixins: [
     MapMixin
   ],
+  inject: {
+    mapSelection: { default: null }
+  },
   props: {
     stac: {
       type: Object,
       default: null
     },
-    assets: {
+    dataSources: {
       type: Array,
       default: null
     },
@@ -113,8 +116,10 @@ export default {
         return this.displayLimitError !== null;
       },
       set(value) {
-        if (!value) {
+        // Confirming resets the error before the modal closes
+        if (!value && this.displayLimitError !== null) {
           this.displayLimitError = null;
+          this.hideRejected();
         }
       }
     }
@@ -123,19 +128,13 @@ export default {
     async stac() {
       await this.showStacLayer();
     },
-    async assets() {
+    async dataSources(dataSources, oldDataSources) {
       if (!this.stacLayer) {
         return;
       }
       this.displayLimitError = null;
-      if (this.ignoreDisplayLimit) {
-        // Re-enable the display limit for the newly selected assets
-        this.ignoreDisplayLimit = false;
-        this.map.removeLayer(this.stacLayer);
-        this.addStacLayer();
-        return;
-      }
-      await this.stacLayer.setAssets(this.assets);
+      this.addedDataSources = (dataSources || []).filter(ref => !(oldDataSources || []).includes(ref));
+      await this.stacLayer.setDataSources(dataSources);
     },
     async children() {
       if (!this.stacLayer) {
@@ -150,7 +149,7 @@ export default {
         this.addStacLayer();
         return;
       }
-      await this.stacLayer.setAssets(null, false);
+      await this.stacLayer.setDataSources(null, false);
       await this.stacLayer.setChildren(this.children, this.childrenOptions, false);
       await this.stacLayer.updateLayers();
       this.fit();
@@ -170,6 +169,7 @@ export default {
     // These are created here and not in data() to avoid them being reactive
     this.stacLayer = null;
     this.ignoreDisplayLimit = false;
+    this.addedDataSources = [];
     this.focusHintTimer = null;
   },
   async mounted() {
@@ -202,7 +202,7 @@ export default {
         // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
         children: this.children,
-        assets: this.assets || null,
+        dataSources: this.dataSources || null,
         displayWebMapLink: true,
         disableMigration: true,
         childrenOptions: this.childrenOptions
@@ -311,6 +311,17 @@ export default {
     hideFocusHint() {
       clearTimeout(this.focusHintTimer);
       this.focusHint = false;
+    },
+    hideRejected() {
+      // The selected data sources that are too large to be shown don't have a layer
+      if (!this.mapSelection || !this.stacLayer) {
+        return;
+      }
+      const layers = this.stacLayer.getLayersArray();
+      this.addedDataSources
+        .filter(ref => !layers.some(layer => layer.get('stac') === ref))
+        .forEach(ref => this.mapSelection.hide(ref));
+      this.addedDataSources = [];
     },
     showAnyway() {
       this.displayLimitError = null;

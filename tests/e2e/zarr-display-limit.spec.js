@@ -2,8 +2,8 @@
  * Display-limit tests.
  *
  * Assets exceeding `maxDisplayPixels` are not shown on the map
- * automatically; "Show on map" asks for confirmation first and
- * selecting another asset re-arms the limit.
+ * automatically; "Show on map" asks for confirmation first, which
+ * then applies to all assets of the item.
  */
 import { http, HttpResponse } from 'msw';
 import { test, expect } from './fixtures.js';
@@ -132,9 +132,16 @@ test.describe('Display limit', () => {
     await dialog(page).getByRole('button', { name: 'Cancel' }).click();
     await expect(dialog(page)).toBeHidden();
     await expect(page.locator('.badge.shown')).toHaveCount(0);
+
+    // The cancelled asset was removed from the selection, so it doesn't ask again
+    await showOnMap(page, 'Big B');
+    await expect(dialog(page)).toBeVisible({ timeout: 15000 });
+    await dialog(page).getByRole('button', { name: 'Cancel' }).click();
+    await expect(dialog(page)).toBeHidden();
+    await expect(page.locator('.badge.shown')).toHaveCount(0);
   });
 
-  test('confirming shows the asset, the next selection re-arms the limit', async ({ page, worker }) => {
+  test('confirming shows the asset, also for further assets', async ({ page, worker }) => {
     await setupTwoBigAssets(page, worker);
 
     await showOnMap(page, 'Big A');
@@ -143,12 +150,11 @@ test.describe('Display limit', () => {
     await expect(dialog(page)).toBeHidden();
     await expect(asset(page, 'Big A').locator('.badge.shown')).toBeVisible({ timeout: 15000 });
 
-    // The confirmation only applied to the previously selected asset
+    // The confirmation applies to all assets of the item
     await showOnMap(page, 'Big B');
-    await expect(dialog(page)).toBeVisible({ timeout: 15000 });
-    await dialog(page).getByRole('button', { name: 'Show anyway' }).click();
-    await expect(dialog(page)).toBeHidden();
     await expect(asset(page, 'Big B').locator('.badge.shown')).toBeVisible({ timeout: 15000 });
+    await expect(asset(page, 'Big A').locator('.badge.shown')).toBeVisible();
+    await expect(dialog(page)).toBeHidden();
   });
 
   test('small Zarr assets are shown automatically without confirmation', async ({ page, worker }) => {

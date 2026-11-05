@@ -18,6 +18,10 @@
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
+      <b-button v-if="hasHideButton" @click="hide" variant="primary">
+        <b-icon-eye-slash class="me-1" />
+        {{ $t('assets.hideFromMap') }}
+      </b-button>
       <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
         <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
@@ -164,6 +168,9 @@ export default {
     },
     hasShowButton() {
       return this.isAsset && this.mapSelection && this.canShow && !this.shown;
+    },
+    hasHideButton() {
+      return this.isAsset && Boolean(this.mapSelection?.isOnMap(this.data));
     },
     canDownload() {
       return this.isAsset && this.isBrowserProtocol && !disableDownloadTypes.includes(this.data?.type);
@@ -331,6 +338,9 @@ export default {
     show() {
       // Credentials are attached by the map itself (see MapMixin)
       this.mapSelection.show(this.data);
+    },
+    hide() {
+      this.mapSelection.hide(this.data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {

@@ -222,8 +222,8 @@ export default defineComponent({
     },
     mapData() {
       const data = {};
-      if (this.selectedAssets.length > 0) {
-        data.assets = this.selectedAssets;
+      if (this.selectedDataSources?.length > 0) {
+        data.dataSources = this.selectedDataSources;
       }
       else {
         const items = this.items.filter(item => item.type === 'Feature');
