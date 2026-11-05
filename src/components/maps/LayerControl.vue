@@ -2,7 +2,8 @@
   <div class="ol-layercontrol ol-unselectable ol-control">
     <button v-if="id" :id="id"><b-icon-layers-fill /></button>
     <b-popover
-      v-if="id" click placement="top" @show="update"
+      v-if="id" click placement="top" class="popover-layercontrol"
+      @show="update"
       :target="id" teleport-to="#stac-browser" :boundary-padding="10"
     >
       <div class="layercontrol">
@@ -111,6 +112,12 @@ export default {
 };
 </script>
 
+<style lang="scss">
+#stac-browser .popover-layercontrol {
+  --bs-popover-max-width: min(400px, calc(100vw - 20px));
+}
+</style>
+
 <style lang="scss" scoped>
 .ol-layercontrol {
   pointer-events: auto;
@@ -119,7 +126,6 @@ export default {
   bottom: 0.5em;
 }
 .layercontrol {
-  max-width: 300px;
   max-height: 500px;
   overflow: auto;
   margin-top: -0.5rem;

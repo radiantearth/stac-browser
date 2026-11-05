@@ -1,11 +1,11 @@
 <template>
   <ul>
     <li v-for="l in layers" :key="l.id">
-      <div class="d-flex justify-content-between">
-        <b-form-checkbox inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <b-form-checkbox class="layer-title" inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
-        <b-button-group size="sm">
+        <b-button-group size="sm" class="flex-shrink-0">
           <template v-if="l.dataSource && mapSelection">
             <b-button variant="primary" :disabled="l.top" :title="$t('mapping.layers.moveUp')" @click.prevent.stop="move(l, 1)">
               <b-icon-arrow-up />
@@ -170,8 +170,12 @@ export default {
   margin-right: -0.75rem;
   padding: 0.5rem 0.75rem 0  0.75rem;
 
+  .layer-title {
+    min-width: 0;
+  }
+
   .title {
-    line-break: anywhere;
+    overflow-wrap: anywhere;
   }
 
   ul {
