@@ -233,6 +233,10 @@ export default defineComponent({
             features: items
           });
         }
+        else if (this.selectedDataSources) {
+          // Everything was hidden, don't fall back to the default visualization
+          data.dataSources = [];
+        }
       }
       return data;
     }

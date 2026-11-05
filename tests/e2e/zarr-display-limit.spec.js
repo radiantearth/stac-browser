@@ -171,4 +171,25 @@ test.describe('Display limit', () => {
     await expect(page.locator('.badge.shown')).toBeVisible({ timeout: 15000 });
     await expect(dialog(page)).toBeHidden();
   });
+
+  test('the asset shown by default can be hidden', async ({ page, worker }) => {
+    const catalog = new StaticCatalog({ url: ROOT_URL });
+    const item = createItem(catalog, {
+      small: { url: SMALL_URL, title: 'Small store' }
+    });
+    await catalog.createServer(worker);
+    await mockZarrStore(worker, SMALL_URL, SMALL_SHAPE);
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+    await expect(page.locator('.badge.shown')).toBeVisible({ timeout: 15000 });
+
+    // The only asset of an item is expanded automatically
+    await asset(page, 'Small store').getByRole('button', { name: 'Hide from map' }).click();
+    await expect(page.locator('.badge.shown')).toBeHidden();
+    // The default visualization doesn't come back
+    await page.waitForTimeout(2000);
+    await expect(page.locator('.badge.shown')).toHaveCount(0);
+    await expect(asset(page, 'Small store').getByRole('button', { name: 'Show on map' })).toBeVisible();
+  });
 });
