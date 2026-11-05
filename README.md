@@ -8,8 +8,8 @@ Based on [radiantearth/stac-browser](https://github.com/radiantearth/stac-browse
 
 Custom code lives in `src/caladapt/` and is wired in through STAC Browser's config files, so upstream files stay unchanged where possible.
 
-- **Config** (`config.js`): Cal-Adapt API and title, the Cal-Adapt bear logo (`public/bear.png`), hash routing so existing `/#/` links keep working, footer links.
-- **Brand theme**: Cal-Adapt colors, Poppins and Roboto fonts, and the Cobalt to Ocean header in `src/theme/variables.scss`; small overrides in `src/theme/custom.scss`.
+- **Config** (`config.js`): Cal-Adapt API and title (also shown on the home page instead of the API's own title), the Cal-Adapt bear logo (`public/bear.png`), hash routing so existing `/#/` links keep working, footer links, English and light mode only, no favorites or social sharing.
+- **Brand theme**: Cal-Adapt colors, Poppins and Roboto fonts, and the Cobalt to Ocean header in `src/theme/variables.scss`; small overrides in `src/theme/custom.scss`, including a left-aligned header title and hidden Browse, Search, API and Share buttons.
 - **Widgets** (`widgets.config.js`): featured collections on the landing page, and a Dataset Overview on collection pages with tables built from `caladapt:*_labels` fields and queryable values (labels in `src/caladapt/collectionOverviewConfig.js`).
 - **Asset actions** (`assetActions.config.js`): Preview for CSV files, and Download for public `s3://` files over HTTPS.
 - **Python snippets**: climakitae or xarray/pandas code on each asset (`src/caladapt/PythonSnippet.vue`).
@@ -19,6 +19,8 @@ Edits to upstream files, to check when upgrading:
 
 - `src/components/AssetAlternative.vue`: renders the Python snippet.
 - `src/views/Catalog.vue`: adds the `view-catalog-intro-end` widget hook.
+
+`src/theme/custom.scss` also targets upstream class names and IDs in the header (`.navigation`, `.title`, `#popover-share-btn`, `#popover-link-btn`). If an upgrade renames them, the header buttons come back or the layout shifts, so check the header after upgrading.
 
 ## Local development
 

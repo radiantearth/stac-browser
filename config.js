@@ -50,7 +50,7 @@ export default {
   crossOriginMedia: null,
   requestHeaders: {},
   requestQueryParameters: {},
-  socialSharing: ['email', 'bsky', 'mastodon', 'x'],
+  socialSharing: [], // the Share button is hidden in src/theme/custom.scss
   // Show the API's root catalog ("Cal-Adapt STAC API") under the site's own title,
   // in the browser only; the API keeps its title for people using it directly
   preprocessSTAC: (stac, state) => {

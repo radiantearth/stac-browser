@@ -13,15 +13,12 @@
     > .title {
       order: -1;
       justify-content: flex-start;
-      align-self: stretch;
-      gap: 24px;
 
       .header-title {
         gap: 10px;
 
         span {
           font-family: $headings-font-family;
-          white-space: nowrap;
         }
       }
     }
@@ -37,14 +34,10 @@
     > .navigation {
       display: none;
     }
-
-    > .user {
-      margin-left: auto;
-    }
   }
 
-  // The Share panel only repeats the address bar's URL (hash routes) plus social
-  // posting buttons; STAC Browser has no option to turn the button off.
+  // The Share panel only repeats the address bar's URL (hash routes), and STAC
+  // Browser has no option to turn the button off.
   // The hidden button still ends the group, so round the source button's corners.
   #popover-share-btn {
     display: none;
