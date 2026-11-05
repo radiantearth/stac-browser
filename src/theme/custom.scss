@@ -42,6 +42,12 @@
     }
   }
 
+  // The Share panel only repeats the address bar's URL (hash routes) plus social
+  // posting buttons; STAC Browser has no option to turn the button off
+  #popover-share-btn {
+    display: none;
+  }
+
   // Keyword chips: light cobalt tint instead of solid grey, so long lists read less heavy.
   // !important because Bootstrap's badge variant classes set these colors with !important.
   .keywords .badge {
