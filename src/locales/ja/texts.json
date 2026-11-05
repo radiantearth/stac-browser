@@ -233,6 +233,7 @@
     "close": "閉じる",
     "displayLimit": {
       "message": "このデータセットは非常に大きいため、表示するとブラウザの動作が重くなったり、フリーズしたりする可能性があります。",
+      "showAnyway": "",
       "title": "大規模データセット"
     },
     "fit": "全体表示",
@@ -243,7 +244,9 @@
       "title": "レイヤ",
       "unnamed": "名無し#{id}"
     },
-    "location": {},
+    "location": {
+      "description": ""
+    },
     "nobasemap": "利用可能なベースマップがありません。",
     "nodata": "メタデータ内に位置情報がありません。",
     "zoom": {
@@ -323,14 +326,23 @@
     "addItemIds": "Enterキーを押してアイテムIDを追加",
     "addSearchTerm": "Enter キーを押して検索語句を追加",
     "arrayInput": {
-      "addValue": "Enterキーを押して値を追加"
+      "addValue": "Enterキーを押して値を追加",
+      "helpText": ""
     },
+    "arrayContains": "",
     "arrayContainsDescription": "配列が指定されたすべての値を含んでいる",
+    "arrayContainedBy": "",
     "arrayContainedByDescription": "配列が指定された値の部分集合である",
+    "arrayEquals": "",
     "arrayEqualsDescription": "配列の要素が順序に関わらず一致する（同じ要素を含む）",
+    "arrayOverlaps": "",
     "arrayOverlapsDescription": "配列が指定された値のいずれかを含んでいる場合",
+    "between": "",
+    "betweenOperatorDescription": "",
     "collectionsRequired": "アイテムを検索するには、一つ以上のコレクションを選択してください。",
     "dateDescription": "すべての時刻はUTC (協定世界時) です",
+    "disabledDueToSingleDate": "",
+    "droppedFilters": "",
     "enterCollections": "1つ以上のコレクションIDを入力してください...",
     "enterItemIds": "1つ以上のアイテムIDを入力してください...",
     "enterSearchTerms": "1つ以上の検索語句を入力してください...",
@@ -341,6 +353,8 @@
     "freeTextDescription": "タイトルや説明などのフィールドで、与えられた語句のうち少なくとも1つを検索します。",
     "greaterThan": "より大きい",
     "greaterThanEqual": "以上",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "アイテム ID",
     "itemsPerPage": "ページあたりの件数",
     "itemsPerPageDescription": "ページあたりのアイテム表示件数 （最大 {maxItems} 件）",
@@ -349,7 +363,8 @@
     "likeOperatorDescription": "ワイルドカード文字を使用できます。 `_` は1文字にマッチし、 `%` は任意の文字数にマッチします。 ワイルドカード文字自体を検索するには、文字の前に `\\` を付ける必要があります。",
     "logical": {
       "and": "すべてのフィルターにマッチ (AND)",
-      "or": "いずれかのフィルターにマッチ (OR)"
+      "or": "いずれかのフィルターにマッチ (OR)",
+      "not": ""
     },
     "matches": "マッチ",
     "metaDescription": "{title} のデータを検索します。",
@@ -440,6 +455,8 @@
       "maxContains": "に含まれている最大数",
       "minContains": "少なくとも含む",
       "missingProperty": "不足しているプロパティ",
+      "multipleOf": "",
+      "passingSchemas": "",
       "pattern": "パターン",
       "property": "属性",
       "propertyName": "属性名",
