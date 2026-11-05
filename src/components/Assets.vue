@@ -4,8 +4,7 @@
     <b-accordion>
       <Asset
         v-for="asset in assets" :asset="asset" :expand="expand"
-        :definition="definition" :shown="shownKeys.includes(asset.getKey())"
-        :key="asset.getKey()" @show="show"
+        :definition="definition" :key="asset.getKey()"
       />
     </b-accordion>
   </section>
@@ -26,10 +25,6 @@ export default {
       type: Array,
       required: true
     },
-    shown: {
-      type: Array,
-      default: () => ([])
-    },
     definition: {
       type: Boolean,
       default: false
@@ -43,13 +38,7 @@ export default {
       default: false
     }
   },
-  emits: ['showAsset'],
   computed: {
-    shownKeys() {
-      return this.shown
-        .filter(asset => asset.isAsset)
-        .map(asset => asset.getKey());
-    },
     displayTitle() {
       if (this.title === null) {
         let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
@@ -67,11 +56,6 @@ export default {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)
-    }
-  },
-  methods: {
-    show() {
-      this.$emit('showAsset', ...arguments);
     }
   }
 };

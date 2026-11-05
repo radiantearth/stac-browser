@@ -15,7 +15,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" autoExpand />
+        <Assets v-if="hasAssets" :assets="assets" autoExpand />
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>

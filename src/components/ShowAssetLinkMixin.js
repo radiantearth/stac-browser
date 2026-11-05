@@ -3,6 +3,14 @@ import { mapGetters, mapState } from 'vuex';
 import { stacBrowserSpecialHandling } from "../rels";
 
 export default {
+  provide() {
+    return {
+      mapSelection: {
+        show: ref => this.showAsset(ref),
+        isShown: ref => this.isShown(ref)
+      }
+    };
+  },
   data() {
     return {
       tabIds: {
@@ -73,6 +81,9 @@ export default {
         return this.isAssetEqual(a, b.getContext());
       }
       return false;
+    },
+    isShown(ref) {
+      return this.selectedReferences.some(shown => this.isAssetEqual(shown, ref));
     },
     isThumbnail(asset) {
       return this.thumbnails.some(t => this.isAssetEqual(t, asset));

@@ -36,7 +36,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />

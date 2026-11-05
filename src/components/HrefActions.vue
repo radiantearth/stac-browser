@@ -64,6 +64,9 @@ export default {
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
   },
+  inject: {
+    mapSelection: { default: null }
+  },
   props: {
     data: {
       type: Object,
@@ -82,16 +85,11 @@ export default {
       default: 'md',
       validator: value => ['sm', 'md', 'lg'].includes(value)
     },
-    shown: {
-      type: Boolean,
-      default: false
-    },
     auth: {
       type: Array,
       default: () => ([])
     }
   },
-  emits: ['show'],
   data() {
     return {
       id: i++,
@@ -161,8 +159,11 @@ export default {
       }
       return false;
     },
+    shown() {
+      return Boolean(this.mapSelection?.isShown(this.data));
+    },
     hasShowButton() {
-      return this.isAsset && this.canShow && !this.shown;
+      return this.isAsset && this.mapSelection && this.canShow && !this.shown;
     },
     canDownload() {
       return this.isAsset && this.isBrowserProtocol && !disableDownloadTypes.includes(this.data?.type);
@@ -329,7 +330,7 @@ export default {
     },
     show() {
       // Credentials are attached by the map itself (see MapMixin)
-      this.$emit('show', this.data);
+      this.mapSelection.show(this.data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {
