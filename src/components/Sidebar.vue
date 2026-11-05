@@ -9,7 +9,7 @@
     </template>
     <template v-if="allowSelectCatalog" #footer>
       <b-button class="switch-catalog" variant="light">
-        <router-link to="/"><b-icon-arrow-left-right /> {{ $t('sidebar.switchCatalog') }}</router-link>
+        <router-link to="/"><mdi-swap-horizontal /> {{ $t('sidebar.switchCatalog') }}</router-link>
       </b-button>
     </template>
   </b-offcanvas>

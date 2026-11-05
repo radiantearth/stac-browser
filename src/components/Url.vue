@@ -4,7 +4,7 @@
       <b-form-input :id="id" :model-value="url" readonly />
       <template #append>
         <CopyButton :copyText="url" variant="primary" />
-        <b-button v-if="open" :href="url" target="_blank" rel="noopener noreferrer" variant="primary" :title="$t('open')"><b-icon-arrow-up-right-square /></b-button>
+        <b-button v-if="open" :href="url" target="_blank" rel="noopener noreferrer" variant="primary" :title="$t('open')"><mdi-open-in-new /></b-button>
       </template>
     </b-input-group>
   </b-form-group>

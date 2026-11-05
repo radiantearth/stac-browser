@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Filters: The "Default" sort option shows the configured default sort (e.g. "Default (Time of Data, Descending)") instead of pre-selecting it
 - Docker: The image is based on `nginx/nginx-unprivileged:1-alpine-slim`, as `nginxinc/nginx-unprivileged` is archived. The image no longer includes `curl`, `update-ca-certificates` or the optional nginx modules.
 
+### Changed
+
+- Replaced Bootstrap Icons with Material Design Icons
+
 ### Fixed
 
 - Item filters from the global search that a collection doesn't support (e.g. item IDs or free text) are no longer sent with its item filter or reported as unapplied changes

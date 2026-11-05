@@ -13,7 +13,7 @@
     />
     <template v-if="canFilter">
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
-        <b-icon-filter />
+        <mdi-filter-variant />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
         <b-badge v-if="hasUnappliedChanges" variant="warning" :title="$t('items.filterChangesNotApplied')">!</b-badge>

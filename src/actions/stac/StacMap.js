@@ -1,7 +1,7 @@
 import StacActionPlugin from "../StacActionPlugin";
 import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
-import BIconMap from '~icons/bi/map';
+import MdiMapOutline from '~icons/mdi/map-outline';
 
 export default class StacMap extends StacActionPlugin {
 
@@ -14,7 +14,7 @@ export default class StacMap extends StacActionPlugin {
   }
 
   get icon() {
-    return BIconMap;
+    return MdiMapOutline;
   }
 
   get text() {
