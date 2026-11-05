@@ -1,6 +1,7 @@
 export const EXTRA_FIELD_TABLES = [
   { key: 'caladapt:variable_labels', heading: 'Variables', nameLabel: 'Variable' },
   { key: 'caladapt:station_labels', heading: 'Locations', nameLabel: 'Station' },
+  { key: 'caladapt:boundary_labels', heading: 'Boundaries', nameLabel: 'Boundary' },
 ];
 
 export const QUERYABLE_TABLES = {

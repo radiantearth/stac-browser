@@ -1,6 +1,52 @@
 // Cal-Adapt overrides on top of STAC Browser's page styles
 
 #stac-browser {
+  // Header: logo and title on the left, as on caladapt-stac-map, with the same 52px height
+  > header .site {
+    padding-block: 0;
+  }
+
+  > header .site > .col-md-12 {
+    min-height: 52px;
+    padding-inline: 22px;
+
+    > .title {
+      order: -1;
+      justify-content: flex-start;
+
+      .header-title {
+        gap: 10px;
+
+        span {
+          font-family: $headings-font-family;
+        }
+      }
+    }
+
+    // Upstream reserves 350px per button group to keep the title centered
+    > .actions {
+      min-width: 0;
+    }
+
+    // Browse, Search and API assume STAC knowledge. People find datasets with the
+    // search box above the home page list and items with each dataset's filters;
+    // the full search page still works at /#/search.
+    > .navigation {
+      display: none;
+    }
+  }
+
+  // The Share panel only repeats the address bar's URL (hash routes), and STAC
+  // Browser has no option to turn the button off.
+  // The hidden button still ends the group, so round the source button's corners.
+  #popover-share-btn {
+    display: none;
+  }
+
+  #popover-link-btn {
+    border-radius: var(--bs-btn-border-radius);
+  }
+
   // Keyword chips: light cobalt tint instead of solid grey, so long lists read less heavy.
   // !important because Bootstrap's badge variant classes set these colors with !important.
   .keywords .badge {

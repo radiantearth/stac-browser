@@ -23,11 +23,10 @@ import { Registry } from '@radiantearth/stac-fields';
  * @returns {string[]} The fields to ignore in the metadata rendering.
  */
 const ignoreMetadata = (object, fields) => fields.concat([
-  // pgSTAC adds a 'features' field to collections; not useful to display
-  'features',
   // Shown as tables by the Cal-Adapt Dataset Overview widget
   'caladapt:variable_labels',
-  'caladapt:station_labels'
+  'caladapt:station_labels',
+  'caladapt:boundary_labels'
 ]);
 
 export { ignoreMetadata };
