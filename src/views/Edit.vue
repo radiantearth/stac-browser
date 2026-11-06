@@ -20,12 +20,37 @@
         <b-button size="sm" variant="primary" class="ms-2" @click="discardDraft">{{ $t('manage.discardDraft') }}</b-button>
       </b-alert>
 
-      <JsonEditor
-        v-model="jsonContent"
-        :read-only="isSaveDisabled"
-        :validator="validateForEditor"
-        @request-save="onSaveRequested"
-      />
+
+      <b-tabs>
+        <b-tab title="JSON Edit" active>
+          <JsonEditor
+            v-model="jsonContent"
+            :read-only="isSaveDisabled"
+            :validator="validateForEditor"
+            @request-save="onSaveRequested"
+          />
+        </b-tab>
+        
+        <b-tab v-if="isItemEdit" title="Visual Edit">
+          <b-alert v-if="!visualItem" variant="warning" show>
+            Fix the JSON before editing it visually.
+          </b-alert>
+          <b-form-group
+            v-else
+            label="Title"
+            label-for="item-title"
+            description="properties.title"
+            class="mt-3"
+          >
+            <b-form-input
+              id="item-title"
+              v-model="itemTitle"
+              :disabled="isSaveDisabled"
+            />
+          </b-form-group>
+        </b-tab>
+      </b-tabs>
+
 
       <ConfirmModal
         v-model="showLeaveConfirm" :title="$t('manage.unsavedChangesTitle')"
@@ -40,6 +65,7 @@
 <script>
 import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
 import { mapGetters, mapState } from 'vuex';
+import {BTabs, BTab, BFormGroup, BFormInput } from 'bootstrap-vue-next';
 import BrowseMixin from './BrowseMixin.js';
 import JsonEditor from '../components/management/JsonEditor.vue';
 import BrowserStorage from '../browser-store';
@@ -48,12 +74,14 @@ import { formatAjvMessage, loadValidationLocale, localizeErrors, schemaTitle, va
 import { toAbsolute } from 'stac-js/src/http.js';
 import { isObject } from 'stac-js/src/utils.js';
 
+
 const DRAFT_SAVE_DELAY = 1000;
 const DRAFT_TTL = 7 * 24 * 60 * 60 * 1000; // discard drafts after a week
 
 export default defineComponent({
   name: "Edit",
   components: {
+    BTabs, BTab, BFormGroup, BFormInput,
     ConfirmModal: defineAsyncComponent(() => import('../components/ConfirmModal.vue')),
     JsonEditor
   },
@@ -152,7 +180,41 @@ export default defineComponent({
     },
     draftKey() {
       return `draft:${this.mode}:${this.path || '/'}`;
-    }
+    },
+    isItemEdit() {
+      if (this.mode !== 'edit') {
+        return false;}
+      try {
+        return JSON.parse(this.sourceContent)?.type === 'Feature';
+      } catch {return false;}
+    },
+    visualItem() {
+      try {
+        const item = JSON.parse(this.jsonContent);
+        if (
+          !isObject(item)
+          || item.type !== 'Feature'
+          || !isObject(item.properties)
+          || Array.isArray(item.properties)
+        ) {
+          return null;}
+        return item;
+      } catch {
+        return null;}
+    },
+    itemTitle: {
+  get() {
+    const title = this.visualItem?.properties.title;
+    return typeof title === 'string' ? title : '';
+  },
+  set(value) {
+    const item = this.visualItem;
+    if (!item) {
+      return;}
+    item.properties.title = value;
+    this.jsonContent = JSON.stringify(item, null, 2);
+  }
+},
   },
   watch: {
     data() {
