@@ -20,7 +20,6 @@
       "generic": "Download",
       "withSource": "Download di {source}"
     },
-    "hideFromMap": "",
     "inItems": "Risorsa negli Elementi | Risorse negli Elementi",
     "role": {
       "data": "Dati",
@@ -242,15 +241,12 @@
     "layers": {
       "base": "Livelli di base",
       "footprint": "Impronta a terra",
-      "moveDown": "",
-      "moveUp": "",
       "title": "Livelli",
       "unnamed": "Senza Nome #{id}"
     },
     "location": {
       "description": "Vai alla tua posizione attuale"
     },
-    "maxLayers": "",
     "nobasemap": "Mappa base non disponibile.",
     "nodata": "Informazione spaziale mancante nei metadati.",
     "zoom": {
