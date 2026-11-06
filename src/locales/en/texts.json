@@ -20,6 +20,7 @@
       "generic": "Download",
       "withSource": "Download from {source}"
     },
+    "hideFromMap": "Hide from map",
     "inItems": "Asset in Items | Assets in Items",
     "role": {
       "data": "Data",
@@ -241,12 +242,15 @@
     "layers": {
       "base": "Base Layers",
       "footprint": "Footprint",
+      "moveDown": "Move down",
+      "moveUp": "Move up",
       "title": "Layers",
       "unnamed": "Unnamed #{id}"
     },
     "location": {
       "description": "Go to your location"
     },
+    "maxLayers": "Up to {max} layers can be shown on the map at once, please hide a layer first.",
     "nobasemap": "No basemaps available.",
     "nodata": "No spatial information available in the metadata.",
     "zoom": {
