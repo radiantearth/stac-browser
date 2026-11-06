@@ -20,6 +20,7 @@
       "generic": "Télécharger",
       "withSource": "Télécharger à partir de {source}"
     },
+    "hideFromMap": "",
     "inItems": "Ressource des éléments | Ressources des éléments",
     "role": {
       "data": "Données",
@@ -241,12 +242,15 @@
     "layers": {
       "base": "Couches de base",
       "footprint": "Empreinte",
+      "moveDown": "",
+      "moveUp": "",
       "title": "Couches",
       "unnamed": "#{id} non nommé"
     },
     "location": {
       "description": "Aller à votre position"
     },
+    "maxLayers": "",
     "nobasemap": "Aucune carte de base disponible.",
     "nodata": "Aucune information spatiale disponible dans les métadonnées.",
     "zoom": {
