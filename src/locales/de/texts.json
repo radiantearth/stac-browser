@@ -20,6 +20,7 @@
       "generic": "Herunterladen",
       "withSource": "Herunterladen von {source}"
     },
+    "hideFromMap": "",
     "inItems": "Verfügbare Datei in Datensätzen | verfügbare Dateien in Datensätzen",
     "role": {
       "data": "Daten",
@@ -241,12 +242,15 @@
     "layers": {
       "base": "Grundkarten",
       "footprint": "Räumliche Ausdehnung",
+      "moveDown": "",
+      "moveUp": "",
       "title": "Kartenebenen",
       "unnamed": "Unbenannt #{id}"
     },
     "location": {
       "description": "Springe zu deiner Position"
     },
+    "maxLayers": "",
     "nobasemap": "Keine Grundkarten verfügbar.",
     "nodata": "In den Metadaten sind keine räumlichen Informationen verfügbar.",
     "zoom": {
