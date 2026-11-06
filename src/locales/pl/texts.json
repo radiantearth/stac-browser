@@ -20,6 +20,7 @@
       "generic": "Pobierz",
       "withSource": "Pobierz z {source}"
     },
+    "hideFromMap": "",
     "inItems": "Zasób w elementach | Zasoby w elementach",
     "role": {
       "data": "Dane",
@@ -237,15 +238,19 @@
       "title": "Duży zbiór danych"
     },
     "fit": "Dopasuj do zasięgu",
+    "focusHint": "",
     "layers": {
       "base": "Warstwy podstawowe",
       "footprint": "Miniatura",
+      "moveDown": "",
+      "moveUp": "",
       "title": "Warstwy",
       "unnamed": "Bez nazwy #{id}"
     },
     "location": {
       "description": "Przejdź do swojej lokalizacji"
     },
+    "maxLayers": "",
     "nobasemap": "Brak dostępnych map podstawowych.",
     "nodata": "Brak informacji przestrzennych w metadanych.",
     "zoom": {
@@ -338,6 +343,7 @@
     "arrayOverlapsDescription": "Tablica zawiera co najmniej jedną z podanych wartości",
     "between": "pomiędzy",
     "betweenOperatorDescription": "Sprawdza, czy wartość liczbowa pola mieści się w podanym zakresie. Zakres jest obustronnie domknięty.",
+    "collectionsRequired": "",
     "dateDescription": "Wszystkie czasy w Uniwersalnym Czasie Koordynowanym (UTC).",
     "disabledDueToSingleDate": "Ten filtr jest wyłączony, ponieważ zakres czasowy kolekcji to pojedyncza data i godzina.",
     "droppedFilters": "Poniższe filtry nie są tutaj obsługiwane i zostały usunięte: {filters}.",
