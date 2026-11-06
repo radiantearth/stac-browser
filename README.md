@@ -117,7 +117,8 @@ The following table shows the major differences between versions and the upcomin
 | 3.3.x     | The last version that uses Leaflet as mapping library. |
 | 4.0.x     | Uses OpenLayers as mapping library. The last version based on VueJS 2, vue-cli and Bootstrap 4. |
 | 5.0.x     | This version upgraded to VueJS 3, Vite and Bootstrap 5. |
-| 5.1.x     | A couple new features before we migrate to v6. Target: Q3 2026 |
+| 5.1.x     | Adds basic support for the STAC API Transactions extensions and preserves search filters. |
+| 5.2.x     | Multiple assets/web maps mappable, web maps in catalogs, SVG support, new config options and (security) fixes. |
 | 6.x.x     | Planned version with a new layout, a pluggable interface, and better integration into existing sites. Target: 2027 |
 
 For more details on our plans, please check our
