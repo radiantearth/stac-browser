@@ -20,6 +20,7 @@
       "generic": "Download",
       "withSource": "Download de {source}"
     },
+    "hideFromMap": "",
     "inItems": "Recurso em Itens | Recursos em Itens",
     "role": {
       "data": "Dados",
@@ -123,6 +124,7 @@
     "storeAs": "Guardar código como:",
     "installDependencies": "Instalação de dependências:"
   },
+  "externalInfo": "",
   "favorites": {
     "add": "Adicionar aos favoritos",
     "empty": "Nenhum favorito foi adicionado ainda. Para adicionar favoritos, use o botão 'Favorito' na página de um catálogo, coleção ou item.",
@@ -157,7 +159,8 @@
   },
   "goBack": {
     "description": "Voltar para {type}",
-    "label": "Voltar"
+    "label": "Voltar",
+    "refererDescription": ""
   },
   "goToCollection": {
     "description": "Ir para a coleção associada",
@@ -235,15 +238,19 @@
       "title": "Conjunto de dados grande"
     },
     "fit": "Ajustar à extensão",
+    "focusHint": "",
     "layers": {
       "base": "Camadas Básicas",
       "footprint": "Footprint",
+      "moveDown": "",
+      "moveUp": "",
       "title": "Camadas",
       "unnamed": "Sem nome #{id}"
     },
     "location": {
       "description": "Ir para a sua localização"
     },
+    "maxLayers": "",
     "nobasemap": "Não existem mapas base disponíveis.",
     "nodata": "Nenhuma informação espacial disponível nos metadados.",
     "zoom": {
@@ -336,6 +343,7 @@
     "arrayOverlapsDescription": "O array contém pelo menos um dos valores especificados",
     "between": "entre",
     "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
+    "collectionsRequired": "",
     "dateDescription": "Todos os horários em UTC.",
     "disabledDueToSingleDate": "Este filtro está desabilitado porque a coleção possui uma única data e hora como extensão temporal.",
     "droppedFilters": "Os seguintes filtros não são suportados aqui e foram removidos: {filters}.",
