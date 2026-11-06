@@ -108,12 +108,19 @@ test.describe('Multiple assets', () => {
     await page.locator('.ol-layercontrol button').click();
     await page.locator('.layercontrol li', { hasText: 'Vector 1' }).last().getByRole('checkbox').uncheck();
     await page.locator('.ol-layercontrol button').click();
-
-    // Updating the selection updates which assets are shown
-    await clickAssetButton(page, 'Vector 2', 'Hide from map');
     await expect(asset(page, 'Vector 1').locator('.badge.shown')).toBeHidden();
 
     await clickAssetButton(page, 'Vector 1', 'Show on map');
     await expect(asset(page, 'Vector 1').locator('.badge.shown')).toBeVisible();
+  });
+
+  test('assets that fail to load can be hidden again', async ({ page, worker }) => {
+    await setup(page, worker, 1);
+    await worker.use(http.get(/vector-1\.geojson$/, () => new HttpResponse(null, { status: 404 })));
+
+    await clickAssetButton(page, 'Vector 1', 'Show on map');
+    await clickAssetButton(page, 'Vector 1', 'Hide from map');
+    await expect(asset(page, 'Vector 1').getByRole('button', { name: 'Hide from map' })).toBeHidden();
+    await expect(asset(page, 'Vector 1').getByRole('button', { name: 'Show on map' })).toBeVisible();
   });
 });

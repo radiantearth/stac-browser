@@ -180,7 +180,9 @@ export default {
       return this.mapSelection && this.canShowOnMap && !this.shown;
     },
     hasHideButton() {
-      return (this.isAsset || this.isWebMapLink) && Boolean(this.mapSelection?.isOnMap(this.data));
+      // Also for selected data sources that failed to load and have no layer
+      return (this.isAsset || this.isWebMapLink)
+        && Boolean(this.mapSelection?.isOnMap(this.data) || this.mapSelection?.isSelected(this.data));
     },
     canDownload() {
       return this.isAsset && this.isBrowserProtocol && !disableDownloadTypes.includes(this.data?.type);

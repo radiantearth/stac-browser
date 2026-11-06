@@ -61,6 +61,11 @@ export default {
   mixins: [
     MapMixin
   ],
+  provide() {
+    return {
+      layerVisibilityChanged: () => this.$emit('changed', this.getShownData())
+    };
+  },
   inject: {
     mapSelection: { default: null }
   },
@@ -128,16 +133,11 @@ export default {
     async stac() {
       await this.showStacLayer();
     },
-    async dataSources(dataSources, oldDataSources) {
+    async dataSources(dataSources) {
       if (!this.stacLayer) {
         return;
       }
       this.displayLimitError = null;
-      const added = (dataSources || []).filter(ref => !(oldDataSources || []).includes(ref));
-      // Data sources that are still loading may be rejected because of the display limit later
-      this.addedDataSources = this.addedDataSources
-        .filter(ref => (dataSources || []).includes(ref))
-        .concat(added);
       await this.stacLayer.setDataSources(dataSources);
     },
     async children() {
@@ -153,7 +153,8 @@ export default {
         this.addStacLayer();
         return;
       }
-      await this.stacLayer.setDataSources(null, false);
+      // The selection may change at the same time, e.g. from children to an asset
+      await this.stacLayer.setDataSources(this.dataSources || null, false);
       await this.stacLayer.setChildren(this.children, this.childrenOptions, false);
       await this.stacLayer.updateLayers();
       this.fit();
@@ -173,7 +174,7 @@ export default {
     // These are created here and not in data() to avoid them being reactive
     this.stacLayer = null;
     this.ignoreDisplayLimit = false;
-    this.addedDataSources = [];
+    this.rejectedDataSources = [];
     this.focusHintTimer = null;
     if (this.mapSelection) {
       this.$watch(() => this.mapSelection.getRevealed(), revealed => this.reveal(revealed?.ref));
@@ -223,6 +224,9 @@ export default {
           // The asset needs to load more data than ol-stac deems safe;
           // offer to display it anyway (see showAnyway)
           this.displayLimitError = event.error;
+          if (event.error.asset) {
+            this.rejectedDataSources.push(event.error.asset);
+          }
         }
         else {
           console.warn(event);
@@ -320,15 +324,11 @@ export default {
       this.focusHint = false;
     },
     hideRejected() {
-      // The selected data sources that are too large to be shown don't have a layer
-      if (!this.mapSelection || !this.stacLayer) {
+      if (!this.mapSelection) {
         return;
       }
-      const layers = this.stacLayer.getLayersArray();
-      this.addedDataSources
-        .filter(ref => !layers.some(layer => layer.get('stac') === ref))
-        .forEach(ref => this.mapSelection.hide(ref));
-      this.addedDataSources = [];
+      this.rejectedDataSources.forEach(ref => this.mapSelection.hide(ref));
+      this.rejectedDataSources = [];
     },
     reveal(ref) {
       if (!ref || !this.stacLayer) {
@@ -341,7 +341,7 @@ export default {
     showAnyway() {
       this.displayLimitError = null;
       this.ignoreDisplayLimit = true;
-      this.addedDataSources = [];
+      this.rejectedDataSources = [];
       this.map.removeLayer(this.stacLayer);
       this.addStacLayer();
     },

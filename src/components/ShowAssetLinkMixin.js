@@ -15,6 +15,7 @@ export default {
         move: (ref, offset) => this.moveAsset(ref, offset),
         isShown: ref => this.isShown(ref),
         isOnMap: ref => this.isOnMap(ref),
+        isSelected: ref => this.isSelected(ref),
         canManage: ref => this.canManage(ref),
         getRevealed: () => this.revealedDataSource
       }
@@ -102,6 +103,9 @@ export default {
     },
     isOnMap(ref) {
       return this.shownOnMap.some(shown => this.isReferenceEqual(shown, ref));
+    },
+    isSelected(ref) {
+      return Boolean(this.selectedDataSources?.some(selected => this.isReferenceEqual(selected, ref)));
     },
     canManage(ref) {
       // Only the assets and links of this STAC entity, not of its children

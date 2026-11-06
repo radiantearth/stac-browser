@@ -43,7 +43,8 @@ export default {
     LayerControlMixin
   ],
   inject: {
-    mapSelection: { default: null }
+    mapSelection: { default: null },
+    layerVisibilityChanged: { default: null }
   },
   props: {
     map: {
@@ -135,6 +136,9 @@ export default {
     setVisibility(data, visible) {
       data.layer.setVisible(visible);
       data.visible = visible;
+      if (this.layerVisibilityChanged) {
+        this.layerVisibilityChanged();
+      }
     },
     fitToExtent(data) {
       if (!data.visible) {
