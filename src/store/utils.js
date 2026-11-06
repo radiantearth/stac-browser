@@ -1,5 +1,5 @@
 import axios from "axios";
-import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import i18n from '../i18n';
 import Queryable from '../models/cql2/queryable';
 
@@ -62,6 +62,34 @@ export async function stacRequest(cx, link, checkPermissions = false, axiosOptio
     cx.dispatch('manager/checkPermissions', options);
   }
   return response;
+}
+
+/**
+ * Returns the URL to resolve relative links in a response against.
+ *
+ * According to RFC 3986, section 5.1.3, this is the URL that the response was retrieved from,
+ * i.e. the URL after following redirects.
+ * Only the scheme, authority and path of the final URL are used. The query and fragment are
+ * taken from the given URL, as the request may contain additional query parameters (e.g. for
+ * authentication) that must not end up in the URL of the STAC entity.
+ *
+ * @param {Object} response - The axios response
+ * @param {string} url - The URL that STAC Browser was asked to load
+ * @returns {string} The base URL for the response
+ */
+export function getResponseUrl(response, url) {
+  const requestUrl = response?.config?.url;
+  // responseURL is set by browsers (XMLHttpRequest), responseUrl by Node.js
+  const responseUrl = response?.request?.responseURL || response?.request?.res?.responseUrl;
+  if (!hasText(url) || !hasText(requestUrl) || !hasText(responseUrl) || responseUrl === requestUrl) {
+    return url;
+  }
+  try {
+    const original = URI(url);
+    return URI(responseUrl).query(original.query()).fragment(original.fragment()).toString();
+  } catch {
+    return url;
+  }
 }
 
 export function isAuthenticationError(error) {
