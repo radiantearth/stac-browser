@@ -22,7 +22,7 @@
           </b-button>
         </b-button-group>
       </div>
-      <LayerControlGroup v-if="l.group > 1" :map="map" :group="l.layer" :maxZoom="maxZoom" />
+      <LayerControlGroup v-if="l.expand" :map="map" :group="l.layer" :maxZoom="maxZoom" />
     </li>
   </ul>
 </template>
@@ -80,14 +80,14 @@ export default {
           continue;
         }
         const group = layer instanceof LayerGroup ? layer.getLayers().getLength() : 0;
-        const stac = layer.get('stac');
         const data = {
-          group,
+          // A single layer is only listed separately if it can be managed
+          expand: group > 1 || (group === 1 && Boolean(this.getDataSource(layer.getLayers().item(0)))),
           layer,
           id: layer.ol_uid,
           visible: layer.getVisible(),
           title: this.getTitle(layer),
-          dataSource: stac?.isAsset || stac?.isLink ? stac : null
+          dataSource: this.getDataSource(layer)
         };
         layers.push(data);
       }
@@ -122,6 +122,13 @@ export default {
     unByKey(this.listenerKeys);
   },
   methods: {
+    getDataSource(layer) {
+      const stac = layer.get('stac');
+      if ((stac?.isAsset || stac?.isLink) && this.mapSelection?.canManage(stac)) {
+        return stac;
+      }
+      return null;
+    },
     move(data, offset) {
       this.mapSelection.move(data.dataSource, offset);
     },

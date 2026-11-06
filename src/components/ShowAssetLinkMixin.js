@@ -1,3 +1,4 @@
+import { toRaw } from 'vue';
 import Utils from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import { stacBrowserSpecialHandling } from "../rels";
@@ -13,7 +14,9 @@ export default {
         hide: ref => this.hideAsset(ref),
         move: (ref, offset) => this.moveAsset(ref, offset),
         isShown: ref => this.isShown(ref),
-        isOnMap: ref => this.isOnMap(ref)
+        isOnMap: ref => this.isOnMap(ref),
+        canManage: ref => this.canManage(ref),
+        getRevealed: () => this.revealedDataSource
       }
     };
   },
@@ -25,7 +28,8 @@ export default {
       },
       tab: null,
       shownOnMap: [],
-      selectedDataSources: null
+      selectedDataSources: null,
+      revealedDataSource: null
     };
   },
   computed: {
@@ -71,8 +75,10 @@ export default {
   },
   methods: {
     isReferenceEqual(a, b) {
-      if (a?.isLink && b?.isLink) {
-        return a === b || (a.rel === b.rel && a.getAbsoluteUrl() === b.getAbsoluteUrl());
+      // Web map links can share the URL, but differ in other properties (e.g. the WMS layers)
+      if (a?.isLink || b?.isLink) {
+        // The STAC data may be wrapped in a reactive proxy
+        return toRaw(a) === toRaw(b);
       }
       if (!a?.isAsset || !b?.isAsset) {
         return false;
@@ -97,6 +103,14 @@ export default {
     isOnMap(ref) {
       return this.shownOnMap.some(shown => this.isReferenceEqual(shown, ref));
     },
+    canManage(ref) {
+      // Only the assets and links of this STAC entity, not of its children
+      let context = ref?.getContext?.();
+      while (context?.isAsset) {
+        context = context.getContext();
+      }
+      return Boolean(context) && toRaw(context) === toRaw(this.data);
+    },
     getSelection() {
       return (this.selectedDataSources || this.shownOnMap).slice();
     },
@@ -116,9 +130,11 @@ export default {
           });
           return;
         }
-        // The last data source is rendered on top
-        selection.push(asset);
+        // The last data source is rendered on top, ol-stac identifies them by the (raw) objects
+        selection.push(toRaw(asset));
         this.selectedDataSources = selection;
+        // Also shows the layer if it was hidden through the layer switcher
+        this.revealedDataSource = { ref: asset };
       }
       if (this.$refs.tabs) {
         Utils.scrollTo(this.$refs.tabs.$el);

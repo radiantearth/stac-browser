@@ -97,4 +97,23 @@ test.describe('Multiple assets', () => {
     await expect(titles).toHaveText(['Vector 2']);
     await expect(asset(page, 'Vector 1').locator('.badge.shown')).toBeHidden();
   });
+
+  test('showing an asset again makes its hidden layer visible', async ({ page, worker }) => {
+    await setup(page, worker, 2);
+    await clickAssetButton(page, 'Vector 1', 'Show on map');
+    await clickAssetButton(page, 'Vector 2', 'Show on map');
+    await expect(asset(page, 'Vector 2').locator('.badge.shown')).toBeVisible();
+
+    // Hide the layer through its checkbox in the layer switcher
+    await page.locator('.ol-layercontrol button').click();
+    await page.locator('.layercontrol li', { hasText: 'Vector 1' }).last().getByRole('checkbox').uncheck();
+    await page.locator('.ol-layercontrol button').click();
+
+    // Updating the selection updates which assets are shown
+    await clickAssetButton(page, 'Vector 2', 'Hide from map');
+    await expect(asset(page, 'Vector 1').locator('.badge.shown')).toBeHidden();
+
+    await clickAssetButton(page, 'Vector 1', 'Show on map');
+    await expect(asset(page, 'Vector 1').locator('.badge.shown')).toBeVisible();
+  });
 });

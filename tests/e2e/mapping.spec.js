@@ -249,6 +249,49 @@ test.describe('Catalog with web map links', () => {
     await expect(popover.getByRole('button', { name: 'Hide from map' })).toBeVisible();
   });
 
+  test('web map links that share a URL can be shown independently', async ({ page, worker }) => {
+    const catalog = createCatalog(['a', 'b'].map(layer => ({
+      rel: 'wms',
+      href: 'https://wms.example/service',
+      type: 'image/png',
+      title: `Layer ${layer}`,
+      'wms:layers': [layer],
+    })));
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+
+    const links = page.locator('.meta > .intro > .links');
+    // The first link is shown by default, the second one isn't
+    await links.getByText('Layer a').hover();
+    await expect(page.locator('.link-more:visible').getByRole('button', { name: 'Hide from map' })).toBeVisible();
+    await page.getByRole('heading', { name: 'Web Map Catalog' }).click();
+    await links.getByText('Layer b').hover();
+    await expect(page.locator('.link-more:visible').getByRole('button', { name: 'Show on map' })).toBeVisible();
+  });
+
+  test('a single web map link can be removed in the layer switcher', async ({ page, worker }) => {
+    const catalog = createCatalog([{
+      rel: 'xyz',
+      href: 'https://tiles.example/tiles/{z}/{x}/{y}.png',
+      type: 'image/png',
+      title: 'Tiles',
+    }]);
+    await catalog.createServer(worker);
+
+    await page.goto(catalog.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+
+    await page.locator('.ol-layercontrol button').click();
+    const layerControl = page.locator('.layercontrol');
+    await expect(layerControl.locator('.title', { hasText: 'Tiles' })).toBeVisible();
+    await layerControl.getByRole('button', { name: 'Hide from map' }).click();
+    await expect(layerControl.locator('.title', { hasText: 'Tiles' })).toHaveCount(0);
+  });
+
   test('shows no map without web map links', async ({ page, worker }) => {
     const catalog = createCatalog();
     await catalog.createServer(worker);

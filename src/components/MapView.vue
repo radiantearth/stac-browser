@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, toRaw } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
@@ -133,7 +133,11 @@ export default {
         return;
       }
       this.displayLimitError = null;
-      this.addedDataSources = (dataSources || []).filter(ref => !(oldDataSources || []).includes(ref));
+      const added = (dataSources || []).filter(ref => !(oldDataSources || []).includes(ref));
+      // Data sources that are still loading may be rejected because of the display limit later
+      this.addedDataSources = this.addedDataSources
+        .filter(ref => (dataSources || []).includes(ref))
+        .concat(added);
       await this.stacLayer.setDataSources(dataSources);
     },
     async children() {
@@ -171,6 +175,9 @@ export default {
     this.ignoreDisplayLimit = false;
     this.addedDataSources = [];
     this.focusHintTimer = null;
+    if (this.mapSelection) {
+      this.$watch(() => this.mapSelection.getRevealed(), revealed => this.reveal(revealed?.ref));
+    }
   },
   async mounted() {
     // Explain that the map must be focused before it reacts to scroll zoom and touch panning
@@ -323,9 +330,18 @@ export default {
         .forEach(ref => this.mapSelection.hide(ref));
       this.addedDataSources = [];
     },
+    reveal(ref) {
+      if (!ref || !this.stacLayer) {
+        return;
+      }
+      this.stacLayer.getLayersArray()
+        .filter(layer => toRaw(layer.get('stac')) === toRaw(ref))
+        .forEach(layer => layer.setVisible(true));
+    },
     showAnyway() {
       this.displayLimitError = null;
       this.ignoreDisplayLimit = true;
+      this.addedDataSources = [];
       this.map.removeLayer(this.stacLayer);
       this.addStacLayer();
     },
