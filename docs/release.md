@@ -13,4 +13,4 @@
    1. Check whether the `dist/report.html` has significantly changed (if yes, check why)
    2. Delete the `dist/report.html`
 9. `npm publish`
-10. Create GitHub release (v3.x.x)
+10. Create GitHub release (vX.Y.Z)
