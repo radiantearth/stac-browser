@@ -7,7 +7,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" card pills vertical end>
               <b-tab :title="$t('map')" :id="tabIds.map" no-body>
-                <MapView :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
+                <MapView :stac="data" :dataSources="selectedDataSources" @changed="dataChanged" @empty="handleEmptyMap" />
               </b-tab>
               <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -15,7 +15,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" autoExpand />
+        <Assets v-if="hasAssets" :assets="assets" autoExpand />
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>

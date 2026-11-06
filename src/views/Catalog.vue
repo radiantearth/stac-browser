@@ -36,7 +36,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
@@ -222,8 +222,8 @@ export default defineComponent({
     },
     mapData() {
       const data = {};
-      if (this.selectedAssets.length > 0) {
-        data.assets = this.selectedAssets;
+      if (this.selectedDataSources?.length > 0) {
+        data.dataSources = this.selectedDataSources;
       }
       else {
         const items = this.items.filter(item => item.type === 'Feature');
@@ -232,6 +232,10 @@ export default defineComponent({
             type: 'FeatureCollection',
             features: items
           });
+        }
+        else if (this.selectedDataSources) {
+          // Everything was hidden, don't fall back to the default visualization
+          data.dataSources = [];
         }
       }
       return data;

@@ -1,15 +1,28 @@
 <template>
   <ul>
     <li v-for="l in layers" :key="l.id">
-      <div class="d-flex justify-content-between">
-        <b-form-checkbox inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <b-form-checkbox class="layer-title" inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
-        <b-button variant="primary" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
-          <b-icon-zoom-in />
-        </b-button>
+        <b-button-group size="sm" class="flex-shrink-0">
+          <template v-if="l.dataSource && mapSelection">
+            <b-button variant="primary" :disabled="l.top" :title="$t('mapping.layers.moveUp')" @click.prevent.stop="move(l, 1)">
+              <b-icon-arrow-up />
+            </b-button>
+            <b-button variant="primary" :disabled="l.bottom" :title="$t('mapping.layers.moveDown')" @click.prevent.stop="move(l, -1)">
+              <b-icon-arrow-down />
+            </b-button>
+            <b-button variant="primary" :title="$t('assets.hideFromMap')" @click.prevent.stop="mapSelection.hide(l.dataSource)">
+              <b-icon-x-lg />
+            </b-button>
+          </template>
+          <b-button variant="primary" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
+            <b-icon-zoom-in />
+          </b-button>
+        </b-button-group>
       </div>
-      <LayerControlGroup v-if="l.group > 1" :map="map" :group="l.layer" :maxZoom="maxZoom" />
+      <LayerControlGroup v-if="l.expand" :map="map" :group="l.layer" :maxZoom="maxZoom" />
     </li>
   </ul>
 </template>
@@ -18,6 +31,7 @@
 import { defineAsyncComponent } from 'vue';
 import LayerControlMixin from './LayerControlMixin';
 import LayerGroup from 'ol/layer/Group';
+import { unByKey } from 'ol/Observable';
 import { toOlExtent } from 'ol-stac/util.js';
 
 export default {
@@ -28,6 +42,10 @@ export default {
   mixins: [
     LayerControlMixin
   ],
+  inject: {
+    mapSelection: { default: null },
+    layerVisibilityChanged: { default: null }
+  },
   props: {
     map: {
       type: Object,
@@ -42,9 +60,20 @@ export default {
       default: undefined
     }
   },
+  data() {
+    return {
+      revision: 0
+    };
+  },
   computed: {
     layers() {
-      const allLayers = this.group.getLayers().getArray();
+      // OpenLayers collections are not reactive
+      this.revision;  
+      // List the layers that are rendered on top first
+      const allLayers = this.group.getLayers().getArray()
+        .map((layer, position) => ({ layer, position }))
+        .sort((a, b) => ((b.layer.getZIndex() || 0) - (a.layer.getZIndex() || 0)) || (b.position - a.position))
+        .map(({ layer }) => layer);
       const layers = [];
       for (const layer of allLayers) {
         if (layer.get('base')) {
@@ -53,13 +82,20 @@ export default {
         }
         const group = layer instanceof LayerGroup ? layer.getLayers().getLength() : 0;
         const data = {
-          group,
+          // A single layer is only listed separately if it can be managed
+          expand: group > 1 || (group === 1 && Boolean(this.getDataSource(layer.getLayers().item(0)))),
           layer,
           id: layer.ol_uid,
           visible: layer.getVisible(),
-          title: this.getTitle(layer)
+          title: this.getTitle(layer),
+          dataSource: this.getDataSource(layer)
         };
         layers.push(data);
+      }
+      const dataSources = layers.filter(data => data.dataSource);
+      if (dataSources.length > 0) {
+        dataSources[0].top = true;
+        dataSources[dataSources.length - 1].bottom = true;
       }
       return layers;
     },
@@ -80,10 +116,29 @@ export default {
       }
     }
   },
+  created() {
+    this.listenerKeys = this.group.getLayers().on(['add', 'remove'], () => this.revision++);
+  },
+  beforeUnmount() {
+    unByKey(this.listenerKeys);
+  },
   methods: {
+    getDataSource(layer) {
+      const stac = layer.get('stac');
+      if ((stac?.isAsset || stac?.isLink) && this.mapSelection?.canManage(stac)) {
+        return stac;
+      }
+      return null;
+    },
+    move(data, offset) {
+      this.mapSelection.move(data.dataSource, offset);
+    },
     setVisibility(data, visible) {
       data.layer.setVisible(visible);
       data.visible = visible;
+      if (this.layerVisibilityChanged) {
+        this.layerVisibilityChanged();
+      }
     },
     fitToExtent(data) {
       if (!data.visible) {
@@ -126,8 +181,12 @@ export default {
   margin-right: -0.75rem;
   padding: 0.5rem 0.75rem 0  0.75rem;
 
+  .layer-title {
+    min-width: 0;
+  }
+
   .title {
-    line-break: anywhere;
+    overflow-wrap: anywhere;
   }
 
   ul {

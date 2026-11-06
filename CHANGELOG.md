@@ -22,9 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
 - Links with the relation type `source_for` open in STAC Browser
 - Filters: Sortables and queryables without a title show translated labels for common fields (e.g. `properties.datetime`)
+- Multiple assets can be shown on the map at once (up to 8), the most recently added asset is shown on top
+- Assets that are shown on the map can be hidden again
+- Web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) can be shown on and hidden from the map through the list of links
+- Layer switcher: Assets and web map links can be moved up and down and removed from the map
 
 ### Changed
 
+- Layer switcher: The layers that are rendered on top are listed first
+- Confirming to show a large asset on the map applies to all assets of the page instead of only to the selected asset
 - Filters: The "Default" sort option shows the configured default sort (e.g. "Default (Time of Data, Descending)") instead of pre-selecting it
 - Docker: The image is based on `nginx/nginx-unprivileged:1-alpine-slim`, as `nginxinc/nginx-unprivileged` is archived. The image no longer includes the optional nginx modules.
 
