@@ -12,9 +12,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    timeout-minutes: 10
+  version:
     runs-on: ubuntu-latest
+    outputs:
+      playwright: ${{ steps.version.outputs.playwright }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Read Playwright version
+      id: version
+      run: echo "playwright=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: version
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    # The image ships the browsers and system dependencies, its version must match the installed @playwright/test
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.version.outputs.playwright }}-noble
     
     steps:
     - name: Checkout code
@@ -28,18 +44,13 @@ jobs:
     - name: Cache dependencies
       uses: actions/cache@v5
       with:
-        path: |
-          ~/.npm
-          ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-playwright-
+          ${{ runner.os }}-npm-
     
     - name: Install dependencies
       run: npm ci
-    
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps chromium
     
     - name: Run Playwright tests
       run: npx playwright test
