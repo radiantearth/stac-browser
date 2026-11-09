@@ -88,7 +88,7 @@ import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
-import { fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../search-schemas';
 
 export default defineComponent({
   name: "Catalog",

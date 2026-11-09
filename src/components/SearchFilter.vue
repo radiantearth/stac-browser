@@ -197,7 +197,7 @@ import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import { formatPropertyKey } from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
-import { fetchQueryablesForLink, fetchSchemaProperties } from '../store/utils';
+import { fetchQueryablesForLink, fetchSchemaProperties } from '../search-schemas';
 import { FILTER_FIELDS } from '../store/modules/search';
 
 function getDefaults() {

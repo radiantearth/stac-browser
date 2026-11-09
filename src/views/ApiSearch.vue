@@ -85,7 +85,8 @@ import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { getErrorCode, getErrorMessage, fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
+import { getErrorCode, getErrorMessage } from '../store/utils';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../search-schemas';
 import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 

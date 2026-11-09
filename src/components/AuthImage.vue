@@ -10,7 +10,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import { markRaw } from 'vue';
-import { acquire, needsAuthenticatedFetch, release } from '../models/authMedia';
+import { acquire, needsAuthenticatedFetch, release } from '../auth-media';
 
 /**
  * An image that is loaded with the configured credentials.
@@ -74,7 +74,7 @@ export default {
   data() {
     return {
       blobUrl: null,
-      // The URL currently held in the authMedia cache
+      // The URL currently held in the auth-media cache
       acquiredUrl: null,
       failed: false,
       // The URL that the image element failed to load. Also covers header
