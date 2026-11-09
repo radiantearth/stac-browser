@@ -489,6 +489,8 @@
   "This document": "このドキュメント",
   "TileJSON": "TileJSON",
   "Tiled Assets": "タイル付きアセット",
+  "Time Threshold in a Flash": "雷フラッシュの時間閾値",
+  "Time Threshold in a Group": "グループ内時間閾値",
   "Time of Data": "データ時間",
   "Time of Data begins": "データ開始時刻",
   "Time of Data ends": "データ終了時間",
