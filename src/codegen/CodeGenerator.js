@@ -26,8 +26,7 @@ export default class CodeGenerator {
   /**
    * The stable identifier of the generator.
    * Used as the tab id, the key in the browser storage, the i18n key for the
-   * label (`programming.<language>`) and, unless `highlightLanguage` is
-   * overridden, as the syntax highlighter language identifier.
+   * label (`programming.<language>`).
    * @returns {string}
    */
   get language() {
@@ -35,13 +34,13 @@ export default class CodeGenerator {
   }
 
   /**
-   * The syntax highlighter language identifier.
-   * Defaults to `language`, override if that is not a language known to the
-   * highlighter, e.g. `curl` snippets are highlighted as `bash`.
-   * @returns {string}
+   * Loads the grammar for the syntax highlighter (shiki).
+   * Return a static `import()`, e.g. `import('@shikijs/langs/python')`,
+   * so that only the grammars of the included generators are bundled.
+   * @returns {Promise|null} The grammar module, or `null` for no highlighting.
    */
-  get highlightLanguage() {
-    return this.language;
+  loadHighlightLanguage() {
+    return null;
   }
 
   /**

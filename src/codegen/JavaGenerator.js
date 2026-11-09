@@ -6,6 +6,10 @@ export default class JavaGenerator extends CodeGenerator {
     return 'java';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/java');
+  }
+
   get outputFile() {
     return 'StacSearch.java';
   }

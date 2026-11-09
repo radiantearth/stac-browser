@@ -6,6 +6,10 @@ export default class PythonGenerator extends CodeGenerator {
     return 'python';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/python');
+  }
+
   get outputFile() {
     return 'search.py';
   }
