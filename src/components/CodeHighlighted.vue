@@ -22,9 +22,26 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { codeToHtml } from 'shiki';
+import { createHighlighterCore } from 'shiki/core';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import CopyButton from './CopyButton.vue';
-import { mapState } from 'vuex/dist/vuex.cjs.js';
+import { mapState } from 'vuex';
+
+let highlighter = null;
+
+function getHighlighter() {
+  if (!highlighter) {
+    highlighter = createHighlighterCore({
+      themes: [
+        import('@shikijs/themes/github-light'),
+        import('@shikijs/themes/github-dark')
+      ],
+      langs: [],
+      engine: createJavaScriptRegexEngine()
+    });
+  }
+  return highlighter;
+}
 
 export default defineComponent({
   name: 'CodeHighlighted',
@@ -36,9 +53,9 @@ export default defineComponent({
       type: String,
       required: true
     },
-    language: {
-      type: String,
-      required: true
+    languageLoader: {
+      type: Function,
+      default: null
     },
     file: {
       type: String,
@@ -60,15 +77,23 @@ export default defineComponent({
         this.renderCode();
       }
     },
-    language() {
+    languageLoader() {
       this.renderCode();
     }
   },
   methods: {
     async renderCode() {
+      const grammarPromise = this.languageLoader?.();
+      if (!grammarPromise) {
+        this.highlightedCode = '';
+        return;
+      }
       try {
-        this.highlightedCode = await codeToHtml(this.code, {
-          lang: this.language,
+        const [shiki, { default: grammar }] = await Promise.all([getHighlighter(), grammarPromise]);
+        await shiki.loadLanguage(grammar);
+        // Embedded grammars come first, the main grammar is the last one
+        this.highlightedCode = shiki.codeToHtml(this.code, {
+          lang: grammar[grammar.length - 1].name,
           theme: 'github-' + this.colorMode
         });
       }
@@ -81,7 +106,7 @@ export default defineComponent({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = this.file || `code.${this.language}`;
+      a.download = this.file || 'code.txt';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -362,4 +362,23 @@ test.describe('STAC Browser code example modal', () => {
     expect(copied, 'should contain python search snippet').toContain('results = catalog.search(');
     expect(copied, 'should include scoped collection id for collection item search').toContain('collections=["test-collection-1"]');
   });
+
+  test('highlights the code of all languages', async ({ page }) => {
+    await page.goto(api.root.getSearchPath());
+    const modal = await openExampleCodeModal(page);
+
+    for (const name of ['C#', 'cURL', 'Go', 'Java', 'JavaScript', 'Python', 'R', 'Rust']) {
+      // eslint-disable-next-line no-await-in-loop
+      await test.step(`${name} is highlighted`, async () => {
+        await modal.getByRole('tab', { name, exact: true }).click();
+        const panel = modal.getByRole('tabpanel', { name, exact: true });
+        // shiki renders a pre.shiki with colored tokens, the fallback is a plain pre
+        await expect(panel.locator('pre.shiki')).toBeVisible();
+        const colors = await panel.locator('pre.shiki span[style*="color"]').evaluateAll(
+          spans => new Set(spans.map(span => span.style.color)).size
+        );
+        expect(colors, 'tokens should use different colors').toBeGreaterThan(1);
+      });
+    }
+  });
 });

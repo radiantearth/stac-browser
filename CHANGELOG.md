@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Code examples only load the syntax highlighting for the included code generators, which makes them load faster and the build much smaller.
+  Custom code generators provide their grammar via `loadHighlightLanguage()` instead of `get highlightLanguage()`.
 - Layer switcher: The layers that are rendered on top are listed first
 - Confirming to show a large asset on the map applies to all assets of the page instead of only to the selected asset
 - Filters: The "Default" sort option shows the configured default sort (e.g. "Default (Time of Data, Descending)") instead of pre-selecting it
