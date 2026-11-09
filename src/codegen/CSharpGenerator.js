@@ -6,6 +6,10 @@ export default class CSharpGenerator extends CodeGenerator {
     return 'csharp';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/csharp');
+  }
+
   get outputFile() {
     return 'Program.cs';
   }
