@@ -70,6 +70,10 @@
               <b-button v-if="parentLink" :to="toBrowserPath(parentLink)" :title="parentLinkTitle" variant="outline-primary" size="sm">
                 <b-icon-arrow-90deg-up /><span class="button-label">{{ $t('goToParent.label') }}</span>
               </b-button>
+              <!-- Cal-Adapt: Browse sits here beside Source; the site header's copy is hidden in custom.scss -->
+              <b-button v-if="!isServerSelector" :title="$t('browse')" variant="outline-primary" size="sm" @click="sidebar = !sidebar">
+                <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
+              </b-button>
             </b-button-group>
           </nav>
           <StacSource v-if="!isFavoritesPage" class="actions" :title="title" />

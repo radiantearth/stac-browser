@@ -39,6 +39,18 @@ export default {
   omitTimeForMidnight: false,
   showFavorites: false,
   defaultCollectionSort: "title",
+  // Cal-Adapt: collections listed here come first, in this order; the rest follow by title
+  collectionOrder: [
+    "wrf-ucla",
+    "wrf-derived-vars",
+    "loca2",
+    "loca2-county",
+    "typical-met-year",
+    "standard-year",
+    "xmy-persist",
+    "xmy-shock",
+    "historical-data-platform",
+  ],
   defaultItemSort: null,
   showKeywordsInItemCards: false,
   showKeywordsInCatalogCards: true,

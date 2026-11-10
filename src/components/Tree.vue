@@ -48,6 +48,7 @@ import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from '../utils';
 import { getDisplayTitle, sortStac } from '../models/stac';
+import { orderCollections } from '../caladapt/collectionOrder';
 import { STAC } from 'stac-js';
 
 export default {
@@ -74,7 +75,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage']),
+    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage', 'collectionOrder']),
     ...mapGetters(['getApiChildren', 'getChildren', 'getStac', 'isApiChildrenLoading', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
@@ -182,7 +183,9 @@ export default {
           }
         }
 
-        const sortedCatalogs = collectionSort.direction === 0 ? catalogs : sortStac(catalogs, collectionSort, this.uiLanguage);
+        let sortedCatalogs = collectionSort.direction === 0 ? catalogs : sortStac(catalogs, collectionSort, this.uiLanguage);
+        // Cal-Adapt: the collections in config.collectionOrder come first
+        sortedCatalogs = orderCollections(sortedCatalogs, this.collectionOrder);
         const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
 
         return prev.concat(sortedCatalogs, sortedItems, next);
