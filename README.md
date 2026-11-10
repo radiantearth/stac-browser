@@ -1,6 +1,6 @@
 # Cal-Adapt STAC Browser
 
-A customized [STAC Browser](https://github.com/radiantearth/stac-browser) for the [Cal-Adapt STAC API](https://8dawjspn5g.execute-api.us-west-2.amazonaws.com), live at https://stac-browser.cal-adapt.org.
+A customized [STAC Browser](https://github.com/radiantearth/stac-browser) for the [Cal-Adapt STAC API](https://stac.cal-adapt.org), live at https://stac-browser.cal-adapt.org.
 
 Based on [radiantearth/stac-browser](https://github.com/radiantearth/stac-browser) v5.1.0. See upstream's [README](https://github.com/radiantearth/stac-browser/blob/v5.1.0/README.md) and [docs](https://github.com/radiantearth/stac-browser/tree/v5.1.0/docs) for everything not covered here.
 
@@ -10,7 +10,7 @@ Custom code lives in `src/caladapt/` and is wired in through STAC Browser's conf
 
 - **Config** (`config.js`): Cal-Adapt API and title (also shown on the home page instead of the API's own title), the Cal-Adapt bear logo (`public/bear.png`), hash routing so existing `/#/` links keep working, footer links, English and light mode only, no favorites or social sharing.
 - **Brand theme**: Cal-Adapt colors, Poppins and Roboto fonts, and the Cobalt to Ocean header in `src/theme/variables.scss`; small overrides in `src/theme/custom.scss`, including a left-aligned header title and hidden Browse, Search, API and Share buttons.
-- **Widgets** (`widgets.config.js`): featured collections on the landing page, and a Dataset Overview on collection pages with tables built from `caladapt:*_labels` fields and queryable values (labels in `src/caladapt/collectionOverviewConfig.js`).
+- **Widgets** (`widgets.config.js`): a Dataset Overview on collection pages with tables built from `caladapt:*_labels` fields and queryable values (labels in `src/caladapt/collectionOverviewConfig.js`).
 - **Asset actions** (`assetActions.config.js`): Preview for CSV files, and Download for public `s3://` files over HTTPS.
 - **Python snippets**: climakitae or xarray/pandas code on each asset (`src/caladapt/PythonSnippet.vue`).
 - **Hidden metadata** (`fields.config.js`): fields that the Dataset Overview already shows.

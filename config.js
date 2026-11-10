@@ -5,8 +5,8 @@
 const calAdaptBear = typeof window === "undefined" ? null : new URL("bear.png", document.baseURI).href;
 
 export default {
-  catalogUrl: "https://8dawjspn5g.execute-api.us-west-2.amazonaws.com",
-  catalogTitle: "Cal-Adapt climate data catalog",
+  catalogUrl: "https://stac.cal-adapt.org",
+  catalogTitle: "Cal-Adapt data browser",
   catalogTitleAfterImage: null,
   catalogImage: calAdaptBear,
   allowExternalAccess: true, // Must be true if catalogUrl is not given
