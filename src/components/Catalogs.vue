@@ -2,7 +2,9 @@
   <section class="catalogs mb-4">
     <header>
       <h2 class="title me-2">{{ displayTitle }}</h2>
-      <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
+      <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" :class="hasPillSelection ? 'me-2' : 'me-4'">{{ catalogCount }}</b-badge>
+      <!-- Cal-Adapt: reset the pill filters next to the filtered count -->
+      <b-button v-if="hasPillSelection" size="sm" variant="link" class="p-0 me-4" @click="clearPillFilters">{{ $t('catalogFilters.clear') }}</b-button>
       <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
     </header>
     <section v-if="showControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
@@ -52,10 +54,6 @@
           </div>
         </div>
       </template>
-      <div v-if="hasPillSelection" class="pill-filter">
-        <span class="pill-filter-label" />
-        <b-button size="sm" variant="link" class="p-0" @click="clearPillFilters">{{ $t('catalogFilters.clear') }}</b-button>
-      </div>
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
@@ -431,11 +429,6 @@ export default defineComponent({
 
       > .pill-filter-label {
         flex: none;
-      }
-
-      // The Clear filters row has an empty label, only there for alignment
-      > .pill-filter-label:empty {
-        display: none;
       }
     }
   }
