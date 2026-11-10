@@ -63,6 +63,9 @@
     "displayOverview": {
       "type": "boolean"
     },
+    "displayPreviewsForChildren": {
+      "type": "boolean"
+    },
     "displayOverviewsForChildren": {
       "type": "boolean"
     },
@@ -99,6 +102,9 @@
     "cardViewMode": {
       "type": "string",
       "enum": ["list", "cards"]
+    },
+    "omitTimeForMidnight": {
+      "type": "boolean"
     },
     "showFavorites": {
       "type": "boolean"

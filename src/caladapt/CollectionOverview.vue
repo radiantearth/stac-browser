@@ -20,7 +20,7 @@
 import { mapState } from 'vuex';
 import LabelTable from './LabelTable.vue';
 import { EXTRA_FIELD_TABLES, QUERYABLE_TABLES, QUERYABLE_TEXT } from './collectionOverviewConfig.js';
-import { fetchSchemaProperties } from '../store/utils';
+import { fetchSchemaProperties } from '../search-schemas';
 
 // Widget for collection pages: label tables from Cal-Adapt's collection fields
 // and readable names for the collection's queryable values.

@@ -6,6 +6,10 @@ export default class JavaScriptGenerator extends CodeGenerator {
     return 'javascript';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/javascript');
+  }
+
   get outputFile() {
     return 'search.mjs';
   }

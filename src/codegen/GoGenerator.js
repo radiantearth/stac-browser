@@ -6,6 +6,10 @@ export default class GoGenerator extends CodeGenerator {
     return 'go';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/go');
+  }
+
   get outputFile() {
     return 'search.go';
   }

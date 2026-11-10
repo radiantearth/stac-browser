@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, toRaw } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
@@ -61,12 +61,20 @@ export default {
   mixins: [
     MapMixin
   ],
+  provide() {
+    return {
+      layerVisibilityChanged: () => this.$emit('changed', this.getShownData())
+    };
+  },
+  inject: {
+    mapSelection: { default: null }
+  },
   props: {
     stac: {
       type: Object,
       default: null
     },
-    assets: {
+    dataSources: {
       type: Array,
       default: null
     },
@@ -92,7 +100,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['displayOverviewsForChildren']),
+    ...mapState(['displayPreviewsForChildren', 'displayOverviewsForChildren']),
     container() {
       if (this.isFullScreen) {
         return '#' + this.mapId;
@@ -104,7 +112,7 @@ export default {
     childrenOptions() {
       const showItems = this.children && this.children.isItemCollection;
       return {
-        displayPreview: showItems,
+        displayPreview: showItems && this.displayPreviewsForChildren,
         displayOverview: showItems && this.displayOverviewsForChildren
       };
     },
@@ -113,8 +121,10 @@ export default {
         return this.displayLimitError !== null;
       },
       set(value) {
-        if (!value) {
+        // Confirming resets the error before the modal closes
+        if (!value && this.displayLimitError !== null) {
           this.displayLimitError = null;
+          this.hideRejected();
         }
       }
     }
@@ -123,19 +133,12 @@ export default {
     async stac() {
       await this.showStacLayer();
     },
-    async assets() {
+    async dataSources(dataSources) {
       if (!this.stacLayer) {
         return;
       }
       this.displayLimitError = null;
-      if (this.ignoreDisplayLimit) {
-        // Re-enable the display limit for the newly selected assets
-        this.ignoreDisplayLimit = false;
-        this.map.removeLayer(this.stacLayer);
-        this.addStacLayer();
-        return;
-      }
-      await this.stacLayer.setAssets(this.assets);
+      await this.stacLayer.setDataSources(dataSources);
     },
     async children() {
       if (!this.stacLayer) {
@@ -150,7 +153,8 @@ export default {
         this.addStacLayer();
         return;
       }
-      await this.stacLayer.setAssets(null, false);
+      // The selection may change at the same time, e.g. from children to an asset
+      await this.stacLayer.setDataSources(this.dataSources || null, false);
       await this.stacLayer.setChildren(this.children, this.childrenOptions, false);
       await this.stacLayer.updateLayers();
       this.fit();
@@ -170,7 +174,11 @@ export default {
     // These are created here and not in data() to avoid them being reactive
     this.stacLayer = null;
     this.ignoreDisplayLimit = false;
+    this.rejectedDataSources = [];
     this.focusHintTimer = null;
+    if (this.mapSelection) {
+      this.$watch(() => this.mapSelection.getRevealed(), revealed => this.reveal(revealed?.ref));
+    }
   },
   async mounted() {
     // Explain that the map must be focused before it reacts to scroll zoom and touch panning
@@ -202,7 +210,7 @@ export default {
         // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
         children: this.children,
-        assets: this.assets || null,
+        dataSources: this.dataSources || null,
         displayWebMapLink: true,
         disableMigration: true,
         childrenOptions: this.childrenOptions
@@ -216,6 +224,9 @@ export default {
           // The asset needs to load more data than ol-stac deems safe;
           // offer to display it anyway (see showAnyway)
           this.displayLimitError = event.error;
+          if (event.error.asset) {
+            this.rejectedDataSources.push(event.error.asset);
+          }
         }
         else {
           console.warn(event);
@@ -312,9 +323,25 @@ export default {
       clearTimeout(this.focusHintTimer);
       this.focusHint = false;
     },
+    hideRejected() {
+      if (!this.mapSelection) {
+        return;
+      }
+      this.rejectedDataSources.forEach(ref => this.mapSelection.hide(ref));
+      this.rejectedDataSources = [];
+    },
+    reveal(ref) {
+      if (!ref || !this.stacLayer) {
+        return;
+      }
+      this.stacLayer.getLayersArray()
+        .filter(layer => toRaw(layer.get('stac')) === toRaw(ref))
+        .forEach(layer => layer.setVisible(true));
+    },
     showAnyway() {
       this.displayLimitError = null;
       this.ignoreDisplayLimit = true;
+      this.rejectedDataSources = [];
       this.map.removeLayer(this.stacLayer);
       this.addStacLayer();
     },

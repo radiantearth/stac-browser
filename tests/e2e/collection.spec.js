@@ -5,9 +5,11 @@
  * item listing, and detail controls.
  */
 import { test, expect } from './fixtures.js';
-import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
+import { clearClipboard, configureBrowser, readClipboard, waitForBrowserReady } from './helpers.js';
+import { commitToStore } from '../helpers/store.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
+import Queryables from '../fixtures/builders/queryables.js';
 
 test.describe('Collection Metadata', () => {
   function createStaticCatalog() {
@@ -71,6 +73,143 @@ test.describe('Collection Metadata', () => {
     // not just "bis jetzt" on its own.
     await expect(temporalValue).toContainText(year);
     await expect(temporalValue).toContainText('bis jetzt');
+  });
+
+  test.describe('Temporal extents', () => {
+    test.use({ timezoneId: 'America/New_York' });
+
+    test('Catalog - optionally omits midnight from temporal extents', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(collection.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+      await expect(temporalValue).toHaveText('2020-01-01 until present');
+    });
+
+    test('Catalog - keeps midnight time by default', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      await catalog.createServer(worker);
+
+      await page.goto(collection.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+      await expect(temporalValue).toHaveText('2020-01-01 0:00:00 UTC until present');
+    });
+
+    test('Catalog - keeps meaningful times when midnight omission is enabled', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      collection.setMetadata({
+        extent: {
+          spatial: collection.getMetadata().extent.spatial,
+          temporal: { interval: [['2020-01-01T12:34:56Z', null]] }
+        }
+      });
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(collection.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('section.metadata .row', { hasText: /temporal extent/i }).locator('.value');
+      await expect(temporalValue).toHaveText('2020-01-01 12:34:56 UTC until present');
+    });
+
+    test('Catalog card - optionally omits midnight from temporal extents', async ({ page, worker }) => {
+      const { catalog } = createStaticCatalog();
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(catalog.root.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      const temporalValue = page.locator('.catalog-card .datetime');
+      await expect(temporalValue).toHaveText('2020-01-01 until present');
+    });
+
+    test('Catalog card - keeps midnight time by default', async ({ page, worker }) => {
+      const { catalog } = createStaticCatalog();
+      await catalog.createServer(worker);
+
+      await page.goto(catalog.root.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      await expect(page.locator('.catalog-card .datetime')).toHaveText('2020-01-01 0:00:00 UTC until present');
+    });
+
+    test('Catalog card - keeps meaningful times when midnight omission is enabled', async ({ page, worker }) => {
+      const { catalog, collection } = createStaticCatalog();
+      collection.setMetadata({
+        extent: {
+          spatial: collection.getMetadata().extent.spatial,
+          temporal: { interval: [['2020-01-01T12:34:56Z', null]] }
+        }
+      });
+      await configureBrowser(page, { omitTimeForMidnight: true });
+      await catalog.createServer(worker);
+
+      await page.goto(catalog.root.getBrowserPath());
+      await waitForBrowserReady(page);
+
+      await expect(page.locator('.catalog-card .datetime')).toHaveText('2020-01-01 12:34:56 UTC until present');
+    });
+
+    for (const isCard of [false, true]) {
+      const name = isCard ? 'Catalog card' : 'Catalog';
+      const selector = isCard ? '.catalog-card .datetime' : 'section.metadata .row:has-text("Temporal extent") .value';
+
+      test(`${name} - keeps both midnight dates in a closed interval`, async ({ page, worker }) => {
+        const { catalog, collection } = createStaticCatalog();
+        collection.setMetadata({
+          extent: {
+            spatial: collection.getMetadata().extent.spatial,
+            temporal: { interval: [['2020-01-01T00:00:00Z', '2020-12-31T00:00:00Z']] }
+          }
+        });
+        await configureBrowser(page, { omitTimeForMidnight: true });
+        await catalog.createServer(worker);
+
+        await page.goto((isCard ? catalog.root : collection).getBrowserPath());
+        await waitForBrowserReady(page);
+
+        await expect(page.locator(selector)).toHaveText('2020-01-01–12-31');
+      });
+
+      test(`${name} - keeps times when a later interval is not midnight`, async ({ page, worker }) => {
+        const { catalog, collection } = createStaticCatalog();
+        collection.setMetadata({
+          extent: {
+            spatial: collection.getMetadata().extent.spatial,
+            temporal: {
+              interval: [
+                ['2020-01-01T00:00:00Z', null],
+                ['2020-01-01T00:00:00Z', '2020-01-02T00:00:00Z'],
+                ['2020-06-01T12:34:56Z', null]
+              ]
+            }
+          }
+        });
+        await configureBrowser(page, { omitTimeForMidnight: true });
+        await catalog.createServer(worker);
+
+        await page.goto((isCard ? catalog.root : collection).getBrowserPath());
+        await waitForBrowserReady(page);
+
+        if (isCard) {
+          await expect(page.locator(selector)).toHaveText('2020-01-01 0:00:00 UTC until present');
+        }
+        else {
+          await expect(page.locator(selector).locator('li')).toHaveText([
+            '2020-01-01 00:00:00 UTC–2020-01-02 00:00:00 UTC',
+            '2020-06-01 12:34:56 UTC until present'
+          ]);
+        }
+      });
+    }
   });
 
   test('API - should load and display collection metadata', async ({ page, worker }) => {
@@ -324,6 +463,14 @@ test.describe('Collection - Items', () => {
 });
 
 test.describe('STAC Collection item search', () => {
+  const selectSortField = async (page, text) => {
+    const sortSelect = page.locator('.sort .multiselect');
+    await sortSelect.locator('.multiselect__select').click();
+    const sortInput = sortSelect.locator('input.multiselect__input');
+    await sortInput.fill(text);
+    await sortInput.press('Enter');
+  };
+
   function createAPIWithSearch() {
     const api = API.minimalApi(
       { url: "https://stac.example/api/" },
@@ -359,6 +506,76 @@ test.describe('STAC Collection item search', () => {
     await expect(await page.getByPlaceholder(/select date range/i)).toBeVisible();
   });
     
+  test('configured default sort is not reported as unapplied filter change', async ({ page, worker }) => {
+    const { api, collection } = createAPIWithSearch();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features#sort');
+    await api.createServer(worker);
+    await page.goto(api.root.getBrowserPath());
+    await commitToStore(page, 'config', { defaultItemSort: '-properties.datetime' });
+    // Navigate within the app so that the configured default sort is kept
+    await page.evaluate((path) => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+    }, collection.getBrowserPath());
+    await expect(page.getByRole('heading', { name: collection.getMetadata().title })).toBeVisible();
+
+    await page.getByRole('button', { name: /show filters/i }).click();
+    const sortSelect = page.locator('.sort .multiselect');
+    const unapplied = page.getByTitle(/changes have not been applied/i);
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Default (Time of Data, Descending)');
+    await expect(unapplied).toHaveCount(0);
+
+    // Selecting the field of the default sort keeps its direction and doesn't change the results
+    await selectSortField(page, 'Time of Data');
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Time of Data');
+    await expect(page.locator('.sort').getByTitle(/descending order/i)).toHaveAttribute('aria-pressed', 'true');
+    await expect(unapplied).toHaveCount(0);
+
+    // Changing the sort direction is an unapplied change
+    await page.locator('.sort').getByTitle(/ascending order/i).click();
+    await expect(unapplied).toBeVisible();
+  });
+
+  test('sortables without title get translated labels that follow language switches', async ({ page, worker }) => {
+    const { api, collection } = createAPIWithSearch();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features#sort');
+    // Serve the sortables through the generic JSON Schema endpoint builder
+    const sortables = new Queryables(api);
+    sortables.url = `collections/${collection.id}/sortables`;
+    sortables.data.properties = {
+      'properties.datetime': { type: 'string' },
+      'properties.eo:cloud_cover': { type: 'number' }
+    };
+    api.endpoints.push(sortables);
+    collection.addLink({
+      rel: 'http://www.opengis.net/def/rel/ogc/1.0/sortables',
+      href: sortables.getAbsoluteUrl(),
+      type: 'application/schema+json'
+    });
+    await api.createServer(worker);
+    await page.goto(api.root.getBrowserPath());
+    await commitToStore(page, 'config', { defaultItemSort: '-properties.datetime' });
+    await page.evaluate((path) => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+    }, collection.getBrowserPath());
+    await expect(page.getByRole('heading', { name: collection.getMetadata().title })).toBeVisible();
+
+    await page.getByRole('button', { name: /show filters/i }).click();
+    const sortSelect = page.locator('.sort .multiselect');
+    await sortSelect.locator('.multiselect__select').click();
+    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Default (Time of Data, Descending)', 'Cloud Cover', 'Time of Data']);
+    await sortSelect.locator('input.multiselect__input').press('Escape');
+    await selectSortField(page, 'Cloud Cover');
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Cloud Cover');
+
+    await page.evaluate(() => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$store.dispatch('switchLocale', { locale: 'de' });
+    });
+    // Both the selected option and the list of options are translated
+    await expect(sortSelect.locator('.multiselect__single')).toHaveText('Wolkenbedeckung');
+    await sortSelect.locator('.multiselect__select').click();
+    await expect(sortSelect.locator('.multiselect__option')).toContainText(['Standardeinstellung (Zeitstempel der Daten, Absteigend)', 'Wolkenbedeckung', 'Zeitstempel der Daten']);
+  });
+
   test('changing limit should result in the according number of items rendered', async ({ page, worker }) => {
     const { api, collection } = createAPIWithSearch();
     await api.createServer(worker);

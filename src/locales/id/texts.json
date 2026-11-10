@@ -70,8 +70,12 @@
     "false": "tidak",
     "true": "ya"
   },
+  "close": "Tutup",
   "copy": "Salin",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "Gagal menyalin. Silakan periksa perizinan mesin penjelajah.",
+    "unsupported": "Papan klip tidak tersedia di mesin penjelajah ini."
+  },
   "default": "Default",
   "defaultWithValue": "Default ({value})",
   "deprecated": "Usang",

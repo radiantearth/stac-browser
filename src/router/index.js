@@ -1,3 +1,14 @@
+// Keep the following constants in sync with the routes below.
+
+// Browser paths that point to external content, optionally prefixed by a tool route.
+// Add new routes that may include .../external/... in the path.
+export const externalBrowserPathRE = /^\/((search|validation|management\/[\w-]+)\/)?external\//;
+
+// First path segments that are taken by routes other than browse, browser paths starting with them get the /browse prefix.
+// Add new top-level routes.
+export const reservedBrowserPathSegments = ['auth', 'browse', 'external', 'favorites', 'management', 'search', 'validation'];
+export const escapedBrowserPathRE = /^\/?browse(?:\/(.*))?$/;
+
 function catchAllString(route) {
   const pathMatch = route.params.pathMatch || '';
   return Array.isArray(pathMatch) ? pathMatch.join("/") : pathMatch;
@@ -101,9 +112,6 @@ function getRoutes(config) {
     component: () => import("../views/Browse.vue"),
     props: route => getPath(route, config)
   });
-
-  // if you add new routes that may include .../external/... in the path make sure
-  // to add the new path prefix to the externalBrowserPathRE regexp in utils.js
 
   return routes;
 }

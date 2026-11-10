@@ -6,8 +6,8 @@ export default class CurlGenerator extends CodeGenerator {
     return 'curl';
   }
 
-  get highlightLanguage() {
-    return 'bash';
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/bash');
   }
 
   get outputFile() {

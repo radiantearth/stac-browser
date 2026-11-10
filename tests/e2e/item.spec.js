@@ -48,6 +48,39 @@ test.describe('Item view - Metadata', () => {
     await expect(itemTitle).toBeVisible();
   });
 
+  test('should escape proj:wkt2 instead of rendering it as HTML', async ({ page, worker }) => {
+    const { catalog, item } = createCatalog();
+    item.setMetadata({ 'proj:wkt2': 'PROJCRS["x</pre><img src=x onerror="window.__xss=true">"]' });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const wkt = page.locator('pre', { hasText: 'PROJCRS' });
+    await expect(wkt).toBeVisible();
+    await expect(wkt).toContainText('<img src=x onerror=');
+    await expect(page.locator('img[src="x"]')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+  });
+
+  test('should escape other formatted properties instead of rendering them as HTML', async ({ page, worker }) => {
+    const { catalog, item } = createCatalog();
+    const payload = '<img src=x onerror="window.__xss=true">';
+    item.setMetadata({
+      'grid:code': `FOO-${payload}`,
+      'processing:software': { [payload]: payload }
+    });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.getByText(`FOO-${payload}`)).toBeVisible();
+    await expect(page.getByText(`${payload} (${payload})`)).toBeVisible();
+    await expect(page.locator('img[src="x"]')).toHaveCount(0);
+    expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+  });
+
   test('should display rich item properties from EO collection', async ({ page, worker }) => {
     const { api, items } = createAPI();
     await api.createServer(worker);
@@ -279,6 +312,38 @@ test.describe('Item view - Alternate thumbnails', () => {
     await expect
       .poll(() => img.evaluate(el => el.complete && el.naturalWidth > 0))
       .toBe(true);
+  });
+});
+
+test.describe('Item view - Asset actions', () => {
+  test('SVG assets are offered for download instead of being opened', async ({ page, worker }) => {
+    const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
+    const item = catalog.addItem({ url: 'https://stac.example/item.json' });
+    item.data.assets = {
+      legend: { href: 'https://stac.example/legend.svg', type: 'image/svg+xml', roles: ['metadata'], title: 'Legend' },
+      chart: { href: 'https://stac.example/chart.png', type: 'image/png', roles: ['metadata'], title: 'Chart' }
+    };
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const expandAsset = async (title) => {
+      const asset = page.locator('.asset', { hasText: title });
+      await asset.getByRole('button', { name: title }).click();
+      return asset;
+    };
+
+    // SVG files opened in the browser can run scripts
+    const legend = await expandAsset('Legend');
+    const download = legend.getByRole('button', { name: /download/i });
+    await expect(download).toBeVisible();
+    await expect(download).toHaveAttribute('download');
+    await expect(legend.getByRole('button', { name: /^open$/i })).toHaveCount(0);
+
+    // Other images that browsers can show are still opened
+    const chart = await expandAsset('Chart');
+    await expect(chart.getByRole('button', { name: /^open$/i })).toBeVisible();
   });
 });
 

@@ -29,6 +29,7 @@
       <b-col class="right">
         <Loading v-if="loading" fill top />
         <ErrorAlert v-else-if="error" :description="error" :id="errorId" />
+        <b-alert v-else-if="data === null && isMissingCollections" variant="secondary" show>{{ $t('search.collectionsRequired') }}</b-alert>
         <b-alert v-else-if="data === null" variant="secondary" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="secondary" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
@@ -78,12 +79,14 @@
 import Utils from '../utils';
 import { isObject, size } from 'stac-js/src/utils.js';
 import SearchFilter from '../components/SearchFilter.vue';
+import { TYPES } from '../components/ApiCapabilitiesMixin';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { getErrorCode, getErrorMessage, fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
+import { getErrorCode, getErrorMessage } from '../store/utils';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../search-schemas';
 import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
@@ -127,7 +130,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'defaultSort', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'supportsConformance']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -144,10 +147,10 @@ export default defineComponent({
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
     collectionSearch() {
-      return this.canSearchCollections && this.parent && this.parent.getApiCollectionsLink();
+      return this.parent && this.canSearchCollections(this.parent) && this.parent.getApiCollectionsLink();
     },
     itemSearch() {
-      return this.canSearchItems && this.parent && this.parent.getSearchLink();
+      return this.parent && this.canSearchItems(this.parent) && this.parent.getSearchLink();
     },
     results() {
       return this.data?.getAll() || [];
@@ -160,6 +163,11 @@ export default defineComponent({
     },
     isCollectionSearch() {
       return this.collectionSearch && this.activeSearch === 'search-collections-tab';
+    },
+    isMissingCollections() {
+      return !this.isCollectionSearch
+        && this.supportsConformance(TYPES.Global.RequireCollections, this.parent)
+        && size(this.$store.state.search.itemFilters.collections) === 0;
     },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
@@ -205,7 +213,7 @@ export default defineComponent({
           fetchSortables: (stac) => fetchSortablesForLink(this.$store, stac?.getSortablesLink?.()),
           targetType: 'Global',
         });
-        this.itemFilters = this.$store.getters['search/itemSearchParams'];
+        this.itemFilters = this.$store.getters['search/requestParams']('Global', this.parent);
       }
       // Restore the previous results for this tab, e.g. when the user returns
       // to the Search page after visiting a result
@@ -224,11 +232,6 @@ export default defineComponent({
     }
   },
   async created() {
-    // Continue with the persisted search filters, e.g. when the user returns
-    // to the Search page after visiting a result
-    this.collectionFilters = this.$store.getters['search/collectionSearchParams'];
-    this.itemFilters = this.$store.getters['search/itemSearchParams'];
-
     let url = this.catalogUrl;
     if (this.loadParent) {
       url = this.fromBrowserPath(this.loadParent);
@@ -245,6 +248,11 @@ export default defineComponent({
       this.parent = this.getStac(url);
       this.showPage();
     }
+
+    // Continue with the persisted search filters, e.g. when the user returns
+    // to the Search page after visiting a result
+    this.collectionFilters = this.$store.getters['search/requestParams']('Collections', this.parent);
+    this.itemFilters = this.$store.getters['search/requestParams']('Global', this.parent);
 
     // We had this initially in a watcher with immediate: true, but this was executed too early.
     // Thus we only apply it once when creating the component and then on any subsequent change.
@@ -295,7 +303,8 @@ export default defineComponent({
       this.loading = true;
 
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
+        const sort = this.defaultSort(this.isCollectionSearch ? 'Collections' : 'Global', this.parent);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage, sort);
       
         const response = await this.$store.dispatch('request', { link: this.link });
         if (response) {
@@ -345,7 +354,7 @@ export default defineComponent({
       else {
         this.itemFilters = filters;
       }
-      if (reset) {
+      if (reset || this.isMissingCollections) {
         this.data = null;
       }
       else if (this.searchLink) {

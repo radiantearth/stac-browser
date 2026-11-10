@@ -27,6 +27,7 @@ export default {
   displayGeoTiffByDefault: false,
   displayPreview: true,
   displayOverview: true,
+  displayPreviewsForChildren: true,
   displayOverviewsForChildren: false,
   maxDisplayPixels: null,
   buildTileUrlTemplate: null,
@@ -35,6 +36,7 @@ export default {
   pathPrefix: "/",
   historyMode: "hash", // existing links use /#/ URLs
   cardViewMode: "cards",
+  omitTimeForMidnight: false,
   showFavorites: false,
   defaultCollectionSort: "title",
   defaultItemSort: null,

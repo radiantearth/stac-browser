@@ -7,7 +7,8 @@ import { stacNavigation, hidden } from "../relationTypes.config.js";
 export const stacBrowserNavigatesTo = [
   'canonical', // Links to other catalogs or items v
   'related',
-  'derived_from',
+  'derived_from', // processing extension v
+  'source_for',
   'latest-version', // version extension v
   'predecessor-version',
   'successor-version',

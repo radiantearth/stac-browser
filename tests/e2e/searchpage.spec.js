@@ -8,6 +8,7 @@
 import { test, expect } from './fixtures.js';
 import API from '../fixtures/instances/api.js';
 import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from './helpers.js';
+import { commitToStore } from '../helpers/store.js';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
@@ -378,6 +379,21 @@ test.describe('STAC Browser Search page', () => {
     });
   });
     
+  test('search without selected sort uses the configured default sort', async ({ page }) => {
+    await page.goto(api.root.getBrowserPath());
+    await commitToStore(page, 'config', { defaultItemSort: '-properties.datetime' });
+    // Navigate within the app so that the configured default sort is kept
+    await page.evaluate((path) => {
+      document.querySelector('[data-v-app]').__vue_app__.config.globalProperties.$router.push(path);
+    }, SEARCH_PATH);
+
+    await expect(page.locator('.sort .multiselect__single')).toHaveText('Default (Time of Data, Descending)');
+    const requestPromise = waitForSearchPost(page);
+    await page.getByRole('button', { name: /submit/i }).click();
+    const { body } = await requestPromise;
+    expect(body.sortby).toEqual([{ field: 'properties.datetime', direction: 'desc' }]);
+  });
+
   test('search with item limit should have valid POST body', async ({ page }) => {
       
     await page.goto(SEARCH_PATH);
@@ -913,6 +929,69 @@ test.describe('STAC Browser Search page', () => {
       expect(body.bbox[1]).toBeCloseTo(44.3, 2);
       expect(body.bbox[2]).toBeCloseTo(-104, 2);
       expect(body.bbox[3]).toBeCloseTo(49, 2);
+    });
+  });
+});
+
+test.describe('STAC Browser Search page with required collections', () => {
+  let SEARCH_PATH;
+
+  test.beforeEach(async ({ worker }) => {
+    const api = API.minimalApi();
+    const collection1 = api.addCollection('collection1')
+      .setMetadata({ title: 'Test Collection 1' });
+    api.addManyItems(collection1, 5);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/item-search#require-collections');
+
+    await api.createServer(worker);
+    SEARCH_PATH = api.root.getSearchPath();
+  });
+
+  test('Item search is only submitted once a collection is selected', async ({ page }) => {
+    const searchRequests = [];
+    page.on('request', req => {
+      if (req.method() === 'POST' && req.url().includes('/search')) {
+        searchRequests.push(req);
+      }
+    });
+
+    await page.goto(SEARCH_PATH);
+    await waitForBrowserReady(page);
+
+    const collectionGroup = page.locator('.filter-collection');
+    const feedback = collectionGroup.locator('.invalid-feedback');
+
+    await test.step('Hint that a collection is required', async () => {
+      await expect(collectionGroup.locator('.form-text')).toHaveText(/select at least one collection/i);
+      await expect(page.locator('.right .alert')).toHaveText(/select at least one collection/i);
+    });
+
+    await test.step('Submitting without a collection shows an error instead of searching', async () => {
+      await page.getByRole('button', { name: /submit/i }).click();
+      await expect(feedback).toBeVisible();
+      await expect(feedback).toHaveText(/select at least one collection/i);
+      await expect(collectionGroup.locator('.multiselect')).toHaveClass(/is-invalid/);
+      expect(searchRequests).toHaveLength(0);
+    });
+
+    await test.step('Selecting a collection clears the error', async () => {
+      const collectionSelect = collectionGroup.locator('.multiselect');
+      await collectionSelect.click();
+      const option = collectionSelect.locator('.multiselect__option', { hasText: 'Test Collection 1' });
+      await option.waitFor({ state: 'visible', timeout: 10000 });
+      await option.click();
+      await expect(feedback).toBeHidden();
+      await expect(collectionSelect).not.toHaveClass(/is-invalid/);
+    });
+
+    await test.step('Submitting with a collection searches', async () => {
+      const requestPromise = waitForSearchPost(page);
+      await page.getByRole('button', { name: /submit/i }).click();
+      const { body } = await requestPromise;
+      expect(body.collections).toEqual(['collection1']);
     });
   });
 });

@@ -10,7 +10,7 @@ Code Examples are created to display example queries for multiple languages. The
    - `get outputFile()`
    - `get template()`
    - if the language doesn't use `#`-style comments: `get commentChars()`
-   - if `get language()` is not a language known to the syntax highlighter (shiki): `get highlightLanguage()`
+   - for syntax highlighting: `loadHighlightLanguage()`, returning the grammar from shiki, e.g. `return import('@shikijs/langs/python');`
    - if dependencies are needed for running the code: `get installDependencies()`
    - if JSON should be indented: `get indent()`
    - if you need extra template variables: `getVariables(filters, cqlSerialized)`

@@ -20,6 +20,7 @@
       "generic": "Download",
       "withSource": "Download from {source}"
     },
+    "hideFromMap": "Hide from map",
     "inItems": "Asset in Items | Assets in Items",
     "role": {
       "data": "Data",
@@ -241,12 +242,15 @@
     "layers": {
       "base": "Base Layers",
       "footprint": "Footprint",
+      "moveDown": "Move down",
+      "moveUp": "Move up",
       "title": "Layers",
       "unnamed": "Unnamed #{id}"
     },
     "location": {
       "description": "Go to your location"
     },
+    "maxLayers": "Up to {max} layers can be shown on the map at once, please hide a layer first.",
     "nobasemap": "No basemaps available.",
     "nodata": "No spatial information available in the metadata.",
     "zoom": {
@@ -339,6 +343,7 @@
     "arrayOverlapsDescription": "Array contains at least one of the specified values",
     "between": "between",
     "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
+    "collectionsRequired": "Select at least one collection to search for items.",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "This filter is disabled because the collection has a single date and time as temporal extent.",
     "droppedFilters": "The following filters are not supported here and were removed: {filters}.",

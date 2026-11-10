@@ -15,7 +15,7 @@ export async function dispatchCarryToItemSearch(page, supportedIds, { targetType
         ?.__vue_app__?.config?.globalProperties?.$store;
       // The carry-over checks the conformance classes; wait for the root
       // catalog to be loaded like the views dispatching the action do
-      return Boolean(store?.state?.search && store.state.browserReady && store.state.conformsTo?.length > 0);
+      return Boolean(store?.state?.search && store.state.browserReady && store.getters.getConformanceClasses().length > 0);
     },
     undefined,
     { timeout: 10000 }
