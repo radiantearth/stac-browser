@@ -18,6 +18,10 @@
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
+      <b-button v-if="hasHideButton" @click="hide" variant="primary">
+        <b-icon-eye-slash class="me-1" />
+        {{ $t('assets.hideFromMap') }}
+      </b-button>
       <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
         <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
@@ -48,8 +52,8 @@ import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
 import AuthUtils from './auth/utils';
 import { browserProtocols } from 'stac-js/src/http';
-import { imageMediaTypes, geojsonMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
-import { getGeoZarrSourceOptionsFromAsset } from 'ol-stac/util.js';
+import { imageMediaTypes, geojsonMediaType, svgMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
+import { getGeoZarrSourceOptionsFromAsset, getWebMapLinks } from 'ol-stac/util.js';
 
 const disableDownloadTypes = [...zarrMediaTypes];
 const mapTypes = imageMediaTypes.concat([geojsonMediaType]).concat(wozMediaTypes);
@@ -63,6 +67,9 @@ export default {
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
+  },
+  inject: {
+    mapSelection: { default: null }
   },
   props: {
     data: {
@@ -82,16 +89,11 @@ export default {
       default: 'md',
       validator: value => ['sm', 'md', 'lg'].includes(value)
     },
-    shown: {
-      type: Boolean,
-      default: false
-    },
     auth: {
       type: Array,
       default: () => ([])
     }
   },
-  emits: ['show'],
   data() {
     return {
       id: i++,
@@ -161,8 +163,26 @@ export default {
       }
       return false;
     },
+    shown() {
+      return Boolean(this.mapSelection?.isShown(this.data));
+    },
+    isWebMapLink() {
+      if (this.isAsset || !this.data.getContext) {
+        return false;
+      }
+      return getWebMapLinks(this.data.getContext())
+        .some(link => link.rel === this.data.rel && link.href === this.data.href);
+    },
+    canShowOnMap() {
+      return this.isAsset ? this.canShow : this.isWebMapLink;
+    },
     hasShowButton() {
-      return this.isAsset && this.canShow && !this.shown;
+      return this.mapSelection && this.canShowOnMap && !this.shown;
+    },
+    hasHideButton() {
+      // Also for selected data sources that failed to load and have no layer
+      return (this.isAsset || this.isWebMapLink)
+        && Boolean(this.mapSelection?.isOnMap(this.data) || this.mapSelection?.isSelected(this.data));
     },
     canDownload() {
       return this.isAsset && this.isBrowserProtocol && !disableDownloadTypes.includes(this.data?.type);
@@ -236,6 +256,10 @@ export default {
     },
     browserCanOpenFile() {
       if (this.useAltDownloadMethod)  {
+        return false;
+      }
+      // SVG files opened in the browser can run scripts, so they are downloaded instead
+      if (this.data.isType(svgMediaType)) {
         return false;
       }
       if (this.data.canBrowserDisplayImage()) {
@@ -325,7 +349,10 @@ export default {
     },
     show() {
       // Credentials are attached by the map itself (see MapMixin)
-      this.$emit('show', this.data);
+      this.mapSelection.show(this.data);
+    },
+    hide() {
+      this.mapSelection.hide(this.data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {

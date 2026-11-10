@@ -2,7 +2,7 @@ import { isObject } from 'stac-js/src/utils.js';
 import i18n from '../../i18n';
 import Utils from '../../utils';
 import { mapGetters, mapState } from 'vuex';
-import { needsAuthenticatedFetch } from '../../models/authMedia';
+import { needsAuthenticatedFetch } from '../../auth-media';
 import OlMap from 'ol/Map.js';
 import View from 'ol/View.js';
 import Kinetic from 'ol/Kinetic.js';
@@ -33,7 +33,7 @@ export default {
     stacLayerOptions() {
       const options = {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
-        crossOriginMedia: this.crossOriginMedia,
+        crossOrigin: this.crossOriginMedia,
         displayPreview: this.displayPreview,
         displayOverview: this.displayOverview,
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,

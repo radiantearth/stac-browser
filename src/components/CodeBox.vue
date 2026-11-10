@@ -22,7 +22,7 @@
         :button-props="{id: 'exampleCodeCopyOutputFilename'}"
       />
     </div>
-    <CodeHighlighted :code="code" :language="language" :file="file" />
+    <CodeHighlighted :code="code" :language-loader="languageLoader" :file="file" />
   </div>
 </template>
 
@@ -56,8 +56,8 @@ export default defineComponent({
     code() {
       return this.generator.generate(this.filters);
     },
-    language() {
-      return this.generator.highlightLanguage;
+    languageLoader() {
+      return () => this.generator.loadHighlightLanguage();
     },
     file() {
       return this.generator.outputFile;

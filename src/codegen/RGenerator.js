@@ -7,6 +7,10 @@ export default class RGenerator extends CodeGenerator {
     return 'r';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/r');
+  }
+
   get outputFile() {
     return 'search.R';
   }

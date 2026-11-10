@@ -7,6 +7,10 @@ export default class RustGenerator extends CodeGenerator {
     return 'rust';
   }
 
+  loadHighlightLanguage() {
+    return import('@shikijs/langs/rust');
+  }
+
   get outputFile() {
     return 'main.rs';
   }

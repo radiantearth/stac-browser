@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-11-09
+
+### Security
+
+**A vulnerability was found, an upgrade is recommended as fast as possible.**
+
+- XSS issues fixed: Metadata values (e.g. `proj:wkt2`, `grid:code` or `processing:software`) are escaped and links with `javascript:` URLs are not clickable
+
+### Added
+
+- Catalogs that provide web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) show a map
+- New config option `displayPreviewsForChildren` controls preview images on maps showing multiple Items
+- New config option `omitTimeForMidnight` to show date-only Collection temporal extents when all boundaries are midnight UTC
+- SVG icons, thumbnails and previews (`image/svg+xml`) are shown, SVG files are offered for download instead of being opened
+- Item Search: Support for the conformance class that requires the `collections` parameter (`item-search#require-collections`)
+- Links with the relation type `source_for` open in STAC Browser
+- Filters: Sortables and queryables without a title show translated labels for common fields (e.g. `properties.datetime`)
+- Multiple assets can be shown on the map at once (up to 8), the most recently added asset is shown on top
+- Assets that are shown on the map can be hidden again
+- Web map links (XYZ, TileJSON, PMTiles, WMTS, WMS) can be shown on and hidden from the map through the list of links
+- Layer switcher: Assets and web map links can be moved up and down and removed from the map
+
+### Changed
+
+- Code examples only load the syntax highlighting for the included code generators, which makes them load faster and the build much smaller.
+  Custom code generators provide their grammar via `loadHighlightLanguage()` instead of `get highlightLanguage()`.
+- Layer switcher: The layers that are rendered on top are listed first
+- Confirming to show a large asset on the map applies to all assets of the page instead of only to the selected asset
+- Filters: The "Default" sort option shows the configured default sort (e.g. "Default (Time of Data, Descending)") instead of pre-selecting it
+- Docker: The image is based on `nginx/nginx-unprivileged:1-alpine-slim`, as `nginxinc/nginx-unprivileged` is archived. The image no longer includes the optional nginx modules.
+
+### Fixed
+
+- Item filters from the global search that a collection doesn't support (e.g. item IDs or free text) are no longer sent with its item filter or reported as unapplied changes
+- The filter button no longer reports unapplied changes for the configured default sort order
+- Icons, logos and card thumbnails that fail to load are hidden
+- A page that is still loading no longer replaces the page that was navigated to in the meantime
+- "Search" on external content opens the search of the catalog instead of an error page
+- The catalog keeps its capabilities (e.g. search, sorting, filters) after visiting external content
+- Maps showing multiple Items now send the configured authentication (headers and query parameters) and apply the source/layer customizations and `maxDisplayPixels` for each Item
+- The `crossOriginMedia` option now applies to images on maps
+- The fallback description in the structured data (JSON-LD) shows the catalog title instead of "undefined"
+- Scientific publications without a DOI show "n/a" instead of escaped HTML, and DOI links use HTTPS
+- Zarr datacubes are visualized based on the metadata of their bands (e.g. RGB data without statistics is no longer shown in white) and apply nodata values
+- Maps show the attribution of assets (GeoTIFF, Zarr, GeoJSON, previews) and of their item or collection (attribution extension)
+- Typo in the label for processing instructions/code links
+- Catalogs, collections and items of a configured catalog in folders that share their name with a page of STAC Browser
+  (e.g. `validation/` or `external/`) open correctly, their paths start with `/browse/`
+
 ## [5.1.0] - 2026-09-07
 
 ### Added
@@ -306,7 +355,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.1.0...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.2.0...HEAD
+[5.2.0]: https://github.com/radiantearth/stac-browser/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/radiantearth/stac-browser/compare/v5.1.0-rc.1...v5.1.0
 [5.1.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...v5.1.0-rc.1
 [5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...v5.0.0

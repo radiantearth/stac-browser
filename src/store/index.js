@@ -4,7 +4,8 @@ import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
-import Utils, { BrowserError, externalBrowserPathRE } from '../utils';
+import Utils, { BrowserError } from '../utils';
+import { escapedBrowserPathRE, externalBrowserPathRE, reservedBrowserPathSegments } from '../router/index.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
@@ -98,6 +99,16 @@ function getOrCreateStac(cx, data, url) {
 }
 
 function getStore(config, router) {
+  // Loads that show their page once finished. A navigation cancels them, so that
+  // a slow load can't replace the page that was navigated to in the meantime.
+  const pendingShows = new Set();
+  const cancelPendingShows = () => {
+    for (const loading of pendingShows) {
+      loading.show = false;
+    }
+    pendingShows.clear();
+  };
+
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -131,7 +142,6 @@ function getStore(config, router) {
   const catalogDefaults = () => ({
     queue: [],
     privateQueryParameters: {},
-    conformsTo: [],
     dataLanguage: null,
 
     apiCollections: [],
@@ -193,6 +203,7 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
+      conformance: {}, // Conformance classes by URL of the API landing page
       // Loading object (when loading the first page) or an object with the props
       // type, list, prev, next and optionally loading (a Loading object when loading another page)
       apiChildren: {},
@@ -328,8 +339,36 @@ function getStore(config, router) {
 
         return null;
       },
-      // The conformance classes only apply to the configured (or selected) catalog itself.
-      // If a context (a STAC entity or a URL) is given, reports false for external content.
+      // The conformance classes of the API landing page that a context (a STAC entity or a URL) belongs to.
+      // Falls back to the conformance classes of the configured (or selected) catalog.
+      getConformanceClasses: (state, getters) => (context = null) => {
+        const urls = Object.keys(state.conformance);
+        const find = url => {
+          const key = urls.find(k => Utils.equalUrl(k, url));
+          return key ? state.conformance[key] : null;
+        };
+        const rootClasses = (state.catalogUrl && find(state.catalogUrl)) || [];
+        if (!context?.isSTAC && !hasText(context) && !(context instanceof urijs)) {
+          return rootClasses;
+        }
+        const stac = getters.getStac(context.isSTAC ? context : String(context));
+        const url = stac ? stac.getAbsoluteUrl() : toAbsolute(String(context), state.url);
+        const rootLink = stac?.getStacLinkWithRel('root');
+        const candidates = [url, rootLink?.getAbsoluteUrl()];
+        for (const candidate of candidates) {
+          const classes = hasText(candidate) && find(candidate);
+          if (classes) {
+            return classes;
+          }
+        }
+        // Context not loaded (yet), e.g. an API endpoint: use the closest landing page above it
+        const parentUrl = urls
+          .filter(k => url.startsWith(Utils.removeTrailingSlash(k) + '/'))
+          .sort((a, b) => b.length - a.length)[0];
+        return parentUrl ? state.conformance[parentUrl] : rootClasses;
+      },
+      // If a context (a STAC entity or a URL) is given, uses the conformance classes of its API.
+      // External content reports false, see https://github.com/radiantearth/stac-browser/pull/988
       supportsConformance: (state, getters) => (classes, context = null) => {
         if (!Array.isArray(classes)) {
           return classes;
@@ -344,24 +383,31 @@ function getStore(config, router) {
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
         let regexp = new RegExp(`^(${classRegexp})$`);
-        return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
+        return Boolean(getters.getConformanceClasses(context).find(uri => uri.match(regexp)));
       },
 
       canSearch: (state, getters) => {
-        return getters.canSearchCollections || getters.canSearchItems;
+        return getters.canSearchCollections() || getters.canSearchItems();
       },
-      canSearchItems: (state, getters) => {
-        return getters.supportsConformance(TYPES.Global.BasicFilters);
+      canSearchItems: (state, getters) => (context = null) => {
+        return getters.supportsConformance(TYPES.Global.BasicFilters, context);
       },
-      canSearchCollections: (state, getters) => {
-        return getters.supportsConformance(TYPES.Collections.BasicFilters);
+      canSearchCollections: (state, getters) => (context = null) => {
+        return getters.supportsConformance(TYPES.Collections.BasicFilters, context);
+      },
+      // The sort applied to API requests without sortby, type is a key of TYPES
+      defaultSort: (state, getters) => (type, context = null) => {
+        if (!getters.supportsConformance(TYPES[type].Sort, context)) {
+          return null;
+        }
+        return (type === 'Collections' ? state.defaultCollectionSort : state.defaultItemSort) || null;
       },
       searchBrowserLink: (state, getters) => {
         if (!getters.canSearch) {
           return null;
         }
         let searchLink;
-        if (state.data?.isCatalogLike && !state.data.is(getters.root)) {
+        if (state.data?.isCatalogLike && !state.data.is(getters.root) && !getters.isExternalContext) {
           searchLink = state.data.getSearchLink();
         }
         if (searchLink) {
@@ -464,12 +510,18 @@ function getStore(config, router) {
           return path;
         }
         else {
-          return `/${relative.toString()}`;
+          const path = relative.toString();
+          const firstSegment = path.split(/[/?#]/, 1)[0];
+          return reservedBrowserPathSegments.includes(firstSegment.toLowerCase()) ? `/browse/${path}` : `/${path}`;
         }
       },
       fromBrowserPath: (state, getters) => url => {
         const externalRE = externalBrowserPathRE;
-        if (!hasText(url) || url === '/') {
+        const escaped = !state.allowSelectCatalog && state.catalogUrl && hasText(url) ? url.match(escapedBrowserPathRE) : null;
+        if (escaped) {
+          url = hasText(escaped[1]) ? toAbsolute(escaped[1], state.catalogUrl, false) : state.catalogUrl;
+        }
+        else if (!hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
         else if (url.match(externalRE)) {
@@ -662,6 +714,9 @@ function getStore(config, router) {
         let data = state.database[url];
         if (data instanceof Loading) {
           data.show = show || data.show;
+          if (show) {
+            pendingShows.add(data);
+          }
         }
       },
       loading(state, { url, loading }) {
@@ -677,8 +732,10 @@ function getStore(config, router) {
       clear(state, url) {
         delete state.database[url];
         delete state.apiChildren[url];
+        delete state.conformance[url];
       },
       resetCatalog(state, clearAll) {
+        cancelPendingShows();
         Object.assign(state, catalogDefaults());
         Object.assign(state, localDefaults());
         if (!state.supportedLocales.includes(state.locale)) {
@@ -688,6 +745,7 @@ function getStore(config, router) {
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
           state.database = {};
+          state.conformance = {};
           state.apiChildren = {};
           state.manager.permissions = {};
           // Don't leak search filters (incl. CQL built against the previous
@@ -698,6 +756,7 @@ function getStore(config, router) {
         }
       },
       resetPage(state) {
+        cancelPendingShows();
         Object.assign(state, localDefaults());
       },
       showPage(state, { url, stac, page }) {
@@ -734,9 +793,9 @@ function getStore(config, router) {
       removeFromQueue(state, num) {
         state.queue.splice(0, num);
       },
-      setConformanceClasses(state, classes) {
+      setConformanceClasses(state, { url, classes }) {
         if (Array.isArray(classes)) {
-          state.conformsTo = classes;
+          state.conformance[url] = classes;
         }
       },
       setApiItemsLink(state, link) {
@@ -973,6 +1032,13 @@ function getStore(config, router) {
 
         url = toAbsolute(url, cx.state.url);
 
+        // Register before the first await, so that a navigation in the meantime cancels showing the page.
+        // Afterwards, check loading.show instead of show.
+        let loading = new Loading(show);
+        if (show) {
+          pendingShows.add(loading);
+        }
+
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
 
@@ -980,10 +1046,10 @@ function getStore(config, router) {
           cx.commit('clear', url);
         }
 
-        let loading = new Loading(show);
         let data = cx.state.database[url];
         if (data instanceof Loading) {
-          cx.commit('updateLoading', { url, show });
+          pendingShows.delete(loading);
+          cx.commit('updateLoading', { url, show: loading.show });
           return;
         }
 
@@ -1004,7 +1070,7 @@ function getStore(config, router) {
             }
             cx.commit('loaded', { url, data });
 
-            if (show) {
+            if (loading.show) {
               // If we prefer another language abort redirect to the new language
               let localeLink = data.getLocaleLink(cx.state.dataLanguage);
               if (localeLink) {
@@ -1015,17 +1081,17 @@ function getStore(config, router) {
 
             // Users may enter a different URL than reported in the STAC document
             // (e.g. missing trailing slash) - correct the URL and redirect.
-            if (await normalizeCatalogUrl(cx, data, url, show)) {
+            if (await normalizeCatalogUrl(cx, data, url, loading.show)) {
               return;
             }
 
             // Handle conformance classes
             let conformanceLink = data.getStacLinkWithRel('conformance');
             if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
-              cx.commit('setConformanceClasses', data.conformsTo);
+              cx.commit('setConformanceClasses', { url, classes: data.conformsTo });
             }
             else if (conformanceLink) {
-              await cx.dispatch('loadOgcApiConformance', conformanceLink);
+              await cx.dispatch('loadOgcApiConformance', { url, link: conformanceLink });
             }
           } catch (error) {
             console.error(error);
@@ -1097,6 +1163,7 @@ function getStore(config, router) {
         }
 
         // All tasks finished, show the page if requested
+        pendingShows.delete(loading);
         if (loading.show) {
           cx.commit('showPage', { url });
           // If we don't have a catalogUrl but have a page to show,
@@ -1120,10 +1187,7 @@ function getStore(config, router) {
             baseUrl = URI(baseUrl);
           }
 
-          let sort = null;
-          if (cx.getters.supportsConformance(TYPES.Items.Sort, baseUrl)) {
-            sort = cx.state.defaultItemSort;
-          }
+          const sort = cx.getters.defaultSort('Items', baseUrl);
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
 
           let response = await cx.dispatch('request', { link, checkPermissions: true });
@@ -1225,10 +1289,7 @@ function getStore(config, router) {
             reset = true;
           }
           link = stac.getLinkWithRel('data');
-          let sort = null;
-          if (cx.getters.supportsConformance(TYPES.Collections.Sort, stac)) {
-            sort = cx.state.defaultCollectionSort;
-          }
+          const sort = cx.getters.defaultSort('Collections', stac);
           const filters = {};
           if (cx.getters.supportsConformance(TYPES.Collections.FreeText, stac) && searching && size(q) > 0) {
             filters.q = q;
@@ -1312,10 +1373,10 @@ function getStore(config, router) {
           }
         }
       },
-      async loadOgcApiConformance(cx, link) {
+      async loadOgcApiConformance(cx, { url, link }) {
         let response = await cx.dispatch('request', { link });
         if (isObject(response.data) && Array.isArray(response.data.conformsTo)) {
-          cx.commit('setConformanceClasses', response.data.conformsTo);
+          cx.commit('setConformanceClasses', { url, classes: response.data.conformsTo });
         }
       },
       async altDownload(cx, args) {

@@ -30,15 +30,15 @@
       <b-card no-body class="border-0 rounded-0">
         <b-tabs v-model="activeTab" lazy card>
           <b-tab :id="mainTabId" :title="asset['alternate:name'] || $t('assets.alternate.main')" no-body>
-            <AssetAlternative :asset="asset" :shown="shown" @show="show" />
+            <AssetAlternative :asset="asset" />
           </b-tab>
           <b-tab v-for="(altAsset, key) in alternatives" :id="getAlternativeTabId(key)" :title="altAsset['alternate:name'] || key" :key="key" no-body>
-            <AssetAlternative :asset="altAsset" :shown="shown" @show="show" />
+            <AssetAlternative :asset="altAsset" />
           </b-tab>
         </b-tabs>
       </b-card>
     </template>
-    <AssetAlternative v-else :asset="asset" :shown="shown" @show="show" />
+    <AssetAlternative v-else :asset="asset" />
   </b-accordion-item>
 </template>
 
@@ -62,6 +62,9 @@ export default {
   mixins: [
     StacFieldsMixin({ formatMediaType })
   ],
+  inject: {
+    mapSelection: { default: null }
+  },
   props: {
     asset: {
       type: Object,
@@ -74,13 +77,8 @@ export default {
     expand: {
       type: Boolean,
       default: null
-    },
-    shown: {
-      type: Boolean,
-      default: false
     }
   },
-  emits: ['show'],
   data() {
     return {
       expanded: false,
@@ -91,6 +89,9 @@ export default {
     ...mapState(['stateQueryParameters', 'preferredAssets']),
     type() {
       return this.definition ? 'itemdef' : 'asset';
+    },
+    shown() {
+      return Boolean(this.mapSelection?.isShown(this.asset));
     },
     uid() {
       return `${this.type}-${this.asset.getKey().toLowerCase().replace(/[^\w]/g, '-')}`;
@@ -217,9 +218,6 @@ export default {
     collapseToggled(isVisible) {
       let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
       this.$store.commit(event, {type: this.type, uid: this.uid});
-    },
-    show() {
-      this.$emit('show', ...arguments);
     }
   }
 };

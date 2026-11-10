@@ -14,11 +14,11 @@ RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!--RC//;s/RC-->//' index.h
 RUN npm run build
 
 
-FROM nginxinc/nginx-unprivileged:1-alpine
+FROM nginx/nginx-unprivileged:1-alpine-slim
 ARG pathPrefix="/"
 
 USER root
-RUN apk add --no-cache jq pcre-tools
+RUN apk add --no-cache ca-certificates curl jq pcre-tools
 
 COPY ./config.schema.json /etc/nginx/conf.d/config.schema.json
 COPY --from=build-step /app/dist /usr/share/nginx/html

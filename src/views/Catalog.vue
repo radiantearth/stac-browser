@@ -25,10 +25,10 @@
           <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
         <WidgetHook id="view-catalog-intro-end" />
-        <section v-if="isCollection || hasThumbnails" class="mb-4">
+        <section v-if="isCollection || hasThumbnails || hasWebMapLinks" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" pills card vertical end>
-              <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
+              <b-tab v-if="isCollection || hasWebMapLinks" :id="tabIds.map" :title="$t('map')" no-body>
                 <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
@@ -37,7 +37,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
@@ -83,12 +83,13 @@ import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { getWebMapLinks } from 'ol-stac/util.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
-import { fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../search-schemas';
 
 export default defineComponent({
   name: "Catalog",
@@ -125,8 +126,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'omitTimeForMidnight', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'collectionLink', 'defaultSort', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -143,7 +144,7 @@ export default defineComponent({
       if (this.additionalLinks.length === 0) {
         return null;
       }
-      if (this.isCollection || !this.hasThumbnails) {
+      if (this.isCollection || (!this.hasThumbnails && !this.hasWebMapLinks)) {
         return "right";
       }
       else {
@@ -179,11 +180,12 @@ export default defineComponent({
     temporalExtents() {
       if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
         let extents = this.data.extent.temporal.interval;
+        const shorten = this.omitTimeForMidnight && Utils.isMidnightUTC(extents);
         if (extents.length > 1) {
           // Remove union temporal extent in favor of more concrete extents
           extents = extents.slice(1);
         }
-        return this.formatTemporalExtents(extents);
+        return this.formatTemporalExtents(extents, null, { shorten });
       }
       return null;
     },
@@ -200,7 +202,7 @@ export default defineComponent({
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters);
+        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters, null, this.defaultSort('Items', this.data));
       }
       return pages;
     },
@@ -216,10 +218,13 @@ export default defineComponent({
     hasCatalogs() {
       return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
     },
+    hasWebMapLinks() {
+      return getWebMapLinks(this.data).length > 0;
+    },
     mapData() {
       const data = {};
-      if (this.selectedAssets.length > 0) {
-        data.assets = this.selectedAssets;
+      if (this.selectedDataSources?.length > 0) {
+        data.dataSources = this.selectedDataSources;
       }
       else {
         const items = this.items.filter(item => item.type === 'Feature');
@@ -228,6 +233,10 @@ export default defineComponent({
             type: 'FeatureCollection',
             features: items
           });
+        }
+        else if (this.selectedDataSources) {
+          // Everything was hidden, don't fall back to the default visualization
+          data.dataSources = [];
         }
       }
       return data;
@@ -269,7 +278,7 @@ export default defineComponent({
             targetType: 'Items',
           });
 
-          this.filters = this.$store.getters['search/itemSearchParams'];
+          this.filters = this.$store.getters['search/requestParams']('Items', newData);
           // Open the filter panel so that the user can see which filters are
           // applied to the item list instead of filtering it silently
           this.$store.commit('updateState', {type: 'itemFilterOpen', value: 1});
