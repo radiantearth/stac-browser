@@ -37,19 +37,21 @@
           </b-button>
         </div>
       </div>
-      <div v-if="isComplete && allSpatialTypes.length > 0" class="pill-filter" role="group" :aria-label="$t('catalogFilters.dataType')">
-        <span class="pill-filter-label">{{ $t('catalogFilters.dataType') }}</span>
-        <div class="pill-filter-options">
-          <b-button
-            v-for="type in allSpatialTypes" :key="type"
-            size="sm" variant="outline-primary" class="rounded-pill"
-            :pressed="selectedSpatialTypes.includes(type)"
-            @click="selectSpatialType(type)"
-          >
-            {{ $t(`catalogFilters.spatialTypes.${type}`) }}
-          </b-button>
+      <template v-if="isComplete">
+        <div v-for="filter in collectionFilters" :key="filter.field" class="pill-filter" role="group" :aria-label="$t(`catalogFilters.${filter.key}.label`)">
+          <span class="pill-filter-label">{{ $t(`catalogFilters.${filter.key}.label`) }}</span>
+          <div class="pill-filter-options">
+            <b-button
+              v-for="value in filter.values" :key="value"
+              size="sm" variant="outline-primary" class="rounded-pill"
+              :pressed="selectedFieldValues[filter.field].includes(value)"
+              @click="selectFieldValue(filter.field, value)"
+            >
+              {{ $t(`catalogFilters.${filter.key}.${value}`) }}
+            </b-button>
+          </div>
         </div>
-      </div>
+      </template>
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
@@ -83,6 +85,7 @@ import Utils from '../utils';
 import ViewMixin from './ViewMixin';
 import { sortStac } from '../models/stac';
 import { orderCollections } from '../caladapt/collectionOrder';
+import { COLLECTION_FILTERS } from '../caladapt/collectionFilters';
 import { TYPES } from './ApiCapabilitiesMixin.js';
 import { hasText, URI } from 'stac-js/src/utils.js';
 
@@ -154,7 +157,9 @@ export default defineComponent({
       searchTerm: '',
       sort: Utils.parseApiSortParameter(), // get empty sort object
       selectedKeywords: [],
-      selectedSpatialTypes: [],
+      collectionFilters: COLLECTION_FILTERS,
+      // Selected values per collection field, e.g. { 'caladapt:source': ['wrf'] }
+      selectedFieldValues: Object.fromEntries(COLLECTION_FILTERS.map(filter => [filter.field, []])),
       selectedSearchTerms: [],
     };
   },
@@ -217,7 +222,8 @@ export default defineComponent({
       });
     },
     hasSearchCritera() {
-      return this.searchTerm || this.selectedKeywords.length > 0 || this.selectedSpatialTypes.length > 0 || this.selectedSearchTerms.length > 0;
+      const hasFieldValues = Object.values(this.selectedFieldValues).some(values => values.length > 0);
+      return this.searchTerm || this.selectedKeywords.length > 0 || hasFieldValues || this.selectedSearchTerms.length > 0;
     },
     catalogView() {
       if (this.hasMore) {
@@ -237,9 +243,11 @@ export default defineComponent({
               return false;
             }
           }
-          // Cal-Adapt: match any selected data type
-          if (this.selectedSpatialTypes.length > 0 && !this.selectedSpatialTypes.includes(catalog['caladapt:spatial_type'])) {
-            return false;
+          // Cal-Adapt: in each field filter (data type, source), match any selected value
+          for (const [field, values] of Object.entries(this.selectedFieldValues)) {
+            if (values.length > 0 && !values.includes(catalog[field])) {
+              return false;
+            }
           }
           if (this.searchTerm) {
             let haystack = [ catalog.title ];
@@ -275,13 +283,6 @@ export default defineComponent({
         }
       }
       return keywords.sort();
-    },
-    allSpatialTypes() {
-      if (!this.isComplete) {
-        return [];
-      }
-      const types = this.allCatalogs.map(catalog => catalog['caladapt:spatial_type']).filter(Boolean);
-      return [...new Set(types)].sort();
     }
   },
   watch: {
@@ -308,10 +309,11 @@ export default defineComponent({
         ? this.selectedKeywords.filter(k => k !== keyword)
         : [...this.selectedKeywords, keyword];
     },
-    selectSpatialType(type) {
-      this.selectedSpatialTypes = this.selectedSpatialTypes.includes(type)
-        ? this.selectedSpatialTypes.filter(t => t !== type)
-        : [...this.selectedSpatialTypes, type];
+    selectFieldValue(field, value) {
+      const selected = this.selectedFieldValues[field];
+      this.selectedFieldValues[field] = selected.includes(value)
+        ? selected.filter(v => v !== value)
+        : [...selected, value];
     },
     loadMore(visible = true) {
       if (visible) {

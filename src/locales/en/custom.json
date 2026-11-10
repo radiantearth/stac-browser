@@ -5,11 +5,18 @@
   "browse": "All datasets",
   "catalogFilters": {
     "topic": "Topic",
-    "dataType": "Data type",
-    "spatialTypes": {
+    "dataType": {
+      "label": "Data type",
       "grid": "grid",
       "point": "point",
       "spatial-aggregate": "spatial aggregate"
+    },
+    "source": {
+      "label": "Source",
+      "wrf": "WRF",
+      "loca2": "LOCA2",
+      "observations": "observations",
+      "other": "other"
     }
   },
   "fields": {
