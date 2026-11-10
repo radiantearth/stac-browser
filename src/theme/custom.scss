@@ -4,6 +4,7 @@
   // Header: logo and title on the left, as on caladapt-stac-map, with the same 52px height
   > header .site {
     padding-block: 0;
+    border-bottom: 2px solid $primary;
   }
 
   > header .site > .col-md-12 {
@@ -28,9 +29,9 @@
       min-width: 0;
     }
 
-    // Browse, Search and API assume STAC knowledge. People find datasets with the
-    // search box above the home page list and items with each dataset's filters;
-    // the full search page still works at /#/search.
+    // Browse, Search and API: Browse moved beside Source (StacBrowser.vue). Search and
+    // API assume STAC knowledge: people find datasets with the search box and keywords
+    // above the home page list, and the full search page still works at /#/search.
     > .navigation {
       display: none;
     }
@@ -45,6 +46,31 @@
 
   #popover-link-btn {
     border-radius: var(--bs-btn-border-radius);
+  }
+
+  // Collection and item tiles: faint border and a cobalt shadow on hover, after Portolan Browser
+  .catalog-card,
+  .item-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.5rem;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      border-color: rgba(var(--bs-primary-rgb), 0.3);
+      box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.1);
+    }
+  }
+
+  // Descriptions: a softer navy, after Portolan Browser
+  .styled-description {
+    color: shade-color($ca-cobalt, 35%);
+  }
+
+  // The Additional filters button opens the full collection search (area and dates),
+  // which adds little for a short list of collections; the search box and keyword
+  // filter cover it. The search page still works at /#/search.
+  .catalog-filter > .additional-filter-link {
+    display: none;
   }
 
   // Keyword chips: light cobalt tint instead of solid grey, so long lists read less heavy.

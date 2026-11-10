@@ -4,7 +4,6 @@
       <h2 class="title me-2">{{ displayTitle }}</h2>
       <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
       <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
-      <SortButtons v-if="allowSorting" v-model="sort.direction" />
     </header>
     <section v-if="showControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
       <template v-if="canSearchFreeText">
@@ -21,18 +20,19 @@
       </template>
       <template v-else>
         <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
-        <multiselect
-          v-if="isComplete && allKeywords.length > 0"
-          v-model="selectedKeywords"
-          :options="allKeywords"
-          multiple
-          :placeholder="$t('multiselect.keywordsPlaceholder')"
-          :select-label="$t('multiselect.selectLabel')"
-          :selected-label="$t('multiselect.selectedLabel')"
-          :deselect-label="$t('multiselect.deselectLabel')"
-          :limit-text="limitText"
-        />
       </template>
+      <!-- Cal-Adapt: keyword filter as toggle pill buttons, shown with API free-text search too
+           (upstream shows a multi-select dropdown, and only without free-text search) -->
+      <div v-if="isComplete && allKeywords.length > 0" class="keyword-filter" role="group" :aria-label="$t('multiselect.keywordsPlaceholder')">
+        <b-button
+          v-for="keyword in allKeywords" :key="keyword"
+          size="sm" variant="outline-primary" class="rounded-pill"
+          :pressed="selectedKeywords.includes(keyword)"
+          @click="selectKeyword(keyword)"
+        >
+          {{ keyword }}
+        </b-button>
+      </div>
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
@@ -65,6 +65,7 @@ import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 import ViewMixin from './ViewMixin';
 import { sortStac } from '../models/stac';
+import { orderCollections } from '../caladapt/collectionOrder';
 import { TYPES } from './ApiCapabilitiesMixin.js';
 import { hasText, URI } from 'stac-js/src/utils.js';
 
@@ -76,7 +77,6 @@ export default defineComponent({
     Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
-    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     ViewButtons
   },
   mixins: [ViewMixin],
@@ -141,7 +141,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'defaultCollectionSort', 'uiLanguage']),
+    ...mapState(['data', 'defaultCollectionSort', 'uiLanguage', 'collectionOrder']),
     ...mapGetters(['searchBrowserLink', 'supportsConformance']),
     ...mapGetters(['getStac']),
     advancedSearchLink() {
@@ -213,7 +213,8 @@ export default defineComponent({
       if (this.hasSearchCritera) {
         catalogs = catalogs.filter(catalog => {
           if (this.selectedKeywords.length > 0 && catalog instanceof STAC && Array.isArray(catalog.keywords)) {
-            let hasKeywords = this.selectedKeywords.every(keyword => catalog.keywords.includes(keyword));
+            // Cal-Adapt: match any selected keyword (upstream requires every one)
+            let hasKeywords = this.selectedKeywords.some(keyword => catalog.keywords.includes(keyword));
             if (!hasKeywords) {
               return false;
             }
@@ -234,7 +235,8 @@ export default defineComponent({
       if (this.allowSorting && !this.apiFilters.sortby && this.sort.direction !== 0) {
         catalogs = sortStac(catalogs, this.sort, this.uiLanguage);
       }
-      return catalogs;
+      // Cal-Adapt: the collections in config.collectionOrder come first
+      return orderCollections(catalogs, this.collectionOrder);
     },
     allKeywords() {
       if (!this.isComplete) {
@@ -271,6 +273,12 @@ export default defineComponent({
       }
       this.selectedSearchTerms.push(term);
     },
+    selectKeyword(keyword) {
+      // Toggle a keyword on or off; collections with any selected keyword are shown
+      this.selectedKeywords = this.selectedKeywords.includes(keyword)
+        ? this.selectedKeywords.filter(k => k !== keyword)
+        : [...this.selectedKeywords, keyword];
+    },
     loadMore(visible = true) {
       if (visible) {
         this.$emit('loadMore');
@@ -281,9 +289,6 @@ export default defineComponent({
         Utils.scrollTo(this.$refs.topPagination.$el);
       }
       this.$emit('paginate', link);
-    },
-    limitText(count) {
-      return this.$t("multiselect.andMore", {count});
     }
   }
 });
@@ -302,6 +307,13 @@ export default defineComponent({
     flex-grow: 1;
     flex-basis: 300px;
     min-width: 300px;
+  }
+
+  > .keyword-filter {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   > .additional-filter-link {

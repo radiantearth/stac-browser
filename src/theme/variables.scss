@@ -78,7 +78,8 @@ $border-radius: .375rem;
 
 // Background and text default colors
 $body-bg: white;
-$body-color: #222222;
+// A dark Cobalt navy instead of near-black, after Portolan Browser's navy text
+$body-color: shade-color($ca-cobalt, 55%);
 
 // Theme colors
 $primary:   $ca-cobalt;
@@ -101,17 +102,19 @@ $link-hover-color: darken($link-color, 20%);
 @import 'bootstrap/scss/_variables';
 
 // Main/top header of the website
-// Cobalt to Ocean gradient, so the orange bear logo stands out
-$header: $ca-cobalt;
-$header-background: linear-gradient(59deg, $ca-cobalt 0%, $ca-ocean 100%);
+// A flat pale Ocean blue with dark text and a Cobalt rule under it (custom.scss),
+// so the orange bear logo stands out
+$header: tint-color($ca-ocean, 85%);
+$header-background: $header;
 $header-position: sticky; // sticky or static
 $header-font-size: 18px; // matches caladapt-stac-map
 $header-font-weight: 700;
 $header-text-shadow: none;
 
 $header-contrast: color-contrast($header);
-$header-color: $header-contrast;
-$header-hover-color: $header-contrast;
+// Dark text on the pale bar, Cobalt on hover
+$header-color: $body-color;
+$header-hover-color: $primary;
 
 $header-button-background: transparent;
 $header-button-border-color: $header-color;
