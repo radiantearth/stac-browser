@@ -10,7 +10,7 @@ Custom code lives in `src/caladapt/` and is wired in through STAC Browser's conf
 
 - **Config** (`config.js`): Cal-Adapt API and title (also shown on the home page instead of the API's own title), the Cal-Adapt bear logo (`public/bear.png`), hash routing so existing `/#/` links keep working, footer links, English and light mode only, no favorites or social sharing.
 - **Brand theme**: Cal-Adapt colors, Poppins and Roboto fonts, and the Cobalt to Ocean header in `src/theme/variables.scss`; small overrides in `src/theme/custom.scss`, including a left-aligned header title and hidden Browse, Search, API and Share buttons.
-- **Widgets** (`widgets.config.js`): featured collections on the landing page, and a Dataset Overview on collection pages with tables built from `caladapt:*_labels` fields and queryable values (labels in `src/caladapt/collectionOverviewConfig.js`).
+- **Widgets** (`widgets.config.js`): a Dataset Overview on collection pages with tables built from `caladapt:*_labels` fields and queryable values (labels in `src/caladapt/collectionOverviewConfig.js`).
 - **Asset actions** (`assetActions.config.js`): Preview for CSV files, and Download for public `s3://` files over HTTPS.
 - **Python snippets**: climakitae or xarray/pandas code on each asset (`src/caladapt/PythonSnippet.vue`).
 - **Hidden metadata** (`fields.config.js`): fields that the Dataset Overview already shows.
