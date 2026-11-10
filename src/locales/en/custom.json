@@ -5,6 +5,7 @@
   "browse": "All datasets",
   "catalogFilters": {
     "topic": "Topic",
+    "clear": "Clear filters",
     "dataType": {
       "label": "Data type",
       "grid": "grid",

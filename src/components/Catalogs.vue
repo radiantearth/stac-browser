@@ -33,25 +33,29 @@
             :pressed="selectedKeywords.includes(keyword)"
             @click="selectKeyword(keyword)"
           >
-            {{ keyword }}
+            {{ keyword }} <span class="pill-count">{{ keywordCounts[keyword] }}</span>
           </b-button>
         </div>
       </div>
       <template v-if="isComplete">
-        <div v-for="filter in collectionFilters" :key="filter.field" class="pill-filter" role="group" :aria-label="$t(`catalogFilters.${filter.key}.label`)">
+        <div v-for="filter in fieldFilters" :key="filter.field" class="pill-filter" role="group" :aria-label="$t(`catalogFilters.${filter.key}.label`)">
           <span class="pill-filter-label">{{ $t(`catalogFilters.${filter.key}.label`) }}</span>
           <div class="pill-filter-options">
             <b-button
-              v-for="value in filter.values" :key="value"
+              v-for="option in filter.options" :key="option.value"
               size="sm" variant="outline-primary" class="rounded-pill"
-              :pressed="selectedFieldValues[filter.field].includes(value)"
-              @click="selectFieldValue(filter.field, value)"
+              :pressed="selectedFieldValues[filter.field].includes(option.value)"
+              @click="selectFieldValue(filter.field, option.value)"
             >
-              {{ $t(`catalogFilters.${filter.key}.${value}`) }}
+              {{ $t(`catalogFilters.${filter.key}.${option.value}`) }} <span class="pill-count">{{ option.count }}</span>
             </b-button>
           </div>
         </div>
       </template>
+      <div v-if="hasPillSelection" class="pill-filter">
+        <span class="pill-filter-label" />
+        <b-button size="sm" variant="link" class="p-0" @click="clearPillFilters">{{ $t('catalogFilters.clear') }}</b-button>
+      </div>
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
@@ -157,14 +161,13 @@ export default defineComponent({
       searchTerm: '',
       sort: Utils.parseApiSortParameter(), // get empty sort object
       selectedKeywords: [],
-      collectionFilters: COLLECTION_FILTERS,
       // Selected values per collection field, e.g. { 'caladapt:source': ['wrf'] }
       selectedFieldValues: Object.fromEntries(COLLECTION_FILTERS.map(filter => [filter.field, []])),
       selectedSearchTerms: [],
     };
   },
   computed: {
-    ...mapState(['data', 'defaultCollectionSort', 'uiLanguage', 'collectionOrder']),
+    ...mapState(['data', 'defaultCollectionSort', 'uiLanguage', 'collectionOrder', 'stateQueryParameters']),
     ...mapGetters(['searchBrowserLink', 'supportsConformance']),
     ...mapGetters(['getStac']),
     advancedSearchLink() {
@@ -221,9 +224,11 @@ export default defineComponent({
         return stac ? stac : catalog;
       });
     },
+    hasPillSelection() {
+      return this.selectedKeywords.length > 0 || Object.values(this.selectedFieldValues).some(values => values.length > 0);
+    },
     hasSearchCritera() {
-      const hasFieldValues = Object.values(this.selectedFieldValues).some(values => values.length > 0);
-      return this.searchTerm || this.selectedKeywords.length > 0 || hasFieldValues || this.selectedSearchTerms.length > 0;
+      return this.searchTerm || this.hasPillSelection || this.selectedSearchTerms.length > 0;
     },
     catalogView() {
       if (this.hasMore) {
@@ -268,21 +273,35 @@ export default defineComponent({
       // Cal-Adapt: the collections in config.collectionOrder come first
       return orderCollections(catalogs, this.collectionOrder);
     },
-    allKeywords() {
+    // Cal-Adapt: number of collections per keyword, shown on the Topic pills
+    keywordCounts() {
+      const counts = {};
       if (!this.isComplete) {
-        return [];
+        return counts;
       }
-      let keywords = [];
-      for(let catalog of this.allCatalogs) {
+      for (const catalog of this.allCatalogs) {
         if (catalog instanceof STAC && Array.isArray(catalog.keywords)) {
-          for(let keyword of catalog.keywords) {
-            if (!keywords.includes(keyword)) {
-              keywords.push(keyword);
-            }
+          for (const keyword of catalog.keywords) {
+            counts[keyword] = (counts[keyword] || 0) + 1;
           }
         }
       }
-      return keywords.sort();
+      return counts;
+    },
+    allKeywords() {
+      return Object.keys(this.keywordCounts).sort();
+    },
+    // Cal-Adapt: the field filter rows with the number of collections per value;
+    // values no collection has are left out, and so are rows with no values
+    fieldFilters() {
+      return COLLECTION_FILTERS
+        .map(filter => ({
+          ...filter,
+          options: filter.values
+            .map(value => ({ value, count: this.allCatalogs.filter(catalog => catalog[filter.field] === value).length }))
+            .filter(option => option.count > 0)
+        }))
+        .filter(filter => filter.options.length > 0);
     }
   },
   watch: {
@@ -291,10 +310,29 @@ export default defineComponent({
         this.$emit('search', searchTerms);
       },
       deep: 1
+    },
+    // Cal-Adapt: keep the selected pills in the URL (e.g. ?.topic=energy,wind&.source=wrf)
+    // so a filtered list survives a reload and can be shared
+    selectedKeywords(keywords) {
+      this.updatePillState('topic', keywords);
+    },
+    selectedFieldValues: {
+      handler(selected) {
+        for (const filter of COLLECTION_FILTERS) {
+          this.updatePillState(filter.key, selected[filter.field]);
+        }
+      },
+      deep: true
     }
   },
   created() {
     this.sort = Utils.parseApiSortParameter(this.defaultCollectionSort);
+    if (this.showControls) {
+      this.selectedKeywords = this.pillState('topic');
+      for (const filter of COLLECTION_FILTERS) {
+        this.selectedFieldValues[filter.field] = this.pillState(filter.key);
+      }
+    }
   },
   methods: {
     addSearchTerm(term) {
@@ -308,6 +346,25 @@ export default defineComponent({
       this.selectedKeywords = this.selectedKeywords.includes(keyword)
         ? this.selectedKeywords.filter(k => k !== keyword)
         : [...this.selectedKeywords, keyword];
+    },
+    pillState(key) {
+      // A value read from the URL is a comma-separated string
+      const value = this.stateQueryParameters[key];
+      if (Array.isArray(value)) {
+        return value;
+      }
+      return hasText(value) ? value.split(',') : [];
+    },
+    updatePillState(key, values) {
+      if (this.showControls) {
+        this.$store.commit('updateState', { type: key, value: values.length > 0 ? values : null });
+      }
+    },
+    clearPillFilters() {
+      this.selectedKeywords = [];
+      for (const field of Object.keys(this.selectedFieldValues)) {
+        this.selectedFieldValues[field] = [];
+      }
     },
     selectFieldValue(field, value) {
       const selected = this.selectedFieldValues[field];
@@ -360,6 +417,26 @@ export default defineComponent({
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
+    }
+
+    .pill-count {
+      opacity: 0.7;
+      font-size: 0.85em;
+    }
+
+    // On phones, put the label above its pills so they get the full width
+    @media (max-width: 575.98px) {
+      flex-direction: column;
+      align-items: flex-start;
+
+      > .pill-filter-label {
+        flex: none;
+      }
+
+      // The Clear filters row has an empty label, only there for alignment
+      > .pill-filter-label:empty {
+        display: none;
+      }
     }
   }
 
