@@ -3,7 +3,16 @@
     "description": ""
   },
   "browse": "All datasets",
+  "catalogFilters": {
+    "topic": "Topic",
+    "dataType": "Data type",
+    "spatialTypes": {
+      "grid": "grid",
+      "point": "point",
+      "spatial-aggregate": "spatial aggregate"
+    }
+  },
   "fields": {
-    
+
   }
 }

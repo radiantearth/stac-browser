@@ -21,17 +21,34 @@
       <template v-else>
         <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
       </template>
-      <!-- Cal-Adapt: keyword filter as toggle pill buttons, shown with API free-text search too
-           (upstream shows a multi-select dropdown, and only without free-text search) -->
-      <div v-if="isComplete && allKeywords.length > 0" class="keyword-filter" role="group" :aria-label="$t('multiselect.keywordsPlaceholder')">
-        <b-button
-          v-for="keyword in allKeywords" :key="keyword"
-          size="sm" variant="outline-primary" class="rounded-pill"
-          :pressed="selectedKeywords.includes(keyword)"
-          @click="selectKeyword(keyword)"
-        >
-          {{ keyword }}
-        </b-button>
+      <!-- Cal-Adapt: topic (keyword) and data type filters as labelled rows of toggle pill buttons,
+           shown with API free-text search too (upstream shows a keyword multi-select dropdown,
+           and only without free-text search) -->
+      <div v-if="isComplete && allKeywords.length > 0" class="pill-filter" role="group" :aria-label="$t('catalogFilters.topic')">
+        <span class="pill-filter-label">{{ $t('catalogFilters.topic') }}</span>
+        <div class="pill-filter-options">
+          <b-button
+            v-for="keyword in allKeywords" :key="keyword"
+            size="sm" variant="outline-primary" class="rounded-pill"
+            :pressed="selectedKeywords.includes(keyword)"
+            @click="selectKeyword(keyword)"
+          >
+            {{ keyword }}
+          </b-button>
+        </div>
+      </div>
+      <div v-if="isComplete && allSpatialTypes.length > 0" class="pill-filter" role="group" :aria-label="$t('catalogFilters.dataType')">
+        <span class="pill-filter-label">{{ $t('catalogFilters.dataType') }}</span>
+        <div class="pill-filter-options">
+          <b-button
+            v-for="type in allSpatialTypes" :key="type"
+            size="sm" variant="outline-primary" class="rounded-pill"
+            :pressed="selectedSpatialTypes.includes(type)"
+            @click="selectSpatialType(type)"
+          >
+            {{ $t(`catalogFilters.spatialTypes.${type}`) }}
+          </b-button>
+        </div>
       </div>
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
@@ -137,6 +154,7 @@ export default defineComponent({
       searchTerm: '',
       sort: Utils.parseApiSortParameter(), // get empty sort object
       selectedKeywords: [],
+      selectedSpatialTypes: [],
       selectedSearchTerms: [],
     };
   },
@@ -199,7 +217,7 @@ export default defineComponent({
       });
     },
     hasSearchCritera() {
-      return this.searchTerm || this.selectedKeywords.length > 0 || this.selectedSearchTerms.length > 0;
+      return this.searchTerm || this.selectedKeywords.length > 0 || this.selectedSpatialTypes.length > 0 || this.selectedSearchTerms.length > 0;
     },
     catalogView() {
       if (this.hasMore) {
@@ -218,6 +236,10 @@ export default defineComponent({
             if (!hasKeywords) {
               return false;
             }
+          }
+          // Cal-Adapt: match any selected data type
+          if (this.selectedSpatialTypes.length > 0 && !this.selectedSpatialTypes.includes(catalog['caladapt:spatial_type'])) {
+            return false;
           }
           if (this.searchTerm) {
             let haystack = [ catalog.title ];
@@ -253,6 +275,13 @@ export default defineComponent({
         }
       }
       return keywords.sort();
+    },
+    allSpatialTypes() {
+      if (!this.isComplete) {
+        return [];
+      }
+      const types = this.allCatalogs.map(catalog => catalog['caladapt:spatial_type']).filter(Boolean);
+      return [...new Set(types)].sort();
     }
   },
   watch: {
@@ -278,6 +307,11 @@ export default defineComponent({
       this.selectedKeywords = this.selectedKeywords.includes(keyword)
         ? this.selectedKeywords.filter(k => k !== keyword)
         : [...this.selectedKeywords, keyword];
+    },
+    selectSpatialType(type) {
+      this.selectedSpatialTypes = this.selectedSpatialTypes.includes(type)
+        ? this.selectedSpatialTypes.filter(t => t !== type)
+        : [...this.selectedSpatialTypes, type];
     },
     loadMore(visible = true) {
       if (visible) {
@@ -309,11 +343,22 @@ export default defineComponent({
     min-width: 300px;
   }
 
-  > .keyword-filter {
+  > .pill-filter {
     flex-basis: 100%;
     display: flex;
-    flex-wrap: wrap;
+    align-items: baseline;
     gap: 0.5rem;
+
+    > .pill-filter-label {
+      flex: 0 0 6rem;
+      font-weight: 600;
+    }
+
+    > .pill-filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
   }
 
   > .additional-filter-link {
