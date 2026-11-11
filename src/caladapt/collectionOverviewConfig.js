@@ -1,8 +1,9 @@
-// `queryable` is the item property each label table names (used by ItemFilters.vue)
+// `queryables` are the item properties each label table names (used by ItemFilters.vue);
+// standard-year calls its variable property `variable` instead of `variable_id`
 export const EXTRA_FIELD_TABLES = [
-  { key: 'caladapt:variable_labels', heading: 'Variables', nameLabel: 'Variable', queryable: 'variable_id' },
-  { key: 'caladapt:station_labels', heading: 'Locations', nameLabel: 'Station', queryable: 'location' },
-  { key: 'caladapt:boundary_labels', heading: 'Boundaries', nameLabel: 'Boundary', queryable: 'boundary' },
+  { key: 'caladapt:variable_labels', heading: 'Variables', nameLabel: 'Variable', queryables: ['variable_id', 'variable'] },
+  { key: 'caladapt:station_labels', heading: 'Locations', nameLabel: 'Station', queryables: ['location'] },
+  { key: 'caladapt:boundary_labels', heading: 'Boundaries', nameLabel: 'Boundary', queryables: ['boundary'] },
 ];
 
 export const QUERYABLE_TABLES = {

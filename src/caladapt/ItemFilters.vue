@@ -1,6 +1,6 @@
 <template>
   <section v-if="filters.length > 0" class="item-filters mb-3" :aria-label="$t('itemFilters.label')">
-    <div v-for="filter in filters" :key="filter.key" class="item-filter" :class="{ wide: filter.key === 'variable_id' }">
+    <div v-for="filter in filters" :key="filter.key" class="item-filter" :class="{ wide: filter.isVariable }">
       <label :for="`item-filter-${filter.key}`">{{ filter.label }}</label>
       <select :id="`item-filter-${filter.key}`" v-model="selected[filter.key]" class="form-select form-select-sm" @change="apply">
         <option :value="null">{{ $t('itemFilters.any') }}</option>
@@ -70,14 +70,14 @@ export default {
           .filter(([key, schema]) => !SKIPPED.includes(key) && Array.isArray(schema.enum) && schema.enum.length > 1)
           .map(([key, schema]) => this.buildFilter(stac, key, schema))
           // Variable first, then the order the API lists them in
-          .sort((a, b) => (b.key === 'variable_id') - (a.key === 'variable_id'));
+          .sort((a, b) => b.isVariable - a.isVariable);
         this.selected = Object.fromEntries(this.filters.map(filter => [filter.key, null]));
       } catch (e) {
         console.error('ItemFilters:', e);
       }
     },
     buildFilter(stac, key, schema) {
-      const table = EXTRA_FIELD_TABLES.find(t => t.queryable === key);
+      const table = EXTRA_FIELD_TABLES.find(t => t.queryables.includes(key));
       const config = QUERYABLE_TABLES[key] || QUERYABLE_TEXT[key];
       const names = (table && stac[table.key]) || config?.values || {};
       const label = table?.nameLabel || config?.nameLabel || new Queryable(key, schema).title;
@@ -85,7 +85,7 @@ export default {
         .map(value => ({ value, label: names[value] || String(value) }))
         // numeric: true puts "9 km" before "45 km" and ge95F before ge100F
         .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
-      return { key, label, options };
+      return { key, label, options, isVariable: table?.key === 'caladapt:variable_labels' };
     },
     clear() {
       this.selected = Object.fromEntries(Object.keys(this.selected).map(key => [key, null]));
