@@ -80,7 +80,7 @@ export default {
       const table = EXTRA_FIELD_TABLES.find(t => t.queryables.includes(key));
       const config = QUERYABLE_TABLES[key] || QUERYABLE_TEXT[key];
       const names = (table && stac[table.key]) || config?.values || {};
-      const label = table?.nameLabel || config?.nameLabel || new Queryable(key, schema).title;
+      const label = table?.nameLabel || config?.nameLabel || config?.label || new Queryable(key, schema).title;
       const options = schema.enum
         .map(value => ({ value, label: names[value] || String(value) }))
         // numeric: true puts "9 km" before "45 km" and ge95F before ge100F

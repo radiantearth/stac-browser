@@ -21,15 +21,14 @@ export const QUERYABLE_TABLES = {
   }
 };
 
+// `nameLabel` is the singular name for a filter dropdown, where it differs from `label`
 export const QUERYABLE_TEXT = {
   'cmip6:grid_label': {
     label: 'Spatial resolution',
-    nameLabel: 'Spatial resolution',
     values: { d01: '45 km', d02: '9 km', d03: '3 km' }
   },
   'cmip6:table_id': {
     label: 'Temporal frequency',
-    nameLabel: 'Temporal frequency',
     values: { '1hr': 'Hourly', day: 'Daily', mon: 'Monthly', gwl: 'Global warming levels', yrmax: 'Yearly Max' }
   },
   'cmip6:experiment_id': {

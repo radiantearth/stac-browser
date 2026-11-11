@@ -25,6 +25,8 @@ Edits to upstream files, to check when upgrading:
 - `src/components/Catalogs.vue`: renders `src/caladapt/PillFilters.vue` under the search box, applies its selection in the collection filter, and shows Clear filters in the header. Also drops the ascending/descending sort buttons, and puts the collections in the `collectionOrder` config option first (`src/caladapt/collectionOrder.js`). Upstream's keyword dropdown is left in place; it only shows when the API has no free-text collection search, so it stays hidden here.
 - `src/components/Tree.vue`: puts the `collectionOrder` collections first in the All datasets sidebar too.
 
+`src/caladapt/ItemFilters.vue` and `CollectionOverview.vue` also call upstream code that isn't a public API, so check them after upgrading: `fetchSchemaProperties` in `src/search-schemas.js` (moved there from `src/store/utils.js` in 5.2), the `Queryable` model in `src/models/cql2/queryable.js` (fallback filter names), `Catalog.vue`'s `filterItems(filters)` method, and `Utils.addFiltersToLink`, which calls `filters.serialize()` to add the filter to the request.
+
 `src/theme/custom.scss` also targets upstream class names and IDs in the header (`.navigation` and the order of its buttons, with Browse first, `.title`, `#popover-share-btn`, `#popover-link-btn`) and on the home page (`.additional-filter-link`). If an upgrade renames them, hidden buttons come back or the layout shifts, so check the header and home page after upgrading.
 
 ## Local development
