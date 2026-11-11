@@ -1,16 +1,19 @@
 <template>
-  <section v-if="filters.length > 0" class="item-filters mb-3" :aria-label="$t('itemFilters.label')">
-    <div v-for="filter in filters" :key="filter.key" class="item-filter" :class="{ wide: filter.isVariable }">
-      <label :for="`item-filter-${filter.key}`">{{ filter.label }}</label>
-      <select :id="`item-filter-${filter.key}`" v-model="selected[filter.key]" class="form-select form-select-sm" @change="apply">
-        <option :value="null">{{ $t('itemFilters.any') }}</option>
-        <option v-for="option in filter.options" :key="option.value" :value="option.value" :title="option.value">
-          {{ option.label }}
-        </option>
-      </select>
-    </div>
-    <div v-if="hasSelection" class="item-filters-clear">
-      <b-button size="sm" variant="link" class="p-0" @click="clear">{{ $t('catalogFilters.clear') }}</b-button>
+  <section v-if="filters.length > 0" class="item-filters mb-3" aria-labelledby="item-filters-title">
+    <header>
+      <h3 id="item-filters-title">{{ $t('itemFilters.label') }}</h3>
+      <b-button v-if="hasSelection" size="sm" variant="link" class="p-0" @click="clear">{{ $t('catalogFilters.clear') }}</b-button>
+    </header>
+    <div class="item-filter-grid">
+      <div v-for="filter in filters" :key="filter.key" class="item-filter" :class="{ wide: filter.isVariable }">
+        <label :for="`item-filter-${filter.key}`">{{ filter.label }}</label>
+        <select :id="`item-filter-${filter.key}`" v-model="selected[filter.key]" class="form-select form-select-sm" @change="apply">
+          <option :value="null">{{ $t('itemFilters.any') }}</option>
+          <option v-for="option in filter.options" :key="option.value" :value="option.value" :title="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
     </div>
   </section>
 </template>
@@ -132,17 +135,40 @@ export default {
 
 <style lang="scss">
 .item-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  padding: 0.75rem 1rem 1rem;
 
-  > .item-filter {
-    flex: 1 1 10rem;
+  > header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+
+    > h3 {
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
+
+  // Equal-width columns, as many as fit
+  > .item-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .item-filter {
     min-width: 0;
 
-    // Variable names are long, so the Variable dropdown gets its own row
+    // Variable names are long, so the Variable dropdown spans two columns
     &.wide {
-      flex-basis: 100%;
+      grid-column: span 2;
+
+      // On phones only one column fits, and span 2 would add a narrower second one
+      @media (max-width: 575.98px) {
+        grid-column: 1 / -1;
+      }
     }
 
     > label {
@@ -151,10 +177,6 @@ export default {
       font-size: 0.875rem;
       margin-bottom: 0.25rem;
     }
-  }
-
-  > .item-filters-clear {
-    flex-basis: 100%;
   }
 }
 </style>
