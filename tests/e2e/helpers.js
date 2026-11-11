@@ -410,6 +410,59 @@ export function getMapState(page) {
 }
 
 /**
+* Read what the `mapContext` provided by MapView gives to `map-end` widgets.
+* The MapView instance is located like in `getMapState`, by walking up from the
+* map element and looking for the instance that provides `mapContext`.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<{hasMap: boolean, hasLayer: boolean}|null>} what the context holds, or null if no MapView provides it
+*/
+export function getMapContextState(page) {
+  return page.evaluate(() => {
+    let el = document.querySelector('.map-container .map');
+    while (el) {
+      const context = el.__vueParentComponent?.provides?.mapContext;
+      if (context) {
+        return {
+          hasMap: typeof context.getMap()?.getLayers === 'function',
+          hasLayer: Boolean(context.getStacLayer())
+        };
+      }
+      el = el.parentElement;
+    }
+    return null;
+  });
+}
+
+/**
+* Count how often the `stacLayer` of the `mapContext` is replaced by another
+* layer. Installs a watcher on the MapView instance that increments
+* `window.__mapContextReplacements`; call it before the action under test.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<boolean>} whether the watcher could be installed
+*/
+export function watchMapContextLayerReplacements(page) {
+  return page.evaluate(() => {
+    let el = document.querySelector('.map-container .map');
+    while (el) {
+      const inst = el.__vueParentComponent;
+      if (inst?.provides?.mapContext) {
+        window.__mapContextReplacements = 0;
+        inst.proxy.$watch(() => inst.provides.mapContext.getStacLayer(), (layer, old) => {
+          if (layer && old && layer !== old) {
+            window.__mapContextReplacements = (window.__mapContextReplacements || 0) + 1;
+          }
+        });
+        return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  });
+}
+
+/**
 * Wait until the bounding-box coordinate inputs have been auto-populated
 * (i.e. all four fields are non-empty).
 * 
