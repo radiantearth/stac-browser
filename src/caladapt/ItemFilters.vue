@@ -1,6 +1,6 @@
 <template>
   <section v-if="filters.length > 0" class="item-filters mb-3" :aria-label="$t('itemFilters.label')">
-    <div v-for="filter in filters" :key="filter.key" class="item-filter">
+    <div v-for="filter in filters" :key="filter.key" class="item-filter" :class="{ wide: filter.key === 'variable_id' }">
       <label :for="`item-filter-${filter.key}`">{{ filter.label }}</label>
       <select :id="`item-filter-${filter.key}`" v-model="selected[filter.key]" class="form-select form-select-sm" @change="apply">
         <option :value="null">{{ $t('itemFilters.any') }}</option>
@@ -129,6 +129,11 @@ export default {
   > .item-filter {
     flex: 1 1 10rem;
     min-width: 0;
+
+    // Variable names are long, so the Variable dropdown gets its own row
+    &.wide {
+      flex-basis: 100%;
+    }
 
     > label {
       display: block;

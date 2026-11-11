@@ -56,10 +56,11 @@
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
-        <!-- Cal-Adapt: dropdown filters for the items (src/caladapt/ItemFilters.vue) -->
+        <!-- Cal-Adapt: dropdown filters for the items (src/caladapt/ItemFilters.vue)
+             replace STAC Browser's Show Filters panel, so allowFilter is not set -->
         <ItemFilters v-if="hasApiItems" :filterItems="filterItems" />
         <Items
-          :stac="data" :items="items" :api="hasApiItems" allowFilter
+          :stac="data" :items="items" :api="hasApiItems"
           showControls :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
