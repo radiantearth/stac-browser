@@ -107,7 +107,7 @@ $link-hover-color: darken($link-color, 20%);
 $header: tint-color($ca-ocean, 85%);
 $header-background: $header;
 $header-position: sticky; // sticky or static
-$header-font-size: 18px; // matches caladapt-stac-map
+$header-font-size: 18px;
 $header-font-weight: 700;
 $header-text-shadow: none;
 

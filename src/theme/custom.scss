@@ -1,7 +1,7 @@
 // Cal-Adapt overrides on top of STAC Browser's page styles
 
 #stac-browser {
-  // Header: logo and title on the left, as on caladapt-stac-map, with the same 52px height
+  // Header: logo and title on the left, 52px tall
   > header .site {
     padding-block: 0;
     border-bottom: 2px solid $primary;

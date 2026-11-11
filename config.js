@@ -11,11 +11,10 @@ export default {
   catalogImage: calAdaptBear,
   allowExternalAccess: true, // Must be true if catalogUrl is not given
   allowedDomains: [],
-  // Light only, matching caladapt-stac-map, which has no dark mode yet. Once it
-  // does, "auto" makes both follow the computer's setting.
+  // Light only: the Cal-Adapt theme has no dark mode yet
   enforcedColorMode: "light",
-  // English only: the map and the catalog's dataset text are English, so other
-  // languages would give a half-translated site. Upstream also ships
+  // English only: the catalog's dataset text is English, so other languages
+  // would give a half-translated site. Upstream also ships
   // ar, de, es, fr, it, ro, ru, ja, pt, id, pl and sv.
   detectLocaleFromBrowser: false,
   storeLocale: true,
