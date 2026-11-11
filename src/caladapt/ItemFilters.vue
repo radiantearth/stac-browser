@@ -5,7 +5,7 @@
       <b-button v-if="hasSelection" size="sm" variant="link" class="p-0" @click="clear">{{ $t('catalogFilters.clear') }}</b-button>
     </header>
     <div class="item-filter-grid">
-      <div v-for="filter in filters" :key="filter.key" class="item-filter" :class="{ wide: filter.isVariable }">
+      <div v-for="filter in filters" :key="filter.key" class="item-filter">
         <label :for="`item-filter-${filter.key}`">{{ filter.label }}</label>
         <select :id="`item-filter-${filter.key}`" v-model="selected[filter.key]" class="form-select form-select-sm" @change="apply">
           <option :value="null">{{ $t('itemFilters.any') }}</option>
@@ -160,16 +160,6 @@ export default {
 
   .item-filter {
     min-width: 0;
-
-    // Variable names are long, so the Variable dropdown spans two columns
-    &.wide {
-      grid-column: span 2;
-
-      // On phones only one column fits, and span 2 would add a narrower second one
-      @media (max-width: 575.98px) {
-        grid-column: 1 / -1;
-      }
-    }
 
     > label {
       display: block;
