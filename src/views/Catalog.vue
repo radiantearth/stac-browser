@@ -56,8 +56,11 @@
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
+        <!-- Cal-Adapt: dropdown filters for the items (src/caladapt/ItemFilters.vue)
+             replace STAC Browser's Show Filters panel, so allowFilter is not set -->
+        <ItemFilters v-if="hasApiItems" :filterItems="filterItems" />
         <Items
-          :stac="data" :items="items" :api="hasApiItems" allowFilter
+          :stac="data" :items="items" :api="hasApiItems"
           showControls :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
@@ -104,6 +107,7 @@ export default defineComponent({
     DeprecationNotice: defineAsyncComponent(() => import('../components/DeprecationNotice.vue')),
     Description,
     Items,
+    ItemFilters: defineAsyncComponent(() => import('../caladapt/ItemFilters.vue')),
     Keywords: defineAsyncComponent(() => import('../components/Keywords.vue')),
     LinkList: defineAsyncComponent(() => import('../components/LinkList.vue')),
     MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
