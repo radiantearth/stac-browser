@@ -25,7 +25,7 @@ export const QUERYABLE_TABLES = {
 export const QUERYABLE_TEXT = {
   'cmip6:grid_label': {
     label: 'Spatial resolution',
-    values: { d01: '45 km', d02: '9 km', d03: '3 km' }
+    values: { d01: '45 km', d02: '9 km', d03: '3 km', conus4km: 'Continental United States 4 km' }
   },
   'cmip6:table_id': {
     label: 'Temporal frequency',
