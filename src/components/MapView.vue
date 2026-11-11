@@ -28,11 +28,12 @@
         <b-button variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
       </div>
     </b-popover>
+    <WidgetHook id="map-end" />
   </div>
 </template>
 
 <script>
-import { defineAsyncComponent, toRaw } from 'vue';
+import { defineAsyncComponent, markRaw, toRaw } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
@@ -63,7 +64,12 @@ export default {
   ],
   provide() {
     return {
-      layerVisibilityChanged: () => this.$emit('changed', this.getShownData())
+      layerVisibilityChanged: () => this.$emit('changed', this.getShownData()),
+      // Getters, as provide() runs once while the map is still null; used by widgets at the `map-end` hook
+      mapContext: {
+        getMap: () => this.map,
+        getStacLayer: () => this.stacLayer
+      }
     };
   },
   inject: {
@@ -97,6 +103,8 @@ export default {
       mapId: `map-${++mapId}`,
       displayLimitError: null,
       focusHint: false,
+      // Reactive so widgets can watch it via mapContext.getStacLayer; the layer itself is raw (see addStacLayer)
+      stacLayer: null,
     };
   },
   computed: {
@@ -172,7 +180,6 @@ export default {
   },
   created() {
     // These are created here and not in data() to avoid them being reactive
-    this.stacLayer = null;
     this.ignoreDisplayLimit = false;
     this.rejectedDataSources = [];
     this.focusHintTimer = null;
@@ -218,7 +225,7 @@ export default {
       if (this.ignoreDisplayLimit) {
         options.maxDisplayPixels = Infinity;
       }
-      this.stacLayer = new StacLayer(options);
+      this.stacLayer = markRaw(new StacLayer(options));
       this.stacLayer.on('error', event => {
         if (event.error?.name === 'DisplayLimitError') {
           // The asset needs to load more data than ol-stac deems safe;
