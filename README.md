@@ -8,7 +8,7 @@ Based on [radiantearth/stac-browser](https://github.com/radiantearth/stac-browse
 
 Custom code lives in `src/caladapt/` and is wired in through STAC Browser's config files, so upstream files stay unchanged where possible.
 
-- **Config** (`config.js`): Cal-Adapt API and title (also shown on the home page instead of the API's own title), the Cal-Adapt bear logo (`public/bear.png`), hash routing so existing `/#/` links keep working, footer links, English and light mode only, no favorites or social sharing, and `collectionOrder`, the collections listed first on the home page and in the All datasets sidebar.
+- **Config** (`config.js`): Cal-Adapt API and title (also shown on the home page instead of the API's own title), the Cal-Adapt bear logo (`public/bear.png`, also the favicon in `public/favicon.ico`), hash routing so existing `/#/` links keep working, footer links, English and light mode only, no favorites or social sharing, and `collectionOrder`, the collections listed first on the home page and in the All datasets sidebar.
 - **Brand theme**: Cal-Adapt colors, Poppins and Roboto fonts, navy text, and a pale blue header in `src/theme/variables.scss`; small overrides in `src/theme/custom.scss`, including a left-aligned header title, hover outlines on collection and item tiles, and hidden Search, API, Share and Additional filters buttons.
 - **Home page filters**: keyword pill buttons under the search box (`src/components/Catalogs.vue`), and Browse, relabelled "All datasets" (`src/locales/en/custom.json`), beside Source.
 - **Widgets** (`widgets.config.js`): a Dataset Overview on collection pages with tables built from `caladapt:*_labels` fields and queryable values (labels in `src/caladapt/collectionOverviewConfig.js`).
