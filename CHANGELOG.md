@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Widget hook `map-end` below the map: widgets at this hook can inject `mapContext` to access the OpenLayers map and the `ol-stac` layer
+
 ## [5.2.0] - 2026-11-09
 
 ### Security

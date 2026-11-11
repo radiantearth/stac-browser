@@ -10,7 +10,7 @@
  * See https://github.com/radiantearth/stac-browser/issues/1002
  */
 import { test, expect } from './fixtures.js';
-import { waitForBrowserReady, waitForMapReady, getMapState } from './helpers.js';
+import { waitForBrowserReady, waitForMapReady, getMapState, getMapContextState } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -181,6 +181,20 @@ test.describe('Very small footprint item', () => {
     expect(view.lon).toBeLessThan(5.93);
     expect(view.lat).toBeGreaterThan(50.77);
     expect(view.lat).toBeLessThan(50.78);
+  });
+});
+
+test.describe('mapContext for map-end widgets', () => {
+  test('provides the map and the stacLayer on an Item page', async ({ page, worker }) => {
+    const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
+    const item = catalog.addItem({ url: 'https://stac.example/item.json', template: 'minimal' });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await waitForMapReady(page);
+
+    await expect.poll(() => getMapContextState(page)).toEqual({ hasMap: true, hasLayer: true });
   });
 });
 

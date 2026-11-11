@@ -16,6 +16,7 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [Featured](#featured)
 - [Hooks](#hooks)
   - [StacBrowser.vue](#stacbrowservue)
+  - [components/MapView.vue](#componentsmapviewvue)
   - [views/ApiSearch.vue](#viewsapisearchvue)
   - [views/Catalog.vue](#viewscatalogvue)
   - [views/Item.vue](#viewsitemvue)
@@ -183,6 +184,10 @@ Each hook has an ID like `view-catalog-meta-start` that you use as the key in
 - `root-end`
 - `root-start`
 
+### components/MapView.vue
+
+- `map-end`
+
 ### views/ApiSearch.vue
 
 - `view-search-filters-collections-end`
@@ -289,6 +294,7 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
   automatically receive page data such as the STAC object or items.
   You can import them from the Vuex store.
 - You can place the same widget at multiple hooks with different props.
+- Widgets at the `map-end` hook can inject `mapContext`, which provides `getMap()` and `getStacLayer()`.
 
 ### Adding a New Hook
 

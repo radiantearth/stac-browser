@@ -7,7 +7,7 @@
  */
 import { http, HttpResponse } from 'msw';
 import { test, expect } from './fixtures.js';
-import { waitForBrowserReady, waitForMapReady } from './helpers.js';
+import { waitForBrowserReady, waitForMapReady, getMapContextState, watchMapContextLayerReplacements } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 
 const ROOT_URL = 'https://stac.example/catalog.json';
@@ -155,6 +155,19 @@ test.describe('Display limit', () => {
     await expect(asset(page, 'Big B').locator('.badge.shown')).toBeVisible({ timeout: 15000 });
     await expect(asset(page, 'Big A').locator('.badge.shown')).toBeVisible();
     await expect(dialog(page)).toBeHidden();
+  });
+
+  test('mapContext sees the stacLayer replaced in place by Show anyway', async ({ page, worker }) => {
+    await setupTwoBigAssets(page, worker);
+    expect(await watchMapContextLayerReplacements(page)).toBe(true);
+
+    await showOnMap(page, 'Big A');
+    await expect(dialog(page)).toBeVisible({ timeout: 15000 });
+    await dialog(page).getByRole('button', { name: 'Show anyway' }).click();
+    await expect(dialog(page)).toBeHidden();
+
+    await expect.poll(() => page.evaluate(() => window.__mapContextReplacements || 0), { timeout: 15000 }).toBe(1);
+    expect((await getMapContextState(page)).hasLayer).toBe(true);
   });
 
   test('small Zarr assets are shown automatically without confirmation', async ({ page, worker }) => {
