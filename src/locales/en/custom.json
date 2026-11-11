@@ -20,6 +20,10 @@
       "other": "other"
     }
   },
+  "itemFilters": {
+    "label": "Filter items",
+    "any": "Any"
+  },
   "fields": {
     
   }
