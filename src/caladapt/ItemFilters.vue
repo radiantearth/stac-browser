@@ -9,6 +9,9 @@
         </option>
       </select>
     </div>
+    <div v-if="hasSelection" class="item-filters-clear">
+      <b-button size="sm" variant="link" class="p-0" @click="clear">{{ $t('catalogFilters.clear') }}</b-button>
+    </div>
   </section>
 </template>
 
@@ -36,7 +39,10 @@ export default {
   },
   data: () => ({ filters: [], selected: {}, loading: false, queued: null }),
   computed: {
-    ...mapState(['data'])
+    ...mapState(['data']),
+    hasSelection() {
+      return Object.values(this.selected).some(value => value !== null);
+    }
   },
   watch: {
     data: {
@@ -80,6 +86,10 @@ export default {
         // numeric: true puts "9 km" before "45 km" and ge95F before ge100F
         .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
       return { key, label, options };
+    },
+    clear() {
+      this.selected = Object.fromEntries(Object.keys(this.selected).map(key => [key, null]));
+      this.apply();
     },
     async apply() {
       // Load one selection at a time and only the latest one after that, so a slow
@@ -141,6 +151,10 @@ export default {
       font-size: 0.875rem;
       margin-bottom: 0.25rem;
     }
+  }
+
+  > .item-filters-clear {
+    flex-basis: 100%;
   }
 }
 </style>
