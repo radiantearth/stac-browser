@@ -2,10 +2,10 @@
   <section class="catalogs mb-4">
     <header>
       <h2 class="title me-2">{{ displayTitle }}</h2>
-      <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" :class="hasPillSelection ? 'me-2' : 'me-4'">{{ catalogCount }}</b-badge>
-      <!-- Cal-Adapt: reset the pill filters next to the filtered count -->
-      <b-button v-if="hasPillSelection" size="sm" variant="link" class="p-0 me-4" @click="clearPillFilters">{{ $t('catalogFilters.clear') }}</b-button>
+      <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
       <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
+      <!-- Cal-Adapt: resets the pill filters below -->
+      <b-button v-if="hasPillSelection" size="sm" variant="link" class="p-0 ms-2" @click="clearPillFilters">{{ $t('catalogFilters.clear') }}</b-button>
     </header>
     <section v-if="showControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
       <template v-if="canSearchFreeText">
@@ -23,9 +23,9 @@
       <template v-else>
         <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
       </template>
-      <!-- Cal-Adapt: topic (keyword) and data type filters as labelled rows of toggle pill buttons,
-           shown with API free-text search too (upstream shows a keyword multi-select dropdown,
-           and only without free-text search) -->
+      <!-- Cal-Adapt: Topic (keyword) and collection field filters (src/caladapt/collectionFilters.js)
+           as labelled rows of toggle pill buttons with counts, shown with API free-text search too
+           (upstream shows a keyword multi-select dropdown, and only without free-text search) -->
       <div v-if="isComplete && allKeywords.length > 0" class="pill-filter" role="group" :aria-label="$t('catalogFilters.topic')">
         <span class="pill-filter-label">{{ $t('catalogFilters.topic') }}</span>
         <div class="pill-filter-options">
