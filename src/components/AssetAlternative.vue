@@ -1,11 +1,14 @@
 <template>
   <div class="asset-alternative">
+    <WidgetHook id="asset-start" :context="{ asset }" />
     <h4 class="mb-4" v-html="fileFormat" />
     <HrefActions isAsset :data="asset" :auth="auth" />
+    <WidgetHook id="asset-actions-end" :context="{ asset }" />
     <div class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
     </div>
     <MetadataGroups class="mt-4" :data="resolvedAsset" :ignoreFields="ignoredMetadataFields" title="" type="Asset" />
+    <WidgetHook id="asset-end" :context="{ asset }" />
   </div>
 </template>
 

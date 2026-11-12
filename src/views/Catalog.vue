@@ -24,6 +24,7 @@
           </section>
           <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
+        <WidgetHook id="view-catalog-intro-end" />
         <section v-if="isCollection || hasThumbnails || hasWebMapLinks" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" pills card vertical end>
