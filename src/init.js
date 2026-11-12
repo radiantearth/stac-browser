@@ -27,6 +27,15 @@ export default function init() {
       }
     });
 
+    // Send a Google Analytics page view for each page, including the first load.
+    // gtag only exists on production (see index.html). The full URL keeps the
+    // #/ path, which GA's automatic tracking can't be relied on to report.
+    router.afterEach((to, from, failure) => {
+      if (window.gtag && !failure) {
+        window.gtag('event', 'page_view', { page_location: window.location.href });
+      }
+    });
+
     // Setup store
     const store = getStore(CONFIG, router);
 
