@@ -102,6 +102,15 @@ HTTP mocking is driven by [playwright-msw](https://github.com/valendres/playwrig
 | `copyDependenciesFromModal(page, panel)` | Copy dependencies from modal panel |
 | `copyFilenameFromModal(page, panel)` | Copy output filename from modal panel |
 
+## Widgets
+
+The e2e tests use `tests/e2e/widgets.config.js` instead of `widgets.config.js`.
+Vite switches the file if `STAC_BROWSER_E2E` is set, which the Playwright web server does.
+If you start the dev server yourself for the tests, set `STAC_BROWSER_E2E=true` as well.
+
+The widgets are only shown for catalogs at `https://widgets.example/` (`WIDGET_TEST_HOST`),
+so they don't affect other tests. Add new widgets for tests with the same condition.
+
 ## Docker Container tests
 
 Docker tests live in `tests/docker/` and verify that the image builds.
