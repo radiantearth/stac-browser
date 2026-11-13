@@ -222,6 +222,10 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
         "@stac-browser-external-config": externalConfigPath,
+        // The e2e tests use their own widgets, see tests/e2e/widgets.config.js
+        ...(process.env.STAC_BROWSER_E2E === "true" ? {
+          "../../widgets.config": fileURLToPath(new URL("./tests/e2e/widgets.config.js", import.meta.url)),
+        } : {}),
       },
     },
     server: {
