@@ -103,7 +103,8 @@ condition: ({ data }) => Boolean(data?.isCollection)
 ### Widgets for Assets
 
 The hooks in `components/AssetAlternative.vue` (`asset-start`, `asset-actions-end` and `asset-end`)
-are rendered once for each asset and each of its alternate assets.
+are rendered for each mounted asset panel. Alternate panels use lazy tabs, so their hooks
+only render when the corresponding tab is selected.
 Widgets in these hooks receive the asset as `asset` prop (in addition to the configured `props`,
 a configured `asset` prop is ignored) and the `condition` function also receives it as `asset`.
 
