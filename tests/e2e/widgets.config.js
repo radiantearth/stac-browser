@@ -12,6 +12,9 @@ function createWidget(name) {
   return Widget;
 }
 
+const AssetWidget = props => h('p', { class: 'test-widget', 'data-widget': 'asset' }, `${props.label}: ${props.asset?.title}`);
+AssetWidget.props = ['asset', 'label'];
+
 export default {
   'root-start': [
     { component: createWidget('A'), condition: isWidgetTest, props: { text: 'Widget A' } }
@@ -20,7 +23,18 @@ export default {
     { component: createWidget('B'), condition: isWidgetTest, props: { text: 'Widget B' } },
     { id: 'AlertBox', condition: isWidgetTest, props: { text: 'Pre-defined widget' } }
   ],
+  'view-catalog-intro-end': [
+    { component: createWidget('intro'), condition: isWidgetTest, props: { text: 'Intro end' } }
+  ],
   'view-catalog-meta-end': [
     { id: 'AlertBox', condition: ctx => isWidgetTest(ctx) && Boolean(ctx.data?.isCollection), props: { text: 'Collections only' } }
+  ],
+  'asset-actions-end': [
+    {
+      component: AssetWidget,
+      condition: ctx => isWidgetTest(ctx) && ctx.asset.type === 'application/json',
+      // The asset from the hook takes precedence
+      props: { label: 'JSON asset', asset: { title: 'Configured asset' } }
+    }
   ]
 };

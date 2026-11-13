@@ -28,6 +28,7 @@ test.describe('Widgets', () => {
     await expect(page.locator('.test-widget[data-widget="A"]')).toHaveText('Widget A');
     await expect(page.locator('.test-widget[data-widget="B"]')).toHaveText('Widget B');
     await expect(page.locator('.alert', { hasText: 'Pre-defined widget' })).toBeVisible();
+    await expect(page.locator('.test-widget[data-widget="intro"]')).toHaveText('Intro end');
   });
 
   test('shows widgets only if their condition is met', async ({ page, worker }) => {
@@ -57,6 +58,20 @@ test.describe('Widgets', () => {
     await expect(page.getByText('Collections only')).toBeVisible();
     await expect(page.locator('.test-widget[data-widget="A"]')).toHaveCount(1);
     await expect(page.locator('.test-widget[data-widget="B"]')).toHaveCount(1);
+  });
+
+  test('passes the asset to widgets in asset hooks', async ({ page, worker }) => {
+    const { catalog } = createCatalog();
+    const item = catalog.addItem({ url: `${WIDGET_TEST_HOST}item.json` });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    // Only shown for the JSON asset, with the asset from the hook instead of the configured one
+    const widget = page.locator('.test-widget[data-widget="asset"]');
+    await expect(widget).toHaveCount(1);
+    await expect(widget).toHaveText(`JSON asset: ${item.data.assets.metadata.title}`);
   });
 
   test('does not show widgets for other catalogs', async ({ page, worker }) => {

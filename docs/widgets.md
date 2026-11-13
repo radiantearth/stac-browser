@@ -9,6 +9,7 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [Using Pre-defined Widgets](#using-pre-defined-widgets)
   - [Using Custom Components](#using-custom-components)
   - [Conditional Widgets](#conditional-widgets)
+  - [Widgets for Assets](#widgets-for-assets)
 - [Pre-defined Widgets](#pre-defined-widgets)
   - [AlertBox](#alertbox)
   - [CustomText](#customtext)
@@ -16,6 +17,7 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [Featured](#featured)
 - [Hooks](#hooks)
   - [StacBrowser.vue](#stacbrowservue)
+  - [components/AssetAlternative.vue](#componentsassetalternativevue)
   - [views/ApiSearch.vue](#viewsapisearchvue)
   - [views/Catalog.vue](#viewscatalogvue)
   - [views/Item.vue](#viewsitemvue)
@@ -96,6 +98,37 @@ Or only for collections:
 
 ```js
 condition: ({ data }) => Boolean(data?.isCollection)
+```
+
+### Widgets for Assets
+
+The hooks in `components/AssetAlternative.vue` (`asset-start`, `asset-actions-end` and `asset-end`)
+are rendered for each mounted asset panel. Alternate panels use lazy tabs, so their hooks
+only render when the corresponding tab is selected.
+Widgets in these hooks receive the asset as `asset` prop (in addition to the configured `props`,
+a configured `asset` prop is ignored) and the `condition` function also receives it as `asset`.
+
+For example, to show a widget only for CSV files:
+
+```js
+'asset-actions-end': [
+  {
+    id: 'CsvPreview',
+    component: defineAsyncComponent(() => import('../CsvPreview.vue')),
+    condition: ({ asset }) => asset.type === 'text/csv'
+  }
+]
+```
+
+The component declares the prop to receive the asset:
+
+```js
+props: {
+  asset: {
+    type: Object,
+    required: true
+  }
+}
 ```
 
 ## Pre-defined Widgets
@@ -183,6 +216,12 @@ Each hook has an ID like `view-catalog-meta-start` that you use as the key in
 - `root-end`
 - `root-start`
 
+### components/AssetAlternative.vue
+
+- `asset-actions-end`
+- `asset-end`
+- `asset-start`
+
 ### views/ApiSearch.vue
 
 - `view-search-filters-collections-end`
@@ -198,6 +237,7 @@ Each hook has an ID like `view-catalog-meta-start` that you use as the key in
 
 - `view-catalog-catalogs-end`
 - `view-catalog-catalogs-start`
+- `view-catalog-intro-end`
 - `view-catalog-items-end`
 - `view-catalog-items-start`
 - `view-catalog-meta-end`
@@ -285,9 +325,10 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
 **Tips:**
 
 - Use `@import "../theme/variables.scss"` to access shared SCSS variables like `$block-gap`.
-- Widgets only receive the `props` defined in `widgets.config.js` — they do not
-  automatically receive page data such as the STAC object or items.
-  You can import them from the Vuex store.
+- Widgets receive the `props` defined in `widgets.config.js` and, in some hooks, additional
+  data from the hook (e.g. the asset in the [asset hooks](#widgets-for-assets)).
+  Other page data such as the STAC object or items is not passed automatically,
+  you can import it from the Vuex store.
 - You can place the same widget at multiple hooks with different props.
 
 ### Adding a New Hook
@@ -301,6 +342,15 @@ To add a new widget insertion point to a view:
    ```
 
    `WidgetHook` is registered as a global component, so no import is needed.
+
+   If the widgets need data that is not available in the store (e.g. the asset in a list of assets),
+   pass it through the `context` prop. The widgets receive each entry as a prop
+   (taking precedence over the configured `props`) and
+   the `condition` functions receive the entries as additional properties:
+
+   ```vue
+   <WidgetHook id="asset-end" :context="{ asset }" />
+   ```
 
 2. **Update the docs** by running:
 

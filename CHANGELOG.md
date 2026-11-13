@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Widget hooks for assets (`asset-start`, `asset-actions-end`, `asset-end`), widgets in these hooks receive the asset
+- Widget hook `view-catalog-intro-end` after the description of catalogs and collections
+
 ### Fixed
 
 - Widgets in different hooks don't replace each other anymore (e.g. custom components without an `id`)

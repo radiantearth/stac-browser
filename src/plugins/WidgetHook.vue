@@ -13,6 +13,10 @@ export default {
     id: {
       type: String,
       required: true,
+    },
+    context: {
+      type: Object,
+      default: () => ({})
     }
   },
   computed: {
@@ -27,6 +31,7 @@ export default {
         try {
           const { state, getters } = this.$store;
           return Boolean(widget.condition({
+            ...this.context,
             data: state.data,
             state,
             getters
@@ -35,7 +40,7 @@ export default {
           console.error(`Condition for widget '${widget.id}' failed:`, error);
           return false;
         }
-      });
+      }).map(widget => ({ ...widget, props: { ...widget.props, ...this.context } }));
     }
   }
 };
