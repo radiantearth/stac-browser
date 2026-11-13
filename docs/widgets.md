@@ -278,6 +278,7 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
    <script>
    export default {
      name: "BannerImage",
+     inheritAttrs: false,
      props: {
        url: {
          type: String,
@@ -329,6 +330,8 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
   data from the hook (e.g. the asset in the [asset hooks](#widgets-for-assets)).
   Other page data such as the STAC object or items is not passed automatically,
   you can import it from the Vuex store.
+- Set `inheritAttrs: false` in all widgets. Some hooks pass data to the widgets (e.g. the asset),
+  and Vue would add the data that a widget doesn't declare as props as attributes to its root element.
 - You can place the same widget at multiple hooks with different props.
 
 ### Adding a New Hook
