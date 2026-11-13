@@ -9,7 +9,7 @@ import getStore from "./store";
 import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
 import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
-import WidgetHook from "./plugins/widget-hook.js";
+import WidgetHook from "./plugins/WidgetHook.vue";
 
 export default function init() {
   return loadDefaultMessages().then(() => {
