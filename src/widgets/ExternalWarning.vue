@@ -9,6 +9,7 @@ import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: "ExternalWarning",
+  inheritAttrs: false,
   props: {
     variant: {
       type: String,
