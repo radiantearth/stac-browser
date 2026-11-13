@@ -104,8 +104,8 @@ condition: ({ data }) => Boolean(data?.isCollection)
 
 The hooks in `components/AssetAlternative.vue` (`asset-start`, `asset-actions-end` and `asset-end`)
 are rendered once for each asset and each of its alternate assets.
-Widgets in these hooks receive the asset as `asset` prop (in addition to the configured `props`)
-and the `condition` function also receives it as `asset`.
+Widgets in these hooks receive the asset as `asset` prop (in addition to the configured `props`,
+a configured `asset` prop is ignored) and the `condition` function also receives it as `asset`.
 
 For example, to show a widget only for CSV files:
 
@@ -324,9 +324,10 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
 **Tips:**
 
 - Use `@import "../theme/variables.scss"` to access shared SCSS variables like `$block-gap`.
-- Widgets only receive the `props` defined in `widgets.config.js` — they do not
-  automatically receive page data such as the STAC object or items.
-  You can import them from the Vuex store.
+- Widgets receive the `props` defined in `widgets.config.js` and, in some hooks, additional
+  data from the hook (e.g. the asset in the [asset hooks](#widgets-for-assets)).
+  Other page data such as the STAC object or items is not passed automatically,
+  you can import it from the Vuex store.
 - You can place the same widget at multiple hooks with different props.
 
 ### Adding a New Hook
@@ -342,7 +343,8 @@ To add a new widget insertion point to a view:
    `WidgetHook` is registered as a global component, so no import is needed.
 
    If the widgets need data that is not available in the store (e.g. the asset in a list of assets),
-   pass it through the `context` prop. The widgets receive each entry as a prop and
+   pass it through the `context` prop. The widgets receive each entry as a prop
+   (taking precedence over the configured `props`) and
    the `condition` functions receive the entries as additional properties:
 
    ```vue

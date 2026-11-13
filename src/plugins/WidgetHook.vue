@@ -40,7 +40,7 @@ export default {
           console.error(`Condition for widget '${widget.id}' failed:`, error);
           return false;
         }
-      }).map(widget => ({ ...widget, props: { ...this.context, ...widget.props } }));
+      }).map(widget => ({ ...widget, props: { ...widget.props, ...this.context } }));
     }
   }
 };
