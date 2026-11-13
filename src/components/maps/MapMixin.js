@@ -12,6 +12,7 @@ import { all, focus, noModifierKeys, primaryAction } from 'ol/events/condition.j
 import ZoomControl from 'ol/control/Zoom.js';
 import AttributionControl from 'ol/control/Attribution.js';
 import FullScreenControl from 'ol/control/FullScreen.js';
+import LayerType from 'ol-stac/layer/type.js';
 
 import configureBasemap from '../../../basemaps.config';
 import CONFIG from '../../merged-config';
@@ -39,7 +40,13 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
-        getLayerOptions: this.getStacLayerOptions,
+        getLayerOptions: (type, layerOptions, reference) => {
+          // Before the configured function, so that it can show the noise again
+          if (type === LayerType.COPC) {
+            layerOptions.hideNoise = true;
+          }
+          return this.getStacLayerOptions ? this.getStacLayerOptions(type, layerOptions, reference) : layerOptions;
+        },
         getRequestHeaders: this.getRequestHeadersForStacLayer,
         // Adds the configured query parameters (incl. query-parameter
         // credentials) to the URLs requested by ol-stac
