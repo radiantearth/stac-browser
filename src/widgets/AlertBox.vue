@@ -16,6 +16,7 @@ export default {
   components: {
     Description
   },
+  inheritAttrs: false,
   props: {
     title: {
       type: String,

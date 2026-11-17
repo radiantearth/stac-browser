@@ -35,6 +35,7 @@ export default {
       condition: ctx => isWidgetTest(ctx) && ctx.asset.type === 'application/json',
       // The asset from the hook takes precedence
       props: { label: 'JSON asset', asset: { title: 'Configured asset' } }
-    }
+    },
+    { id: 'AlertBox', condition: ctx => isWidgetTest(ctx) && ctx.asset.type === 'application/json', props: { text: 'Asset alert' } }
   ]
 };

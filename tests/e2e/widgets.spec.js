@@ -74,6 +74,19 @@ test.describe('Widgets', () => {
     await expect(widget).toHaveText(`JSON asset: ${item.data.assets.metadata.title}`);
   });
 
+  test('pre-defined widgets do not render hook data as attributes', async ({ page, worker }) => {
+    const { catalog } = createCatalog();
+    const item = catalog.addItem({ url: `${WIDGET_TEST_HOST}item.json` });
+    await catalog.createServer(worker);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const alert = page.locator('.alert', { hasText: 'Asset alert' });
+    await expect(alert).toHaveCount(1);
+    await expect(alert).not.toHaveAttribute('asset');
+  });
+
   test('does not show widgets for other catalogs', async ({ page, worker }) => {
     const { catalog } = createCatalog('https://stac.example/');
     await catalog.createServer(worker);

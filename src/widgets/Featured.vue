@@ -21,6 +21,7 @@ export default defineComponent({
   components: {
     Catalogs
   },
+  inheritAttrs: false,
   props: {
     entities: {
       type: Array,
