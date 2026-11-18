@@ -591,6 +591,7 @@ getStacLayerOptions(type, options, reference) => options | Promise<options>
 - `type` is the [layer type](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_type-LayerType.html)
   that is going to be created (compare with `String(type)`, e.g. `'WebGLTile'` for GeoTIFF and GeoZarr layers).
 - `options` are the assembled layer options.
+  For point clouds (`'COPC'`), STAC Browser hides the points classified as noise (`hideNoise: true`).
 - `reference` is the STAC Asset or Link the layer is created for.
 
 The function can be asynchronous, e.g. to load a style definition that is referenced in the
