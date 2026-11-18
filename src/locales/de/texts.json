@@ -20,7 +20,7 @@
       "generic": "Herunterladen",
       "withSource": "Herunterladen von {source}"
     },
-    "hideFromMap": "Auf Karte ausblenden",
+    "hideFromMap": "Von Karte entfernen",
     "inItems": "Verfügbare Datei in Datensätzen | verfügbare Dateien in Datensätzen",
     "role": {
       "data": "Daten",
@@ -242,15 +242,15 @@
     "layers": {
       "base": "Grundkarten",
       "footprint": "Räumliche Ausdehnung",
-      "moveDown": "Nach unten",
-      "moveUp": "Nach oben",
+      "moveDown": "Nach unten verschieben",
+      "moveUp": "Nach oben verschieben",
       "title": "Kartenebenen",
       "unnamed": "Unbenannt #{id}"
     },
     "location": {
       "description": "Springe zu deiner Position"
     },
-    "maxLayers": "Bis zu {max} Layer können auf der Karte auf einmal angezeigt werden, bitte zuerst eine Ebene ausblenden.",
+    "maxLayers": "Bis zu {max} Ebenen können auf der Karte angezeigt werden, bitte zuerst eine Ebene ausblenden.",
     "nobasemap": "Keine Grundkarten verfügbar.",
     "nodata": "In den Metadaten sind keine räumlichen Informationen verfügbar.",
     "zoom": {
