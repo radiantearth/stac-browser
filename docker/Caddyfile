@@ -1,0 +1,28 @@
+{
+	# Static file server only: no admin API, no config autosave, no automatic HTTPS (terminate TLS in front of the container)
+	admin off
+	persist_config off
+	auto_https off
+}
+
+# STAC_PATH_PREFIX and STAC_PREFIX_REDIRECT are set by docker-entrypoint.sh
+:{$PORT:8080} {
+	log {
+		output stdout
+	}
+	encode zstd gzip
+
+	{$STAC_PREFIX_REDIRECT}
+
+	handle_path {$STAC_PATH_PREFIX}* {
+		root * /usr/share/stac-browser
+		# Serve index.html for all routes of the single-page application
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	# Everything outside of the path prefix
+	handle {
+		respond 404
+	}
+}
