@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML
+- Docker:
+  - The port can be changed via the `PORT` environment variable
+  - Responses are compressed (zstd, gzip)
+  - Arbitrary user IDs in the root group are supported (e.g. OpenShift)
+
+### Changed
+
+- Docker: The image is based on [Caddy](https://caddyserver.com) (`caddy:2-alpine`) instead of nginx. Breaking changes:
+  - Static files are served from `/usr/share/stac-browser` instead of `/usr/share/nginx/html`,
+    e.g. update the target path if you mount `runtime-style.css` into the container
+  - The configuration is located in `docker/Caddyfile`, nginx configuration files are not supported anymore
+  - The container runs with UID 101 and GID 0 (instead of the `nginx` user and group)
 
 ### Removed
 

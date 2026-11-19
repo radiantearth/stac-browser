@@ -121,7 +121,7 @@ Mount your own version of the file into the container to customize the styling w
 ```bash
 docker run -p 8080:8080 \
   -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" \
-  -v ./my-style.css:/usr/share/nginx/html/runtime-style.css:ro \
+  -v ./my-style.css:/usr/share/stac-browser/runtime-style.css:ro \
   ghcr.io/radiantearth/stac-browser:latest
 ```
 
