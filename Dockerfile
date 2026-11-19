@@ -13,26 +13,26 @@ COPY . .
 RUN npm run build
 
 
-FROM nginx/nginx-unprivileged:1-alpine-slim
+FROM caddy:2-alpine
 ARG pathPrefix="/"
 
-USER root
-RUN apk add --no-cache ca-certificates curl jq pcre-tools
+RUN apk add --no-cache ca-certificates curl jq
 
-COPY ./config.schema.json /etc/nginx/conf.d/config.schema.json
-COPY --from=build-step /app/dist /usr/share/nginx/html
-COPY --from=build-step /app/docker/default.conf /etc/nginx/conf.d/default.conf.template
-ADD docker/docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.sh
+COPY ./config.schema.json /etc/stac-browser/config.schema.json
+COPY --from=build-step --chown=101:0 /app/dist /usr/share/stac-browser
+COPY docker/Caddyfile /etc/caddy/Caddyfile
+COPY --chmod=755 docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-# Remove default.conf so a skipped entrypoint fails loudly instead of serving nginx's welcome page.
-RUN rm -f /etc/nginx/conf.d/default.conf && \
-    chown -R nginx:nginx /usr/share/nginx/html && \
-    chmod +x /docker-entrypoint.d/40-stac-browser-entrypoint.sh
+# The entrypoint rewrites index.html and runtime-config.js at startup.
+# Group-writable so that it also works with arbitrary user IDs in the root group (e.g. OpenShift).
+RUN chmod g+w /usr/share/stac-browser
 
 ENV SB_pathPrefix="${pathPrefix}"
-
+# Port inside the container
+ENV PORT=8080
 EXPOSE 8080
 
-STOPSIGNAL SIGTERM
+USER 101
 
-USER nginx
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
