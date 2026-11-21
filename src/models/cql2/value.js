@@ -1,93 +1,48 @@
-export default class CqlValue {
+import {
+  CqlArray as BaseArray,
+  CqlTimestamp as BaseTimestamp,
+  CqlValue as BaseValue
+} from '@moregeo-it/cql2';
 
-  constructor(value) {
-    this.value = value;
-  }
+export default class CqlValue extends BaseValue {
 
   static create(value) {
-    if (value instanceof CqlValue) {
-      return value;
-    }
-    else if (Array.isArray(value)) {
+    if (Array.isArray(value)) {
       return new CqlArray(value);
     }
     else if (value instanceof Date) {
       return new CqlTimestamp(value);
     }
-    else if (typeof value === 'string') {
-      return new CqlString(value);
-    }
-    else {
+    else if (value === null || typeof value === 'undefined') {
       return new CqlValue(value);
     }
-  }
-
-  toJSON() {
-    return this.value;
-  }
-
-  toText() {
-    return this.value;
+    return BaseValue.create(value);
   }
 
 }
 
-export class CqlTimestamp extends CqlValue {
+export class CqlTimestamp extends BaseTimestamp {
 
-  constructor(value) {
-    super(value);
+  constructor(date) {
+    super(date);
+    this.date = date;
   }
 
-  toJSON() {
-    return { timestamp: this.toTimestamp() };
-  }
-
-  toText() {
-    return `TIMESTAMP('${this.toTimestamp()}')`;
-  }
-
-  toTimestamp() {
-    return this.value.toISOString();
+  get raw() {
+    return this.date;
   }
 
 }
 
-export class CqlString extends CqlValue {
+export class CqlArray extends BaseArray {
 
-  constructor(value) {
-    super(value);
+  constructor(values = []) {
+    super(values.map(value => CqlValue.create(value)));
   }
 
-  toJSON() {
-    return this.value;
-  }
-
-  toText() {
-    // How to write a backslash is not defined by CQL2 yet: https://github.com/opengeospatial/ogcapi-features/issues/1133
-    return `'${this.value.replaceAll('\\', '\\\\').replaceAll("'", "''")}'`;
-  }
-
-}
-
-export class CqlArray extends CqlValue {
-
-  constructor(value) {
-    super(value);
-  }
-
-  toJSON() {
-    return this.value.map(elem => {
-      const cql = elem instanceof CqlValue ? elem : CqlValue.create(elem);
-      return cql.toJSON();
-    });
-  }
-
-  toText() {
-    const csv = this.value.map(elem => {
-      const cql = elem instanceof CqlValue ? elem : CqlValue.create(elem);
-      return cql.toText();
-    });
-    return `(${csv.join(',')})`;
+  // The values as entered in the form, e.g. Date objects instead of timestamps
+  get raw() {
+    return this.value.map(element => 'raw' in element ? element.raw : element.value);
   }
 
 }

@@ -1,21 +1,15 @@
+import * as Base from '@moregeo-it/cql2';
 import i18n from '../../../i18n.js';
-import CqlOperator from './operator.js';
+import withFormSupport from './operator.js';
 
-export default class CqlLogicalOperator extends CqlOperator {
-
-  constructor(operator, args = []) {
-    super(operator, args);
-  }
+export default class CqlLogicalOperator {
 
   static create(op, args) {
-    if (args.length === 1 && ['&&', 'and', '||', 'or'].includes(op)) {
-      return args[0];
-    }
-    else if (['&&', 'and'].includes(op)) {
-      return new CqlAnd(args);
+    if (['&&', 'and'].includes(op)) {
+      return args.length === 1 ? args[0] : new CqlAnd(args);
     }
     else if (['||', 'or'].includes(op)) {
-      return new CqlOr(args);
+      return args.length === 1 ? args[0] : new CqlOr(args);
     }
     else if (['!', 'not'].includes(op)) {
       return new CqlNot(args[0]);
@@ -24,13 +18,7 @@ export default class CqlLogicalOperator extends CqlOperator {
 
 }
 
-export class CqlAnd extends CqlLogicalOperator {
-
-  static SYMBOL = "and";
-
-  constructor(args = []) {
-    super(CqlAnd.SYMBOL, args);
-  }
+export class CqlAnd extends withFormSupport(Base.CqlAnd) {
 
   static get label() {
     return "∧";
@@ -42,13 +30,7 @@ export class CqlAnd extends CqlLogicalOperator {
 
 }
 
-export class CqlOr extends CqlLogicalOperator {
-
-  static SYMBOL = "or";
-
-  constructor(args = []) {
-    super(CqlOr.SYMBOL, args);
-  }
+export class CqlOr extends withFormSupport(Base.CqlOr) {
 
   static get label() {
     return "∨";
@@ -60,17 +42,7 @@ export class CqlOr extends CqlLogicalOperator {
 
 }
 
-export class CqlNot extends CqlLogicalOperator {
-
-  static SYMBOL = "not";
-
-  constructor(arg = null) {
-    super(CqlNot.SYMBOL, arg ? [arg] : []);
-  }
-
-  toText() {
-    return `NOT (${this.args[0].toText()})`;
-  }
+export class CqlNot extends withFormSupport(Base.CqlNot) {
 
   static get label() {
     return "¬";

@@ -123,7 +123,7 @@ test.describe('STAC Browser code example CQL modal', () => {
     
     await test.step('Verify snippet contains text CQL fields', () => {
       expect(javascriptCode).toContain('"filter-lang": "cql2-text"');
-      expect(javascriptCode).toContain(`"filter": "NOT (id = 'test123')"`);
+      expect(javascriptCode).toContain(`"filter": "NOT id = 'test123'"`);
       expect(javascriptCode).not.toContain('"filters":');
     });
   });
