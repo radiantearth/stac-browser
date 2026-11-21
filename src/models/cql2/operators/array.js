@@ -18,7 +18,7 @@ export default class CqlArrayOperator extends CqlOperator {
         return new CqlArrayContains(pred, obj);
       case 'a_equals':
         return new CqlArrayEquals(pred, obj);
-      case 'a_contained_by':
+      case 'a_containedby':
         return new CqlArrayContainedBy(pred, obj);
     }
   }
@@ -132,7 +132,7 @@ export class CqlArrayEquals extends CqlArrayOperator {
 
 export class CqlArrayContainedBy extends CqlArrayOperator {
 
-  static SYMBOL = 'a_contained_by';
+  static SYMBOL = 'a_containedBy';
 
   constructor(pred = null, obj = null) {
     super(CqlArrayContainedBy.SYMBOL, pred, obj);

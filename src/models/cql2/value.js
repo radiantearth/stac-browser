@@ -65,7 +65,7 @@ export class CqlString extends CqlValue {
   }
 
   toText() {
-    return `'${this.value.replace("'", "''")}'`;
+    return `'${this.value.replaceAll("'", "''")}'`;
   }
 
 }
