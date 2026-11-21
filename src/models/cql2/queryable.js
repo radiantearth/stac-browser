@@ -15,6 +15,18 @@ export function formatPropertyKey(key) {
   return formatKey(field);
 }
 
+const toPattern = source => new RegExp(source, 'u');
+const IDENTIFIER = toPattern('^[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFE\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u{10000}-\u{EFFFF}][:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFE\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u{10000}-\u{EFFFF}.0-9\u0300-\u036F\u203F-\u2040]*$');
+const KEYWORDS = new Set([
+  'a_equals', 'a_contains', 'a_containedby', 'a_overlaps', 'accenti', 'and', 'bbox', 'between', 'casei',
+  'date', 'div', 'false', 'geometrycollection', 'in', 'interval', 'is', 'like', 'linestring',
+  'multilinestring', 'multipoint', 'multipolygon', 'not', 'null', 'or', 'point', 'polygon', 's_intersects',
+  's_equals', 's_disjoint', 's_touches', 's_within', 's_overlaps', 's_crosses', 's_contains', 't_after',
+  't_before', 't_contains', 't_disjoint', 't_during', 't_equals', 't_finishedby', 't_finishes',
+  't_intersects', 't_meets', 't_metby', 't_overlappedby', 't_overlaps', 't_startedby', 't_starts',
+  'timestamp', 'true'
+]);
+
 export default class Queryable {
   constructor(id, schema) {
     this.id = id;
@@ -169,7 +181,10 @@ export default class Queryable {
   }
 
   toText() {
-    return this.id;
+    if (IDENTIFIER.test(this.id) && !KEYWORDS.has(this.id.toLowerCase())) {
+      return this.id;
+    }
+    return `"${this.id.replaceAll('"', '""')}"`;
   }
 
   toJSON() {

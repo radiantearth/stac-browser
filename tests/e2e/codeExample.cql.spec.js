@@ -128,6 +128,50 @@ test.describe('STAC Browser code example CQL modal', () => {
     });
   });
   
+  test('writes backslashes, unusual property names and incomplete filters as the CQL2 grammar requires', async ({ page, worker }) => {
+    api = API.minimalApi({})
+      .addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension({ methods: ['POST']})
+      .addFilterExtension();
+    api.addQueryablesEndpoint();
+    const queryables = api.endpoints.find(endpoint => endpoint.data?.properties?.id).data.properties;
+    queryables['my-prop'] = { type: 'string', title: 'Hyphenated' };
+    queryables.date = { type: 'string', title: 'Keyword' };
+    queryables.gsd = { type: 'number', title: 'Resolution' };
+    api.root.addConformsTo('http://www.opengis.net/spec/cql2/1.0/conf/cql2-text');
+    api.root.addConformsTo('http://www.opengis.net/spec/cql2/1.0/conf/advanced-comparison-operators');
+    api.addCollection('test-collection-1', {});
+    await api.createServer(worker);
+
+    await page.goto(api.root.getSearchPath());
+
+    const addFilter = async (name) => {
+      await page.getByRole('button', { name: /add filter/i }).click();
+      await page.getByRole('menuitem', { name }).click();
+      return page.locator('.queryable-row').last();
+    };
+
+    await test.step('Add filters and submit search', async () => {
+      await (await addFilter(/identifier/i)).locator('input.value').fill('C:' + String.fromCharCode(92) + 'new');
+      await (await addFilter(/hyphenated/i)).locator('input.value').fill('a');
+      await (await addFilter(/keyword/i)).locator('input.value').fill('b');
+      await (await addFilter(/resolution/i)).locator('input.value').fill('');
+      const list = await addFilter(/identifier/i);
+      await list.locator('.op .dropdown-toggle-split').click();
+      await list.locator('.queryable-item', { hasText: '∈' }).click();
+      await page.getByRole('button', { name: /submit/i }).click();
+    });
+
+    const modal = await openExampleCodeModal(page);
+    await modal.getByRole('tab', { name: 'JavaScript' }).click();
+    await copyCodeFromModal(page, modal.getByRole('tabpanel', { name: 'JavaScript' }));
+    const javascriptCode = await readClipboard(page);
+
+    const filter = JSON.parse(javascriptCode.match(/"filter": (".*")/)[1]);
+    expect(filter).toBe(`id = 'C:${String.fromCharCode(92).repeat(2)}new' AND "my-prop" = 'a' AND "date" = 'b'`);
+  });
+
   test('keeps cql2-json filter as object for GET item-search JavaScript code', async ({ page, worker }) => {
     api = API.minimalApi({})
       .addCollectionsExtension()

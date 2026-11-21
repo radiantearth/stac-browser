@@ -1,4 +1,4 @@
-import Cql from '../../models/cql2/cql';
+import Cql, { isCompleteFilter } from '../../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../../models/cql2/operators/logical';
 import { CQL_JSON, CQL_TEXT, TYPES } from '../../components/ApiCapabilitiesMixin';
 
@@ -308,9 +308,10 @@ export default {
               .filter(f => !compatible.includes(f))
               .forEach(f => dropped.push(describeCqlDrop(f)));
 
-            if (compatible.length > 0) {
+            const complete = compatible.filter(isCompleteFilter);
+            if (complete.length > 0) {
               const { andOr = 'and', negate = false } = source.filterLogic || {};
-              const args = compatible.map(f => {
+              const args = complete.map(f => {
                 const filter = new f.operator(f.queryable, f.value);
                 return f.negate ? new CqlNot(filter) : filter;
               });
