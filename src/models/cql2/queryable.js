@@ -184,6 +184,7 @@ export default class Queryable {
     if (IDENTIFIER.test(this.id) && !KEYWORDS.has(this.id.toLowerCase())) {
       return this.id;
     }
+    // CQL2 only allows identifiers inside the quotes: https://github.com/opengeospatial/ogcapi-features/issues/916
     return `"${this.id.replaceAll('"', '""')}"`;
   }
 

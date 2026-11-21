@@ -65,6 +65,7 @@ export class CqlString extends CqlValue {
   }
 
   toText() {
+    // How to write a backslash is not defined by CQL2 yet: https://github.com/opengeospatial/ogcapi-features/issues/1133
     return `'${this.value.replaceAll('\\', '\\\\').replaceAll("'", "''")}'`;
   }
 
