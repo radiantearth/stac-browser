@@ -8,14 +8,17 @@ export default class CqlLogicalOperator extends CqlOperator {
   }
 
   static create(op, args) {
-    if (['&&', 'and'].includes(op)) {
+    if (args.length === 1 && ['&&', 'and', '||', 'or'].includes(op)) {
+      return args[0];
+    }
+    else if (['&&', 'and'].includes(op)) {
       return new CqlAnd(args);
     }
     else if (['||', 'or'].includes(op)) {
       return new CqlOr(args);
     }
     else if (['!', 'not'].includes(op)) {
-      return new CqlNot(args);
+      return new CqlNot(args[0]);
     }
   }
 
@@ -62,7 +65,11 @@ export class CqlNot extends CqlLogicalOperator {
   static SYMBOL = "not";
 
   constructor(arg = null) {
-    super(CqlNot.SYMBOL, arg ? [arg] : null);
+    super(CqlNot.SYMBOL, arg ? [arg] : []);
+  }
+
+  toText() {
+    return `NOT (${this.args[0].toText()})`;
   }
 
   static get label() {

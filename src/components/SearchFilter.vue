@@ -194,7 +194,7 @@ import Loading from './Loading.vue';
 
 import { CollectionCollection, STAC } from 'stac-js'; 
 import { createSTAC } from '../models/stac';
-import Cql from '../models/cql2/cql';
+import Cql, { isCompleteFilter } from '../models/cql2/cql';
 import { formatPropertyKey } from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { fetchQueryablesForLink, fetchSchemaProperties } from '../search-schemas';
@@ -789,10 +789,11 @@ export default defineComponent({
       this.sortables = sortables.map(([key, schema]) => ({ value: key, title: schema.title }));
     },
     buildFilter() {
-      if (this.filters.length === 0) {
+      const filters = this.filters.filter(isCompleteFilter);
+      if (filters.length === 0) {
         return null;
       }
-      const args = this.filters.map(f => {
+      const args = filters.map(f => {
         let filter = new f.operator(f.queryable, f.value);
         if (f.negate) {
           filter = new CqlNot(filter);

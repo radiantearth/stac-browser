@@ -189,7 +189,15 @@ export class CqlBetween extends CqlComparisonOperator {
 
   toText() {
     const bounds = this.args[1];
-    return `${this.args[0].toText()} BETWEEN ${bounds[0].toText()} and ${bounds[1].toText()}`;
+    return `${this.args[0].toText()} BETWEEN ${bounds[0].toText()} AND ${bounds[1].toText()}`;
+  }
+
+  toJSON() {
+    const bounds = this.args[1];
+    return {
+      op: this.operator,
+      args: [this.args[0].toJSON(), bounds[0].toJSON(), bounds[1].toJSON()]
+    };
   }
 
   static valueType() {
