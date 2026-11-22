@@ -44,10 +44,12 @@
             :time-config="{ 
               enableTimePicker: true, 
               enableSeconds: true,
-              timePickerInline: true 
+              timePickerInline: true,
+              ignoreTimeValidation: true
             }"
             :input-attrs="{ clearable: true }"
             text-input
+            timezone="UTC"
             :min-date="temporalExtent?.[0]"
             :max-date="temporalExtent?.[1]"
             :start-date="temporalExtent?.[1]"
@@ -449,10 +451,10 @@ export default defineComponent({
     datetime: {
       get() {
         const dt = this.activeParams.datetime;
-        return Array.isArray(dt) ? dt.map(d => Utils.dateFromUTC(d)) : null;
+        return Array.isArray(dt) ? dt : null;
       },
       set(val) {
-        const dt = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
+        const dt = Array.isArray(val) ? val.map(d => d && new Date(d.getTime())) : null;
         this.commitToVuex('datetime', dt);
       }
     },

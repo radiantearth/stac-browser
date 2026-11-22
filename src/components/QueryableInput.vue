@@ -238,7 +238,8 @@ export default {
         },
         inputAttrs: { clearable: true },
         autoApply: true,
-        textInput: true
+        textInput: true,
+        timezone: 'UTC'
       };
     },
     listValues() {
@@ -293,7 +294,7 @@ export default {
         return;
       }
       const dates = this.listValues.slice(0);
-      dates[index] = date;
+      dates[index] = new Date(date.getTime());
       this.updateValue(dates);
     },
     removeTemporalValue(index) {
@@ -335,6 +336,9 @@ export default {
       }
     },
     castValue(value) {
+      if (value instanceof Date) {
+        return new Date(value.getTime());
+      }
       if (typeof value !== "string") {
         return value;
       }
