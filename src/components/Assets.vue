@@ -1,6 +1,6 @@
 <template>
   <section class="assets mb-4">
-    <h2 v-if="displayTitle">{{ displayTitle }}</h2>
+    <SectionHeading v-if="displayTitle" :id="id">{{ displayTitle }}</SectionHeading>
     <b-accordion>
       <Asset
         v-for="asset in assets" :asset="asset" :expand="expand"
@@ -13,12 +13,14 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { BAccordion } from 'bootstrap-vue-next';
+import SectionHeading from './SectionHeading.vue';
 
 export default {
   name: 'Assets',
   components: {
     Asset: defineAsyncComponent(() => import('./Asset.vue')),
-    BAccordion
+    BAccordion,
+    SectionHeading
   },
   props: {
     assets: {
@@ -36,6 +38,12 @@ export default {
     autoExpand: {
       type: Boolean,
       default: false
+    },
+    // Stable anchor id for the heading, e.g. "assets".
+    // Leave empty where the component renders more than once per page.
+    id: {
+      type: String,
+      default: null
     }
   },
   computed: {
