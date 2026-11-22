@@ -233,7 +233,7 @@ export default {
         closeOnScroll: false,
         timeConfig: {
           enableTimePicker: this.queryable.isDateTime,
-          seconds: this.queryable.isDateTime,
+          enableSeconds: this.queryable.isDateTime,
           timePickerInline: true
         },
         inputAttrs: { clearable: true },
