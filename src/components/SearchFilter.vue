@@ -44,13 +44,14 @@
             :time-config="{ 
               enableTimePicker: true, 
               enableSeconds: true,
-              timePickerInline: true 
+              timePickerInline: true,
+              ignoreTimeValidation: true
             }"
             :input-attrs="{ clearable: true }"
             text-input
-            :min-date="temporalExtent?.[0]"
-            :max-date="temporalExtent?.[1]"
-            :start-date="temporalExtent?.[1]"
+            :min-date="pickerExtent?.[0]"
+            :max-date="pickerExtent?.[1]"
+            :start-date="pickerExtent?.[1]"
             :prevent-min-max-navigation="Boolean(temporalExtent)"
             auto-apply
             range
@@ -467,6 +468,10 @@ export default defineComponent({
         }
       }
       return null;
+    },
+    pickerExtent() {
+      // The picker shows UTC, like the datetime model
+      return this.temporalExtent?.map(dt => Utils.dateFromUTC(dt));
     },
     isSingleDateExtent() {
       const [min, max] = this.temporalExtent || [];

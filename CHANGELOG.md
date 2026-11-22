@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Widgets in different hooks don't replace each other anymore (e.g. custom components without an `id`)
 - Item asset definitions in collections show the asset key and don't render an empty box anymore
 - Date pickers show seconds in the time picker again
+- Date filter: the first and last day of a temporal extent can be selected in all time zones
 
 ## [5.2.0] - 2026-11-09
 
