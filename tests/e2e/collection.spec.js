@@ -262,6 +262,51 @@ test.describe('Collection Metadata', () => {
     await expect(page.locator('.providers')).toBeVisible();
     await expect(page.locator('.assets').first()).toBeVisible();
   });
+
+  // Regression test for https://github.com/radiantearth/stac-browser/issues/1074
+  test('Catalog - item asset definitions show their key', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    collection.setMetadata({
+      item_assets: {
+        model: { title: 'Model', roles: ['model'] }
+      }
+    });
+    await catalog.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const definition = page.locator('.assets', { has: page.getByRole('heading', { name: 'Asset in Items' }) }).locator('.asset').first();
+    await definition.getByRole('button', { name: /Model/ }).click();
+    await expect(definition.locator('.asset-alternative')).toContainText('Items provide this asset with the key model.');
+    await expect(definition.locator('.asset-alternative code')).toHaveText('model');
+  });
+
+  test('Catalog - alternates of item asset definitions show the key of the main asset', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    collection.setMetadata({
+      item_assets: {
+        model: {
+          title: 'Model',
+          roles: ['model'],
+          alternate: {
+            s3: { 'alternate:name': 'S3' }
+          }
+        }
+      }
+    });
+    await catalog.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const definition = page.locator('.assets', { has: page.getByRole('heading', { name: 'Asset in Items' }) }).locator('.asset').first();
+    await definition.getByRole('button', { name: /Model/ }).click();
+    await definition.getByRole('tab', { name: 'S3' }).click();
+    const alternative = definition.locator('.tab-pane.active .asset-alternative');
+    await expect(alternative).toContainText('Items provide this asset with the key model.');
+    await expect(alternative.locator('code')).toHaveText('model');
+  });
 });
 
 test.describe('Collection - toolBar', () => {
