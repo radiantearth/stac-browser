@@ -4,7 +4,7 @@
       <b-col class="meta">
         <WidgetHook id="view-catalog-meta-start" />
         <section class="intro">
-          <h2>{{ $t('description') }}</h2>
+          <SectionHeading id="description">{{ $t('description') }}</SectionHeading>
           <DeprecationNotice v-if="showDeprecation" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
           <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
@@ -22,7 +22,7 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
+          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" id="additional-resources" />
         </section>
         <WidgetHook id="view-catalog-intro-end" />
         <section v-if="isCollection || hasThumbnails || hasWebMapLinks" class="mb-4">
@@ -37,11 +37,11 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" />
+        <Assets v-if="hasAssets" :assets="assets" id="assets" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
-        <Providers v-if="providers" :providers="providers" />
-        <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Providers v-if="providers" :providers="providers" id="providers" />
+        <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" id="metadata" />
+        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" id="additional-resources" />
         <WidgetHook id="view-catalog-meta-end" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
@@ -78,6 +78,7 @@ import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "../components/ReadMore.vue";
+import SectionHeading from "../components/SectionHeading.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
@@ -110,6 +111,7 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
+    SectionHeading,
     Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [
