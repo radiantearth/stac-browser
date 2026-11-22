@@ -550,6 +550,21 @@ test.describe('STAC Collection item search', () => {
     await expect(await page.getByLabel(/spatial extent/i)).toBeVisible();
     await expect(await page.getByPlaceholder(/select date range/i)).toBeVisible();
   });
+
+  test('date range can be typed into the date filter', async ({ page, worker }) => {
+    const { api, collection } = createAPIWithSearch();
+    await api.createServer(worker);
+    await page.goto(collection.getBrowserPath());
+    await page.getByRole('button', { name: /show filters/i }).click();
+
+    const input = page.getByPlaceholder(/select date range/i);
+    await input.fill('2021-03-04 10:20:30 - 2021-03-05 11:22:33');
+    await input.press('Enter');
+    const request = page.waitForRequest(r => r.url().includes('/collections/collection1/items'));
+    await page.getByRole('button', { name: /submit/i }).click();
+    const url = new URL((await request).url());
+    expect(url.searchParams.get('datetime')).toBe('2021-03-04T10:20:30.000Z/2021-03-05T11:22:33.000Z');
+  });
     
   test('configured default sort is not reported as unapplied filter change', async ({ page, worker }) => {
     const { api, collection } = createAPIWithSearch();
