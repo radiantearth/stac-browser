@@ -43,7 +43,7 @@
             :placeholder="$t('search.selectDateRange')"
             :time-config="{ 
               enableTimePicker: true, 
-              seconds: true,
+              enableSeconds: true,
               timePickerInline: true 
             }"
             :input-attrs="{ clearable: true }"
