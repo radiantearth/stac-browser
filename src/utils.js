@@ -165,16 +165,6 @@ export default class Utils {
     }
   }
 
-  // Convert from UTC to locale time (needed for vue2-datetimepicker)
-  // see https://github.com/mengxiong10/vue2-datepicker/issues/388
-  static dateFromUTC(dt) {
-    if (dt) {
-      const value = new Date(dt);
-      dt = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
-    }
-    return dt;
-  }
-
   static dateToUTC(dt) {
     if (dt instanceof Date) {
       dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);

@@ -49,9 +49,10 @@
             }"
             :input-attrs="{ clearable: true }"
             text-input
-            :min-date="pickerExtent?.[0]"
-            :max-date="pickerExtent?.[1]"
-            :start-date="pickerExtent?.[1]"
+            timezone="UTC"
+            :min-date="temporalExtent?.[0]"
+            :max-date="temporalExtent?.[1]"
+            :start-date="temporalExtent?.[1]"
             :prevent-min-max-navigation="Boolean(temporalExtent)"
             auto-apply
             range
@@ -450,10 +451,10 @@ export default defineComponent({
     datetime: {
       get() {
         const dt = this.activeParams.datetime;
-        return Array.isArray(dt) ? dt.map(d => Utils.dateFromUTC(d)) : null;
+        return Array.isArray(dt) ? dt : null;
       },
       set(val) {
-        const dt = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
+        const dt = Array.isArray(val) ? val.map(d => d && new Date(d.getTime())) : null;
         this.commitToVuex('datetime', dt);
       }
     },
@@ -468,10 +469,6 @@ export default defineComponent({
         }
       }
       return null;
-    },
-    pickerExtent() {
-      // The picker shows UTC, like the datetime model
-      return this.temporalExtent?.map(dt => Utils.dateFromUTC(dt));
     },
     isSingleDateExtent() {
       const [min, max] = this.temporalExtent || [];

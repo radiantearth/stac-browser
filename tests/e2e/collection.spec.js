@@ -731,7 +731,7 @@ test.describe('STAC Collection item search', () => {
         collection.setMetadata({
           extent: {
             spatial: collection.getMetadata().extent.spatial,
-            temporal: { interval: [['2005-07-01T23:59:59Z', '2005-07-31T23:59:59Z']] }
+            temporal: { interval: [['2005-07-01T23:59:59Z', '2005-07-31T00:00:01Z']] }
           }
         });
         await api.createServer(worker);
