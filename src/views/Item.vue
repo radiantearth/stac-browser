@@ -15,14 +15,14 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" autoExpand />
-        <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Assets v-if="hasAssets" :assets="assets" autoExpand id="assets" />
+        <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" id="additional-resources" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>
       <b-col class="right">
         <WidgetHook id="view-item-secondary-start" />
         <section class="intro">
-          <h2 v-if="data.properties.description">{{ $t('description') }}</h2>
+          <SectionHeading v-if="data.properties.description" id="description">{{ $t('description') }}</SectionHeading>
           <DeprecationNotice v-if="showDeprecation" :data="data" />
           <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
           <ReadMore v-if="data.properties.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
@@ -31,8 +31,8 @@
           <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" class="mb-3" />
         </section>
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
-        <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
-        <MetadataGroups :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
+        <Providers v-if="data.properties.providers" :providers="data.properties.providers" id="providers" />
+        <MetadataGroups :data="data" type="Item" :ignoreFields="ignoredMetadataFields" id="metadata" />
         <WidgetHook id="view-item-secondary-end" />
       </b-col>
     </b-row>
@@ -45,6 +45,7 @@ import { mapState, mapGetters } from 'vuex';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import Description from '../components/Description.vue';
 import ReadMore from "../components/ReadMore.vue";
+import SectionHeading from '../components/SectionHeading.vue';
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
@@ -67,6 +68,7 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
+    SectionHeading,
     Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [
