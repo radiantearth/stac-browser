@@ -1,6 +1,6 @@
 <template>
   <section class="links mb-4">
-    <h2 v-if="title">{{ title }}</h2>
+    <SectionHeading v-if="title" :id="id">{{ title }}</SectionHeading>
     <template v-if="hasGroups">
       <div class="group" v-for="group in groups" :key="group.rel">
         <h4 v-if="group.rel">{{ group.label }}</h4>
@@ -17,6 +17,7 @@
 
 <script>
 import LinkListEntry from './LinkListEntry.vue';
+import SectionHeading from './SectionHeading.vue';
 import { Fields } from '@radiantearth/stac-fields';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 import { ogcRelPrefix } from '../rels';
@@ -28,10 +29,17 @@ import { mapState } from 'vuex';
 export default {
   name: "LinkList",
   components: {
-    LinkListEntry
+    LinkListEntry,
+    SectionHeading
   },
   props: {
     title: {
+      type: String,
+      default: null
+    },
+    // Stable anchor id for the heading, e.g. "additional-resources".
+    // Leave empty where the component renders more than once per page.
+    id: {
       type: String,
       default: null
     },
