@@ -16,6 +16,7 @@
       "withSource": "Copiar la URL para {source}"
     },
     "currentlyShown": "Este es el recurso que actualmente se muestra.",
+    "definition": "",
     "download": {
       "generic": "Descargar",
       "withSource": "Descargar desde {source}"
