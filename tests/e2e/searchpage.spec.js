@@ -995,3 +995,34 @@ test.describe('STAC Browser Search page with required collections', () => {
     });
   });
 });
+
+for (const timezoneId of ['UTC', 'Europe/Zurich', 'America/Los_Angeles']) {
+  test.describe(`STAC Browser Search page with temporal queryables in time zone ${timezoneId}`, () => {
+    test.use({ timezoneId });
+
+    test('A typed timestamp is sent as UTC', async ({ page, worker }) => {
+      const api = API.minimalApi({})
+        .addCollectionsExtension()
+        .addItemsExtension()
+        .addSearchExtension()
+        .addFilterExtension();
+      const queryables = api.endpoints.find(endpoint => endpoint.data?.properties?.id).data.properties;
+      queryables.acquired = { type: 'string', format: 'date-time', title: 'Acquired' };
+      api.root.addConformsTo('http://www.opengis.net/spec/cql2/1.0/conf/cql2-json');
+      api.addCollection('collection1');
+      await api.createServer(worker);
+      await page.goto(api.root.getSearchPath());
+
+      await page.getByRole('button', { name: /add filter/i }).click();
+      await page.getByRole('menuitem', { name: /acquired/i }).click();
+      const input = page.locator('.queryable-row').last().locator('input');
+      await input.fill('2021-03-28 02:30:00');
+      await input.press('Enter');
+
+      const requestPromise = waitForSearchPost(page);
+      await page.getByRole('button', { name: /submit/i }).click();
+      const { body } = await requestPromise;
+      expect(JSON.stringify(body.filter)).toContain('{"timestamp":"2021-03-28T02:30:00.000Z"}');
+    });
+  });
+}

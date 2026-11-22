@@ -165,13 +165,6 @@ export default class Utils {
     }
   }
 
-  static dateToUTC(dt) {
-    if (dt instanceof Date) {
-      dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);
-    }
-    return dt;
-  }
-
   static formatDatetimeQuery(value) {
     if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
       return value.map(dt => {

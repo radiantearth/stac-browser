@@ -1,5 +1,3 @@
-import Utils from "../../utils";
-
 export default class CqlValue {
 
   constructor(value) {
@@ -49,7 +47,7 @@ export class CqlTimestamp extends CqlValue {
   }
 
   toTimestamp() {
-    return Utils.dateToUTC(this.value).toISOString();
+    return this.value.toISOString();
   }
 
 }
