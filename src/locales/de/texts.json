@@ -16,6 +16,7 @@
       "withSource": "Kopiere Adresse für {source}"
     },
     "currentlyShown": "Diese Datei wird derzeit angezeigt.",
+    "definition": "Datensätze stellen diese Datei unter dem Schlüssel {key} bereit. Die Datei ist nicht zwangsläufig in allen Datensätzen enthalten.",
     "download": {
       "generic": "Herunterladen",
       "withSource": "Herunterladen von {source}"

@@ -30,15 +30,15 @@
       <b-card no-body class="border-0 rounded-0">
         <b-tabs v-model="activeTab" lazy card>
           <b-tab :id="mainTabId" :title="asset['alternate:name'] || $t('assets.alternate.main')" no-body>
-            <AssetAlternative :asset="asset" />
+            <AssetAlternative :asset="asset" :definition="definition" />
           </b-tab>
           <b-tab v-for="(altAsset, key) in alternatives" :id="getAlternativeTabId(key)" :title="altAsset['alternate:name'] || key" :key="key" no-body>
-            <AssetAlternative :asset="altAsset" />
+            <AssetAlternative :asset="altAsset" :definition="definition" />
           </b-tab>
         </b-tabs>
       </b-card>
     </template>
-    <AssetAlternative v-else :asset="asset" />
+    <AssetAlternative v-else :asset="asset" :definition="definition" />
   </b-accordion-item>
 </template>
 

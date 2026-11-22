@@ -16,6 +16,7 @@
       "withSource": "Copy URL for {source}"
     },
     "currentlyShown": "This is the asset that is currently shown.",
+    "definition": "Items provide this asset with the key {key}. Not all items may include this asset.",
     "download": {
       "generic": "Download",
       "withSource": "Download from {source}"
