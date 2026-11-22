@@ -237,7 +237,8 @@ export default {
           timePickerInline: true
         },
         inputAttrs: { clearable: true },
-        autoApply: true
+        autoApply: true,
+        textInput: true
       };
     },
     listValues() {

@@ -47,6 +47,7 @@
               timePickerInline: true 
             }"
             :input-attrs="{ clearable: true }"
+            text-input
             :min-date="temporalExtent?.[0]"
             :max-date="temporalExtent?.[1]"
             :start-date="temporalExtent?.[1]"
