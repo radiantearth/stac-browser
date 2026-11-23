@@ -69,7 +69,7 @@ object() {
 
 STAC_PATH_PREFIX=$(printf '%s' "${SB_pathPrefix:-/}" | sed -e 's|^/*|/|' -e 's|/*$|/|')
 
-# Allow only URL path-safe characters so values cannot break nginx/sed/envsubst.
+# Allow only URL path-safe characters so values cannot break the Caddyfile/sed.
 if ! printf '%s' "$STAC_PATH_PREFIX" | grep -Eq '^[A-Za-z0-9/_.~-]+$'; then
     echo "Err: SB_pathPrefix contains unsupported characters: ${SB_pathPrefix}" >&2
     exit 1
@@ -78,34 +78,33 @@ fi
 export SB_pathPrefix="$STAC_PATH_PREFIX"
 export STAC_PATH_PREFIX
 
+# Redirect the bare prefix to the prefix with trailing slash (e.g. /browser -> /browser/), keeping the query string.
+# Caddy substitutes STAC_PATH_PREFIX and STAC_PREFIX_REDIRECT into the Caddyfile at startup.
 barePrefix=$(printf '%s' "$STAC_PATH_PREFIX" | sed 's|/*$||')
 if [ -n "$barePrefix" ] && [ "$barePrefix" != "/" ]; then
-    STAC_PREFIX_REDIRECT="location = ${barePrefix} { return 301 ${STAC_PATH_PREFIX}\$is_args\$args; }"
+    STAC_PREFIX_REDIRECT="redir ${barePrefix} ${STAC_PATH_PREFIX}{?query} 301"
 else
     STAC_PREFIX_REDIRECT=""
 fi
 export STAC_PREFIX_REDIRECT
 
-# Single-quoted so the shell does not expand; envsubst expands these names.
-# shellcheck disable=SC2016
-envsubst '$STAC_PATH_PREFIX $STAC_PREFIX_REDIRECT' \
-    < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+html_dir=/usr/share/stac-browser
 
 # Point the <base> tag (emitted by SB_RUNTIME builds) at the path prefix so
 # relative asset URLs resolve against it (Vite builds with base "./").
 # The tag's href must be REPLACED (not skipped) when the tag exists — it is
 # baked with the build-time prefix and needs to follow SB_pathPrefix.
 # Updating in place keeps this idempotent across container restarts.
-index_html=/usr/share/nginx/html/index.html
+index_html="$html_dir/index.html"
 if [ -f "$index_html" ] && grep -q 'id="stac-browser-base"' "$index_html"; then
     sed -i "s|<base [^>]*id=\"stac-browser-base\"[^>]*>|<base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" "$index_html"
 elif [ "$STAC_PATH_PREFIX" != "/" ]; then
     echo "Warn: SB_pathPrefix is set, but index.html contains no stac-browser-base tag (image built with SB_RUNTIME=false?). The path prefix must be set at build time instead." >&2
 fi
 
-config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
-runtime_config_tmp=/usr/share/nginx/html/runtime-config.js.tmp
-runtime_config=/usr/share/nginx/html/runtime-config.js
+config_schema=$(cat /etc/stac-browser/config.schema.json)
+runtime_config_tmp="$html_dir/runtime-config.js.tmp"
+runtime_config="$html_dir/runtime-config.js"
 
 # Resolve a JSON Schema "type" keyword to a single type name. The keyword may be
 # a string ("array") or an array of strings (["array", "null"]); take the first.
@@ -152,4 +151,7 @@ env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | grep -v -e "^SB_CONFIG$" -e 
     done
     echo "}"
 } > "$runtime_config_tmp"
-mv -f "$runtime_config_tmp" "$runtime_config"
+mv -f "$runtime_config_tmp" "$runtime_config" || exit 1
+
+# Start the server (CMD of the Dockerfile)
+exec "$@"

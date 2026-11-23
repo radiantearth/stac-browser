@@ -139,7 +139,7 @@ services:
       SB_catalogUrl: "https://localhost:7188"
       SB_pathPrefix: "/browser/"
     volumes:
-      - ./my-style.css:/usr/share/nginx/html/runtime-style.css:ro
+      - ./my-style.css:/usr/share/stac-browser/runtime-style.css:ro
 ```
 
 Anything that requires code — custom widgets, actions, function-valued options such as
@@ -150,14 +150,19 @@ Anything that requires code — custom widgets, actions, function-valued options
 
 The docker image uses a multi stage build.
 The first stage is based on a node image and runs `npm run build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
-The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint applies `SB_pathPrefix` to nginx and to the `<base>` tag in `index.html`, and generates `runtime-config.js`.
-So, essentially, in the end you get an nginx instance that serves static files.
+The second stage is based on the official [Caddy](https://caddyserver.com) image that serves the folder with static files from `/usr/share/stac-browser`.
+At startup, the entrypoint applies `SB_pathPrefix` to the Caddy configuration and to the `<base>` tag in `index.html`, and generates `runtime-config.js`.
+So, essentially, in the end you get a Caddy instance that serves static files.
+
+Caddy runs as a non-root user (UID 101, group 0) and listens on port 8080.
+The port can be changed via the `PORT` environment variable.
+Arbitrary user IDs (e.g. on OpenShift) are supported as long as the user is in the root group (GID 0).
 
 ## Essential parts
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
-2. [docker/default.conf](../docker/default.conf) - nginx configuration template; `${STAC_PATH_PREFIX}` is substituted at startup.
-3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables, render the nginx config, and produce the `runtime-config.js` file.
+2. [docker/Caddyfile](../docker/Caddyfile) - Caddy configuration; `{$STAC_PATH_PREFIX}` and `{$STAC_PREFIX_REDIRECT}` are substituted at startup.
+3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables, set the path prefix, produce the `runtime-config.js` file and start Caddy.
 
 ## FAQ
 
