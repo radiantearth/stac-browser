@@ -4,8 +4,20 @@ import i18n from '../i18n';
 
 export class Loading {
 
-  constructor(show = false) {
+  constructor(show = false, waitable = false) {
     this.show = Boolean(show);
+    if (waitable) {
+      this.promise = new Promise(resolve => {
+        this.resolve = resolve;
+      });
+    }
+  }
+
+  finish(value) {
+    if (this.resolve) {
+      this.resolve(value);
+      this.resolve = null;
+    }
   }
 
 }

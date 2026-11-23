@@ -9,6 +9,7 @@
 import { mapState, mapGetters } from "vuex";
 import Utils from "../utils";
 import { getDisplayTitle } from "../models/stac";
+import { getLocaleDirection } from "../i18n";
 import AuthImage from "./AuthImage.vue";
 
 export default {
@@ -91,8 +92,9 @@ export default {
           return;
         }
 
-        // Update the HTML lang tag
+        // Keep the document language and writing direction in sync with the UI.
         document.documentElement.setAttribute("lang", locale);
+        document.documentElement.setAttribute("dir", getLocaleDirection(locale));
         document.getElementById('og-locale').setAttribute("content", locale);
       }
     },

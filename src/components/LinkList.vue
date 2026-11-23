@@ -100,7 +100,7 @@ export default {
 
     > li {
       margin-bottom: 0.2em;
-      padding-left: 0.5em;
+      padding-inline-start: 0.5em;
     }
   }
 }

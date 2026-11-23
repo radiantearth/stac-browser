@@ -122,7 +122,7 @@ export default {
 .ol-layercontrol {
   pointer-events: auto;
   z-index: 1;
-  left: 0.5em;
+  inset-inline-start: 0.5em;
   bottom: 0.5em;
 }
 .layercontrol {
@@ -139,7 +139,7 @@ export default {
     margin: 0;
 
     li {
-      padding-left: 0.5em;
+      padding-inline-start: 0.5em;
     }
   }
 }

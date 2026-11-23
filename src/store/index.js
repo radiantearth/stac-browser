@@ -87,6 +87,22 @@ function guessParentUrlFromApiPath(url, levels) {
   return uri.toString();
 }
 
+function toExternalBrowserPath(absolute) {
+  const parts = ['/external'];
+  const protocol = absolute.protocol();
+  if (protocol !== 'https') {
+    parts.push(`${protocol}:`);
+  }
+  parts.push(absolute.authority());
+  parts.push(absolute.path().replace(/^\//, ''));
+  let path = parts.join('/');
+  const query = absolute.query();
+  if (query) {
+    path += `?${query}`;
+  }
+  return path;
+}
+
 // Returns the STAC object for the given URL from the cache,
 // otherwise creates it from the given data and adds it to the cache.
 function getOrCreateStac(cx, data, url) {
@@ -143,6 +159,9 @@ function getStore(config, router) {
     queue: [],
     privateQueryParameters: {},
     dataLanguage: null,
+    dataLanguageNavigation: null,
+    dataLanguageNavigationId: 0,
+    catalogRootUrl: null,
 
     apiCollections: [],
     apiItemsLoading: {},
@@ -287,8 +306,9 @@ function getStore(config, router) {
       root: (_, getters) => getters.getStac(getters.rootLink),
 
       rootLink: state => {
-        if (state.catalogUrl) {
-          return Utils.createLink(state.catalogUrl, 'root', state.catalogTitle);
+        const activeRootUrl = state.catalogRootUrl || state.catalogUrl;
+        if (activeRootUrl) {
+          return Utils.createLink(activeRootUrl, 'root', state.catalogTitle);
         }
         const link = state.data?.getStacLinkWithRel('root');
         if (link) {
@@ -491,23 +511,18 @@ function getStore(config, router) {
           relative = absolute.relativeTo(state.catalogUrl);
         }
 
+        const relativeStr = relative?.toString();
+        const localizedOutsideBrowserBase = getters.isLocalizedCatalogUrl(absolute) &&
+          (typeof relative === 'undefined' || relativeStr.startsWith('//') || relativeStr.startsWith('../'));
+        if (localizedOutsideBrowserBase) {
+          return toExternalBrowserPath(absolute);
+        }
+
         if (typeof relative === 'undefined' || getters.isExternalUrl(absolute, false)) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
-          let parts = ['/external'];
-          let protocol = absolute.protocol();
-          if (protocol !== 'https') {
-            parts.push(`${protocol}:`);
-          }
-          parts.push(absolute.authority());
-          parts.push(absolute.path().replace(/^\//, ''));
-          let path = parts.join('/');
-          let q = absolute.query();
-          if (q) {
-            path += `?${q}`;
-          }
-          return path;
+          return toExternalBrowserPath(absolute);
         }
         else {
           const path = relative.toString();
@@ -542,12 +557,32 @@ function getStore(config, router) {
       },
       // Whether the currently shown page is not part of the configured (or selected) catalog
       isExternalContext: (state, getters) => Boolean(state.url && getters.isExternalUrl(state.url, false)),
-      isExternalUrl: state => (absoluteUrl, whitelist = true) => {
+      isLocalizedCatalogUrl: state => absoluteUrl => {
+        if (!state.catalogRootUrl) {
+          return false;
+        }
+        if (!(absoluteUrl instanceof urijs)) {
+          absoluteUrl = URI(absoluteUrl);
+        }
+        if (absoluteUrl.is("relative")) {
+          return false;
+        }
+        const relative = absoluteUrl.relativeTo(state.catalogRootUrl);
+        if (relative.equals(absoluteUrl)) {
+          return false;
+        }
+        const relativeStr = relative.toString();
+        return !relativeStr.startsWith('//') && !relativeStr.startsWith('../');
+      },
+      isExternalUrl: (state, getters) => (absoluteUrl, whitelist = true) => {
         if (!state.catalogUrl) {
           return false;
         }
         if (!(absoluteUrl instanceof urijs)) {
           absoluteUrl = URI(absoluteUrl);
+        }
+        if (getters.isLocalizedCatalogUrl(absoluteUrl)) {
+          return false;
         }
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.some(d => hasAuthority(d, absoluteUrl))) {
           return false;
@@ -654,14 +689,25 @@ function getStore(config, router) {
           }
         }
       },
-      languages(state, { uiLanguage, dataLanguage }) {
+      languages(state, { uiLanguage, dataLanguage, navigateData = false }) {
         if (typeof uiLanguage !== 'undefined') {
           i18n.global.locale = uiLanguage;
           state.uiLanguage = uiLanguage || null;
         }
         if (typeof dataLanguage !== 'undefined') {
-          state.dataLanguage = dataLanguage || null;
+          const resolvedDataLanguage = dataLanguage || null;
+          const changed = state.dataLanguage !== resolvedDataLanguage;
+          state.dataLanguage = resolvedDataLanguage;
+          if (navigateData && changed && resolvedDataLanguage) {
+            state.dataLanguageNavigation = {
+              id: ++state.dataLanguageNavigationId,
+              locale: resolvedDataLanguage
+            };
+          }
         }
+      },
+      catalogRootUrl(state, url) {
+        state.catalogRootUrl = hasText(url) ? url : null;
       },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
@@ -727,9 +773,17 @@ function getStore(config, router) {
         }
       },
       loaded(state, { url, data }) {
+        const loading = state.database[url];
+        if (loading instanceof Loading) {
+          loading.finish(data);
+        }
         state.database[url] = data;
       },
       clear(state, url) {
+        const loading = state.database[url];
+        if (loading instanceof Loading) {
+          loading.finish(null);
+        }
         delete state.database[url];
         delete state.apiChildren[url];
         delete state.conformance[url];
@@ -742,6 +796,11 @@ function getStore(config, router) {
           state.locale = config.locale;
         }
         if (clearAll) {
+          for (const data of Object.values(state.database)) {
+            if (data instanceof Loading) {
+              data.finish(null);
+            }
+          }
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
           state.database = {};
@@ -778,6 +837,9 @@ function getStore(config, router) {
         }
         if (!(error instanceof Error)) {
           error = new Error(error);
+        }
+        if (status instanceof Loading) {
+          status.finish(error);
         }
         state.database[url] = error;
       },
@@ -951,13 +1013,37 @@ function getStore(config, router) {
         await updateExternals(uiLanguage, cx.state.fallbackLocale);
 
         // Update store and URL
-        cx.commit('languages', { dataLanguage, uiLanguage });
+        cx.commit('languages', {
+          dataLanguage,
+          uiLanguage,
+          navigateData: cx.state.data instanceof STAC
+        });
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
       // eslint-disable-next-line require-await
       async switchDataLocale(cx, { locale }) {
         const dataLanguage = detectDataLanguage(cx.state.data, locale, cx.state.uiLanguage);
-        cx.commit('languages', { dataLanguage });
+        cx.commit('languages', { dataLanguage, navigateData: true });
+      },
+      async switchCatalogRootLocale(cx, { locale, commit = true }) {
+        let root = cx.getters.root;
+        if (!root && cx.state.catalogUrl) {
+          await cx.dispatch('load', { url: cx.state.catalogUrl, isRoot: true });
+          root = cx.getters.root;
+        }
+        const link = root?.getLocaleLink(locale);
+        if (!link) {
+          return null;
+        }
+        const url = link.getAbsoluteUrl();
+        await cx.dispatch('load', { url, isRoot: true });
+        if (!cx.getters.getStac(url)) {
+          return null;
+        }
+        if (commit) {
+          cx.commit('catalogRootUrl', url);
+        }
+        return url;
       },
       async loadBackground(cx, count) {
         let urls = cx.state.queue.slice(0, count);
@@ -1034,7 +1120,7 @@ function getStore(config, router) {
 
         // Register before the first await, so that a navigation in the meantime cancels showing the page.
         // Afterwards, check loading.show instead of show.
-        let loading = new Loading(show);
+        let loading = new Loading(show, true);
         if (show) {
           pendingShows.add(loading);
         }
@@ -1050,6 +1136,9 @@ function getStore(config, router) {
         if (data instanceof Loading) {
           pendingShows.delete(loading);
           cx.commit('updateLoading', { url, show: loading.show });
+          if (data.promise) {
+            await data.promise;
+          }
           return;
         }
 
@@ -1070,15 +1159,6 @@ function getStore(config, router) {
             }
             cx.commit('loaded', { url, data });
 
-            if (loading.show) {
-              // If we prefer another language abort redirect to the new language
-              let localeLink = data.getLocaleLink(cx.state.dataLanguage);
-              if (localeLink) {
-                router.replace(cx.getters.toBrowserPath(localeLink));
-                return;
-              }
-            }
-
             // Users may enter a different URL than reported in the STAC document
             // (e.g. missing trailing slash) - correct the URL and redirect.
             if (await normalizeCatalogUrl(cx, data, url, loading.show)) {
@@ -1098,6 +1178,44 @@ function getStore(config, router) {
             cx.commit('errored', { url, error });
             return;
           }
+        }
+
+        let dataLanguage;
+        const redirectToDataLocale = async stac => {
+          // A locale can be selected before the first catalog is loaded.
+          // Resolve it against the entity before showing the page, including
+          // when the entity was already available from the cache.
+          dataLanguage = detectDataLanguage(
+            stac,
+            cx.state.locale,
+            cx.state.uiLanguage
+          );
+
+          // Keep catalogUrl stable as the browser-path base. The localized root
+          // is loaded separately for the header, breadcrumbs, and root metadata.
+          const localeLink = stac.getLocaleLink(dataLanguage);
+          const localeUrl = localeLink?.getAbsoluteUrl();
+          if (localeUrl && !Utils.equalUrl(localeUrl, url)) {
+            await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
+            const browserPath = cx.getters.toBrowserPath(localeLink);
+            if (browserPath.startsWith('/')) {
+              const target = URI(browserPath);
+              const query = Utils.stateQueryParametersToObject(
+                cx.state.stateQueryParameters,
+                target.query(true)
+              );
+              await router.replace({ path: target.path(), query });
+            }
+            else {
+              await router.replace(browserPath);
+            }
+            return true;
+          }
+          return false;
+        };
+
+        if (loading.show && await redirectToDataLocale(data)) {
+          return;
         }
 
         if (loading.show) {
@@ -1134,6 +1252,11 @@ function getStore(config, router) {
           }
         }
 
+        const entityLanguage = data.getMetadata('language');
+        const entityMatchesRequestedLanguage = loading.show &&
+          isObject(entityLanguage) &&
+          getBest([entityLanguage.code], dataLanguage, null);
+
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!cx.getters.root && !isRoot) {
           let catalogUrl = cx.state.catalogUrl;
@@ -1152,6 +1275,14 @@ function getStore(config, router) {
           }
         }
 
+        // On a reload of an already localized page there is no locale redirect
+        // to establish the matching root context. Once the configured root is
+        // available, select its alternate when the shown entity itself is in
+        // the requested language.
+        if (entityMatchesRequestedLanguage) {
+          await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
+        }
+
         // Check management permissions for editable resources (items/collections).
         // The list endpoints are preflighted when their listings are loaded, but the
         // detail resources (where edit/delete live) need an explicit check. This runs
@@ -1165,7 +1296,14 @@ function getStore(config, router) {
         // All tasks finished, show the page if requested
         pendingShows.delete(loading);
         if (loading.show) {
+          // A background request can be promoted to a shown request while any
+          // of the awaited work above is in progress. Re-resolve the locale so
+          // the promoted page cannot bypass its alternate-language redirect.
+          if (await redirectToDataLocale(data)) {
+            return;
+          }
           cx.commit('showPage', { url });
+          cx.commit('languages', { dataLanguage });
           // If we don't have a catalogUrl but have a page to show,
           // we should assume this URL is the root catalog for now.
           if (!cx.state.catalogUrl) {
