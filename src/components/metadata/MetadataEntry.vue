@@ -21,7 +21,10 @@ const FORCE_TABLE = [
   'languages',
   'eo:bands',
   'raster:bands',
-  'bands'
+  'bands',
+  'mlm:input',
+  'mlm:output',
+  'mlm:hyperparameters'
 ];
 
 export default {
