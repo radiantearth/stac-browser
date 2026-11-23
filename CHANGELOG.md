@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Date pickers show seconds in the time picker again
 - Date filter: the first and last day of a temporal extent can be selected in all time zones
 - Date pickers send times that fall into a daylight saving time change of the local time zone correctly
+- English (UK): Some texts used American instead of British spelling
 
 ## [5.2.0] - 2026-11-09
 

@@ -13,7 +13,9 @@
     "button": {},
     "schemeTypes": {}
   },
-  "catalog": {},
+  "catalog": {
+    "license": "Licence"
+  },
   "catalogs": {
     "filterByTitle": "Filter catalogues by title",
     "filterByTitleAndMore": "Filter catalogues by title, description or keywords",
@@ -29,19 +31,25 @@
   },
   "exampleCode": {},
   "favorites": {
+    "add": "Add to favourites",
     "empty": "No favourites have been added yet. To add favourites, use the 'Favourite' button on the page of a catalogue, collection, or item.",
+    "exportDescription": "Export the favourites to a file, e.g. to import them in another browser.",
     "exportFormats": {
       "stac": "STAC Catalogue"
     },
+    "importDescription": "Import favourites from a file that was exported before.",
+    "importInvalid": "The selected file does not contain favourites.",
     "imported": "{count} new favourites were imported.",
     "label": "Favourite",
-    "localOnly": "Favourites are stored only locally in this web browser. They are not synchronized across devices or browsers.",
+    "localOnly": "Favourites are stored only locally in this web browser. They are not synchronised across devices or browsers.",
     "remove": "Remove from favourites",
     "title": "Favourites"
   },
   "features": {},
   "fullscreen": {},
-  "goBack": {},
+  "goBack": {
+    "refererDescription": "Go back to the last visited page in the catalogue"
+  },
   "goToCollection": {},
   "goToParent": {},
   "index": {
