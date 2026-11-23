@@ -1,6 +1,6 @@
 <template>
   <section class="providers mb-4">
-    <h2>{{ $t('providers.title', count) }}</h2>
+    <SectionHeading :id="id">{{ $t('providers.title', count) }}</SectionHeading>
     <b-list-group v-if="isSimple" class="mimic-accordion">
       <b-list-group-item
         v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
@@ -19,6 +19,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import ProviderRoles from './ProviderRoles.vue';
+import SectionHeading from './SectionHeading.vue';
 import { size } from 'stac-js/src/utils.js';
 import { BAccordion } from 'bootstrap-vue-next';
 
@@ -27,12 +28,19 @@ export default {
   components: {
     Provider: defineAsyncComponent(() => import('./Provider.vue')),
     BAccordion,
-    ProviderRoles
+    ProviderRoles,
+    SectionHeading
   },
   props: {
     providers: {
       type: Array,
       required: true
+    },
+    // Stable anchor id for the heading, e.g. "providers".
+    // Leave empty where the component renders more than once per page.
+    id: {
+      type: String,
+      default: null
     }
   },
   computed: {

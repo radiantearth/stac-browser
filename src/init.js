@@ -18,7 +18,11 @@ export default function init() {
       history: CONFIG.historyMode === 'history' ? createWebHistory(CONFIG.pathPrefix) : createWebHashHistory(CONFIG.pathPrefix),
       routes: getRoutes(CONFIG),
       scrollBehavior: (to, from, savedPosition) => {
-        if (to.path !== from.path) {
+        if (to.hash) {
+          // E.g. section anchors such as #assets (see SectionHeading.vue)
+          return { el: to.hash };
+        }
+        else if (to.path !== from.path) {
           return { left: 0, top: 0 };
         }
         else {

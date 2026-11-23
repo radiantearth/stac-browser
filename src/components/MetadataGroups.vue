@@ -1,11 +1,12 @@
 <template>
   <section v-if="formattedData.length > 0" class="metadata">
-    <component :is="headerTag" v-if="title">{{ titleText }}</component>
+    <SectionHeading v-if="title" :tag="headerTag" :id="id">{{ titleText }}</SectionHeading>
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup
         v-for="group in formattedData"
         :key="group.extension"
         v-bind="group"
+        :anchorPrefix="id ? `${id}-` : null"
       />
     </b-card-group>
   </section>
@@ -25,6 +26,7 @@ import {
 } from "@radiantearth/stac-fields";
 import StacFieldsMixin from './StacFieldsMixin';
 import MetadataGroup from "./metadata/MetadataGroup.vue";
+import SectionHeading from "./SectionHeading.vue";
 import { isoDuration } from "@musement/iso-duration";
 import { mapState } from "vuex";
 // Register custom fields for the metadata rendering
@@ -36,6 +38,7 @@ export default {
   components: {
     BCardGroup,
     MetadataGroup,
+    SectionHeading
   },
   mixins: [
     StacFieldsMixin({}),
@@ -56,6 +59,13 @@ export default {
     title: {
       type: [Boolean, String],
       default: true,
+    },
+    // Stable anchor id for the heading, e.g. "metadata".
+    // Leave empty where the component renders more than once per page;
+    // the per-extension groups only get anchors when an id is given.
+    id: {
+      type: String,
+      default: null,
     },
     headerTag: {
       type: String,
