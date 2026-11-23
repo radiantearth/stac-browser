@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Widget hooks for assets (`asset-start`, `asset-actions-end`, `asset-end`), widgets in these hooks receive the asset. Widgets should set `inheritAttrs: false`, see the [widget docs](docs/widgets.md).
 - Widget hook `view-catalog-intro-end` after the description of catalogs and collections
 - Dates can be typed into the date pickers
+- Metadata rendering for the Machine Learning Model (MLM) and Version Control System (VCS) extensions
 
 ### Changed
 
@@ -24,9 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Widgets in different hooks don't replace each other anymore (e.g. custom components without an `id`)
 - Item asset definitions in collections show the asset key and don't render an empty box anymore
 - Date pickers show seconds in the time picker again
-- Date filter: the first and last day of a temporal extent can be selected in all time zones
 - Date pickers send times that fall into a daylight saving time change of the local time zone correctly
+- Date filter: the first and last day of a temporal extent can be selected in all time zones
 - CQL2 filters: Strings with apostrophes or backslashes, negated filters, property names that need quotes and `between` in cql2-json are written correctly, incomplete filters are skipped
+- English (UK): Some texts used American instead of British spelling
 
 ## [5.2.0] - 2026-11-09
 
