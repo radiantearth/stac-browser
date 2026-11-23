@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for the [STAC API - Children extension](https://github.com/stac-api-extensions/children)
+- New config option `apiItemPriority` to only show items from either the items endpoint or the item links
 - New config option `basemaps` to customize the basemaps via JSON without code changes,
   e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
 - Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:
@@ -16,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML
+
+### Changed
+
+- The children (from the `child` links) and the collections (from the `/collections` endpoint) of an entity are shown as two separate lists by default.
+  The new config option `mergeCatalogsAndCollections` restores the previous merged display.
+- Items from the item links and the items endpoint are combined and deduplicated,
+  previously the item links were only used when the items endpoint returned nothing
+- Entities loaded from list endpoints (children, collections, items) are reloaded
+  from their self link when opened, as the lists may contain reduced entities
 
 ### Removed
 
