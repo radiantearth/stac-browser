@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.1] - 2026-11-23
+
 ### Added
 
 - Widget hooks for assets (`asset-start`, `asset-actions-end`, `asset-end`), widgets in these hooks receive the asset. Widgets should set `inheritAttrs: false`, see the [widget docs](docs/widgets.md).
 - Widget hook `view-catalog-intro-end` after the description of catalogs and collections
 - Dates can be typed into the date pickers
+
+### Changed
+
+- Updated dependencies and translations
 
 ### Fixed
 
@@ -20,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Date pickers show seconds in the time picker again
 - Date filter: the first and last day of a temporal extent can be selected in all time zones
 - Date pickers send times that fall into a daylight saving time change of the local time zone correctly
+- CQL2 filters: Strings with apostrophes or backslashes, negated filters, property names that need quotes and `between` in cql2-json are written correctly, incomplete filters are skipped
 
 ## [5.2.0] - 2026-11-09
 
@@ -369,7 +376,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.2.0...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.2.1...HEAD
+[5.2.1]: https://github.com/radiantearth/stac-browser/compare/v5.2.0...v5.2.1
 [5.2.0]: https://github.com/radiantearth/stac-browser/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/radiantearth/stac-browser/compare/v5.1.0-rc.1...v5.1.0
 [5.1.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...v5.1.0-rc.1
