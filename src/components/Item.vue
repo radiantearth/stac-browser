@@ -4,6 +4,7 @@
       <AuthImage v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     </div>
     <b-card-body>
+      <b-card-text v-if="showStacIdsInItemCards"><small class="stac-id" v-html="stacId" /></b-card-text>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
@@ -60,7 +61,7 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(['showKeywordsInItemCards']),
+    ...mapState(['showKeywordsInItemCards', 'showStacIdsInItemCards']),
     ...mapGetters(['getStac']),
     data() {
       return this.getStac(this.item);
@@ -88,6 +89,9 @@ export default defineComponent({
       else {
         return this.$t('items.noTime');
       }
+    },
+    stacId() {
+      return this.data?.id;
     },
   },
   methods: {

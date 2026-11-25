@@ -4,6 +4,7 @@
       <AuthImage v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     </div>
     <b-card-body>
+      <b-card-text v-if="showStacIdsInCatalogCards"><small class="stac-id" v-html="stacId" /></b-card-text>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
@@ -69,7 +70,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['omitTimeForMidnight', 'showKeywordsInCatalogCards']),
+    ...mapState(['omitTimeForMidnight', 'showKeywordsInCatalogCards', 'showStacIdsInCatalogCards']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -97,7 +98,10 @@ export default {
         }
       }
       return null;
-    }
+    },
+    stacId() {
+      return this.data?.id;
+    },
   },
   methods: {
     load(visible) {
