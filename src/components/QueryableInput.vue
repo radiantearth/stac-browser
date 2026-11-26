@@ -97,7 +97,7 @@
       <VueDatePicker
         v-else-if="queryable.isTemporal && operator.SYMBOL !== 'like'"
         class="value"
-        :model-value="value.value"
+        :model-value="value.raw"
         @update:model-value="updateValue"
         v-bind="datepickerProps"
       />
@@ -243,12 +243,11 @@ export default {
       };
     },
     listValues() {
-      return this.value?.value || [];
+      return this.value?.raw || [];
     },
     arrayValues: {
       get() {
-        const arr = this.value?.value || [];
-        return arr.map(v => String(v));
+        return this.listValues.map(v => String(v));
       },
       set(newValues) {
         this.updateValue(newValues.map(v => this.castArrayItem(v)));
@@ -312,7 +311,7 @@ export default {
         return;
       }
       const value = this.castArrayItem(tag);
-      const currentArr = this.value?.value || [];
+      const currentArr = this.listValues;
       this.updateValue([...currentArr, value]);
     },
     onArrayPaste(event) {
@@ -325,7 +324,7 @@ export default {
         return;
       }
       event.preventDefault();
-      const currentArr = this.value?.value || [];
+      const currentArr = this.listValues;
       const items = pasted.split(',')
         .map(s => s.trim())
         .filter(s => s !== '')

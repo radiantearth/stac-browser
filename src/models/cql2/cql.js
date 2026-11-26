@@ -13,7 +13,7 @@ export function isCompleteFilter(row) {
     return false;
   }
   if (Array.isArray(row.value?.value)) {
-    const list = row.value.value;
+    const list = row.value.raw;
     return list.every(hasValue) && (list.length > 0 || row.operator?.SYMBOL !== 'in');
   }
   return true;

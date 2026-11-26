@@ -1,42 +1,32 @@
 import CqlValue from "../value";
 
-export default class CqlOperator {
+function valueType() {
+  return CqlValue;
+}
 
-  constructor(operator, args = []) {
-    this.operator = operator;
-    this.args = args;
-  }
+function getDefaultValue(queryable) {
+  return CqlValue.create(queryable.defaultValue);
+}
 
-  toText() {
-    let op = this.operator.toUpperCase();
-    return this.args.map(arg => arg.toText()).join(` ${op} `);
-  }
+// Adds what the search form needs to an operator class of the CQL2 library
+export default function withFormSupport(Operator) {
+  return class extends Operator {
 
-  toJSON() {
-    return {
-      op: this.operator,
-      args: this.args.map(arg => arg.toJSON())
-    };
-  }
+    static valueType = valueType;
 
-  static get description() {
-    return "";
-  }
+    static getDefaultValue = getDefaultValue;
 
-  static get label() {
-    return this.SYMBOL;
-  }
+    static get description() {
+      return "";
+    }
 
-  static get longLabel() {
-    return this.label;
-  }
+    static get label() {
+      return this.SYMBOL;
+    }
 
-  static valueType() {
-    return CqlValue;
-  }
+    static get longLabel() {
+      return this.label;
+    }
 
-  static getDefaultValue(queryable) {
-    return CqlValue.create(queryable.defaultValue);
-  }
-
+  };
 }

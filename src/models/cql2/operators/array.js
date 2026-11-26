@@ -1,50 +1,22 @@
+import * as Base from '@moregeo-it/cql2';
 import i18n from '../../../i18n.js';
 import CqlValue, { CqlArray } from '../value.js';
-import CqlOperator from './operator';
+import withFormSupport from './operator.js';
 
-export default class CqlArrayOperator extends CqlOperator {
+function valueType() {
+  return CqlArray;
+}
 
-  constructor(operator, pred = null, obj = null) {
-    super(operator, [pred, obj]);
-  }
-
-  static create(pred, op, obj) {
-    switch(op.toLowerCase()) {
-      case 'in':
-        return new CqlIn(pred, obj);
-      case 'a_overlaps':
-        return new CqlArrayOverlaps(pred, obj);
-      case 'a_contains':
-        return new CqlArrayContains(pred, obj);
-      case 'a_equals':
-        return new CqlArrayEquals(pred, obj);
-      case 'a_containedby':
-        return new CqlArrayContainedBy(pred, obj);
-    }
-  }
-
-  toText() {
-    return `${this.operator}(${this.args.map(arg => arg.toText()).join(', ')})`;
-  }
-
-  static valueType() {
-    return CqlArray;
-  }
-
-  static getDefaultValue() {
-    return CqlValue.create([]);
-  }
-
+function getDefaultValue() {
+  return CqlValue.create([]);
 }
 
 // Currently only implemented for strings, numbers and time instances, not for booleans
-export class CqlIn extends CqlArrayOperator {
+export class CqlIn extends withFormSupport(Base.CqlIn) {
 
-  static SYMBOL = "in";
+  static valueType = valueType;
 
-  constructor(pred = null, obj = []) {
-    super(CqlIn.SYMBOL, pred, obj);
-  }
+  static getDefaultValue = getDefaultValue;
 
   static get label() {
     return "∈";
@@ -58,19 +30,13 @@ export class CqlIn extends CqlArrayOperator {
     return i18n.global.t('search.inOperatorDescription');
   }
 
-  toText() {
-    return `${this.args[0].toText()} IN ${this.args[1].toText()}`;
-  }
-
 }
 
-export class CqlArrayOverlaps extends CqlArrayOperator {
+export class CqlArrayOverlaps extends withFormSupport(Base.CqlArrayOverlaps) {
 
-  static SYMBOL = 'a_overlaps';
+  static valueType = valueType;
 
-  constructor(pred = null, obj = null) {
-    super(CqlArrayOverlaps.SYMBOL, pred, obj);
-  }
+  static getDefaultValue = getDefaultValue;
 
   static get label() {
     return '∩';
@@ -86,13 +52,11 @@ export class CqlArrayOverlaps extends CqlArrayOperator {
 
 }
 
-export class CqlArrayContains extends CqlArrayOperator {
+export class CqlArrayContains extends withFormSupport(Base.CqlArrayContains) {
 
-  static SYMBOL = 'a_contains';
+  static valueType = valueType;
 
-  constructor(pred = null, obj = null) {
-    super(CqlArrayContains.SYMBOL, pred, obj);
-  }
+  static getDefaultValue = getDefaultValue;
 
   static get label() {
     return '⊇';
@@ -108,13 +72,11 @@ export class CqlArrayContains extends CqlArrayOperator {
 
 }
 
-export class CqlArrayEquals extends CqlArrayOperator {
+export class CqlArrayEquals extends withFormSupport(Base.CqlArrayEquals) {
 
-  static SYMBOL = 'a_equals';
+  static valueType = valueType;
 
-  constructor(pred = null, obj = null) {
-    super(CqlArrayEquals.SYMBOL, pred, obj);
-  }
+  static getDefaultValue = getDefaultValue;
 
   static get label() {
     return '≡';
@@ -130,13 +92,11 @@ export class CqlArrayEquals extends CqlArrayOperator {
 
 }
 
-export class CqlArrayContainedBy extends CqlArrayOperator {
+export class CqlArrayContainedBy extends withFormSupport(Base.CqlArrayContainedBy) {
 
-  static SYMBOL = 'a_containedBy';
+  static valueType = valueType;
 
-  constructor(pred = null, obj = null) {
-    super(CqlArrayContainedBy.SYMBOL, pred, obj);
-  }
+  static getDefaultValue = getDefaultValue;
 
   static get label() {
     return '⊆';
