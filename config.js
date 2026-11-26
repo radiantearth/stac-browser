@@ -52,7 +52,7 @@ export default {
   defaultItemSort: null,
   showKeywordsInItemCards: false,
   showKeywordsInCatalogCards: false,
-  showStacIdsForItems: false,
+  showStacIdsForCatalogs: false,
   showStacIdsForCollections: false,
   preferredAssets: true,
   showThumbnailsAsAssets: false,

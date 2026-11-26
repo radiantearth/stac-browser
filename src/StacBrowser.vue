@@ -184,7 +184,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url', 'showStacIdsForItems', 'showStacIdsForCollections']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
     ...mapState({
       allowExternalAccessFromVueX: 'allowExternalAccess',
       showFavoritesFromVueX: 'showFavorites',
@@ -303,7 +303,9 @@ export default defineComponent({
       return Utils.getIcon(this.data);
     },
     stacIdVisible() {
-      return this.$route.name === 'browse' && ((this.showStacIdsForCollections && this.data?.isCollection) || (this.showStacIdsForItems && this.data?.isItem));
+      return this.$route.name === 'browse'
+        && ((this.showStacIdsForCatalogs && this.data?.isCatalog) || (this.showStacIdsForCollections && this.data?.isCollection))
+        && this.data?.title != undefined;
     },
     stacId() {
       return this.data?.id;

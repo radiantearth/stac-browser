@@ -118,7 +118,7 @@
     "showKeywordsInCatalogCards": {
       "type": "boolean"
     },
-    "showStacIdsForItems": {
+    "showStacIdsForCatalogs": {
       "type": "boolean"
     },
     "showStacIdsForCollections": {

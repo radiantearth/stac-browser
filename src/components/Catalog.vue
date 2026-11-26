@@ -70,7 +70,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['omitTimeForMidnight', 'showKeywordsInCatalogCards', 'showStacIdsForCollections']),
+    ...mapState(['omitTimeForMidnight', 'showKeywordsInCatalogCards', 'showStacIdsForCatalogs', 'showStacIdsForCollections']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -100,7 +100,8 @@ export default {
       return null;
     },
     stacIdVisible() {
-      return this.showStacIdsForCollections && this.data?.isCollection;
+      return ((this.showStacIdsForCatalogs && this.data?.isCatalog) || (this.showStacIdsForCollections && this.data?.isCollection))
+        && this.data?.title != null;
     },
     stacId() {
       return this.data?.id;
