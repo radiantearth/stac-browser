@@ -112,6 +112,12 @@
     "defaultItemSort": {
       "type": ["string", "null"]
     },
+    "showKeywordsInItemCards": {
+      "type": "boolean"
+    },
+    "showKeywordsInCatalogCards": {
+      "type": "boolean"
+    },
     "defaultCollectionSort": {
       "type": ["string", "null"]
     },

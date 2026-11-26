@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `showKeywordsInItemCards` and `showKeywordsInCatalogCards` are read as booleans when set via environment variables or CLI parameters
+
 ## [5.2.1] - 2026-11-23
 
 ### Added
