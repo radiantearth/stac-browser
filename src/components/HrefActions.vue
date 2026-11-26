@@ -52,11 +52,11 @@ import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
 import AuthUtils from './auth/utils';
 import { browserProtocols } from 'stac-js/src/http';
-import { imageMediaTypes, geojsonMediaType, svgMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
+import { copcMediaTypes, imageMediaTypes, geojsonMediaType, svgMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
 import { getGeoZarrSourceOptionsFromAsset, getWebMapLinks } from 'ol-stac/util.js';
 
 const disableDownloadTypes = [...zarrMediaTypes];
-const mapTypes = imageMediaTypes.concat([geojsonMediaType]).concat(wozMediaTypes);
+const mapTypes = imageMediaTypes.concat([geojsonMediaType]).concat(wozMediaTypes).concat(copcMediaTypes);
 
 let i = 0;
 
