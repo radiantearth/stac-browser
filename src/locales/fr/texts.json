@@ -16,6 +16,7 @@
       "withSource": "Copier le  lien de {source}"
     },
     "currentlyShown": "Ceci est la ressource actuellement affichée.",
+    "definition": "Les éléments fournissent cette ressource avec la clé {key}. Des éléments peuvent ne pas inclure cette ressource.",
     "download": {
       "generic": "Télécharger",
       "withSource": "Télécharger à partir de {source}"
