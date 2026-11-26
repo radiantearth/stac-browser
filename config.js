@@ -52,6 +52,8 @@ export default {
   defaultItemSort: null,
   showKeywordsInItemCards: false,
   showKeywordsInCatalogCards: false,
+  showStacIdsForItems: false,
+  showStacIdsForCollections: false,
   preferredAssets: true,
   showThumbnailsAsAssets: false,
   searchResultsPerPage: null,

@@ -57,7 +57,10 @@
         <b-col md="12">
           <div class="title">
             <AuthImage v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon" />
-            <h1 :title="title">{{ title }}</h1>
+            <h1 :title="title">
+              <small v-if="stacIdVisible" class="d-block stac-id fs-6" v-html="stacId" />
+              {{ title }}
+            </h1>
           </div>
           <nav class="actions navigation">
             <b-button-group>
@@ -181,7 +184,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url', 'showStacIdsForItems', 'showStacIdsForCollections']),
     ...mapState({
       allowExternalAccessFromVueX: 'allowExternalAccess',
       showFavoritesFromVueX: 'showFavorites',
@@ -298,7 +301,13 @@ export default defineComponent({
     },
     icon() {
       return Utils.getIcon(this.data);
-    }
+    },
+    stacIdVisible() {
+      return this.$route.name === 'browse' && ((this.showStacIdsForCollections && this.data?.isCollection) || (this.showStacIdsForItems && this.data?.isItem));
+    },
+    stacId() {
+      return this.data?.id;
+    },
   },
   watch: {
     ...Watchers,

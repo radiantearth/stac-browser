@@ -387,6 +387,10 @@ svg {
     max-height: 1.2em;
   }
 
+  .stac-id {
+    color: $secondary;
+  }
+
   .global-error {
     position: fixed;
     bottom: 0;
