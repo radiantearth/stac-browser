@@ -58,7 +58,7 @@
           <div class="title">
             <AuthImage v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon" />
             <h1 :title="title">
-              <small v-if="stacIdVisible" class="d-block stac-id fs-6" v-html="stacId" />
+              <small v-if="stacIdVisible" class="d-block stac-id fs-6">{{ stacId }}</small>
               {{ title }}
             </h1>
           </div>

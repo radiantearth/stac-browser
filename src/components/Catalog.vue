@@ -4,7 +4,7 @@
       <AuthImage v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     </div>
     <b-card-body>
-      <b-card-text v-if="stacIdVisible"><small class="stac-id" v-html="stacId" /></b-card-text>
+      <b-card-text v-if="stacIdVisible"><small class="stac-id">{{ stacId }}</small></b-card-text>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>

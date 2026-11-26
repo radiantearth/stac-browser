@@ -93,8 +93,8 @@ The override order for the configuration is:
   - [showFavorites](#showfavorites)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
-  - [showStacIdsInItemCards](#showstacidsinitemcards)
-  - [showStacIdsInCatalogCards](#showstacidsincatalogcards)
+  - [showStacIdsForItems](#showstacidsforitems)
+  - [showStacIdsForCollections](#showstacidsforcollections)
   - [defaultThumbnailSize](#defaultthumbnailsize)
 - [Metadata Retrieval](#metadata-retrieval)
   - [searchResultsPerPage](#searchresultsperpage)
@@ -657,7 +657,7 @@ Enables display of stac IDs before the title for items if set to `true`. Useful 
 
 ### showStacIdsForCollections
 
-Enables display of stac IDs before the title for collections if set to `true`. Useful when IDs are meaningful for end users. Catalogs ar not affected. Defaults to `false`.
+Enables display of stac IDs before the title for collections if set to `true`. Useful when IDs are meaningful for end users. Catalogs are not affected. Defaults to `false`.
 
 ### defaultThumbnailSize
 
