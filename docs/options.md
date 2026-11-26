@@ -653,11 +653,11 @@ Enables keywords in the lists of catalogs/collections if set to `true`. Defaults
 
 ### showStacIdsForItems
 
-Enables display of stac IDs in the lists of items before the title if set to `true`. Useful when IDs are meaningful for end users. defaults to `false`.
+Enables display of stac IDs before the title for items if set to `true`. Useful when IDs are meaningful for end users. Defaults to `false`.
 
 ### showStacIdsForCollections
 
-Enables display of stac IDs in the lists of catalogs/collections before the title if set to `true`. Useful when IDs are meaningful for end users. defaults to `false`.
+Enables display of stac IDs before the title for collections if set to `true`. Useful when IDs are meaningful for end users. Catalogs ar not affected. Defaults to `false`.
 
 ### defaultThumbnailSize
 
