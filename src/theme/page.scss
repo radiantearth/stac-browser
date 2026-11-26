@@ -387,6 +387,10 @@ svg {
     max-height: 1.2em;
   }
 
+  .stac-id {
+    color: $secondary;
+  }
+
   .global-error {
     position: fixed;
     bottom: 0;
@@ -671,10 +675,6 @@ svg {
     }
 
     .datetime {
-      color: $secondary;
-    }
-
-    .stac-id {
       color: $secondary;
     }
   }
